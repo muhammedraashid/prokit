@@ -1,0 +1,21 @@
+.table-dark {
+    background-color: #343a40; /* Dark background */
+    color: #ffffff; /* White text */
+}
+
+.table-dark th {
+    background-color: #495057; /* Darker header background */
+    color: #ffffff; /* White text */
+}
+
+.table-dark tbody tr:hover {
+    background-color: #495057; /* Highlight row on hover */
+}
+
+.table-bordered {
+    border: 1px solid #dee2e6; /* Border for the table */
+}
+
+.table-bordered th, .table-bordered td {
+    border: 1px solid #dee2e6; /* Border for table cells */
+}

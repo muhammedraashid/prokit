@@ -1,0 +1,396 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active"><a href="{% url 'admin_products' %}">Products</a></li>
+<li class="breadcrumb-item active"><a href="{% url 'add_product' %}">Add Product</a></li>
+{%endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 800px;">
+    <!-- Category Selection -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="mb-0">Add New Product</h2>
+        </div>
+        <div class="card-body">
+            <form method="get" action="{% url 'add_product' %}" id="categoryForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="category">Category <span class="text-danger">*</span></label>
+                    <select 
+                        class="form-control" 
+                        id="category" 
+                        name="category" 
+                        required 
+                        onchange="document.getElementById('categoryForm').submit()">
+                        <option value="">Select Category</option>
+                        {% for category in categories %}
+                            {% if category.is_listed %}
+                                <option value="{{ category.id }}" 
+                                    {% if category.id|stringformat:"s" == category_id %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                            {% endif %}    
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Details Form -->
+    <form method="post" action="{% url 'add_product' %}" enctype="multipart/form-data" id="productForm" onsubmit="return validateForm()">
+        {% csrf_token %}
+        <input type="hidden" name="categoryId" value="{{ category_id }}">
+        
+        <!-- Basic Information Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">Basic Information</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="name">Product Name <span class="text-danger">*</span></label>
+                            <input type="text" 
+                                class="form-control" 
+                                id="name" 
+                                name="name" 
+                                placeholder="Enter product name" 
+                                required 
+                                maxlength="200">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="price">Price <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₹</span>
+                                </div>
+                                <input type="number" 
+                                    step="0.01" 
+                                    class="form-control" 
+                                    id="price" 
+                                    name="price" 
+                                    placeholder="0.00" 
+                                    min="0" 
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" 
+                        id="description" 
+                        name="description" 
+                        rows="3" 
+                        placeholder="Enter product description"
+                        maxlength="1000"></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="offer">Offer (%)</label>
+                            <input type="number" 
+                                step="0.01" 
+                                class="form-control" 
+                                id="offer" 
+                                name="offer" 
+                                placeholder="Discount percentage"
+                                min="0" 
+                                max="100">
+                        </div>
+                    </div>
+                  
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Brand </label>
+                                <select class="form-control" name="Brand" >
+                                    <option value="">Select Brand</option>
+                                    {% for brand in brands %}
+                                        <option value="{{ brand }}">{{ brand }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="custom-control custom-switch mt-4">
+                                <input type="checkbox" 
+                                    class="custom-control-input" 
+                                    id="is_listed" 
+                                    name="is_listed" 
+                                    checked>
+                                <label class="custom-control-label" for="is_listed">
+                                    List Product (Visible to customers)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Variants Section -->
+        <!-- Product Variants Section -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">Product Variants</h3>
+    </div>
+    <div class="card-body">
+        <div id="variantsContainer" style="display: block;">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Each variant requires:
+                <ul class="mb-0">
+                    <li>Size and Color selection</li>
+                    <li>At least 3 images </li>
+                    <li>Stock quantity</li>
+                </ul>
+            </div>
+
+            <div id="variantsList">
+                <!-- Single Variant Template -->
+                <div class="variant-item border rounded p-3 mb-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Size <span class="text-danger">*</span></label>
+                                <select class="form-control" name="size" required>
+                                    <option value="">Select size</option>
+                                    {% for size in sizes %}
+                                        <option value="{{ size }}">{{ size }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Color <span class="text-danger">*</span></label>
+                                <select class="form-control" name="color" required>
+                                    <option value="">Select color</option>
+                                    {% for color in colors %}
+                                        <option value="{{ color }}">{{ color }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Variant Images <span class="text-danger">*</span></label>
+                        <small class="text-secondary d-block mb-2">Upload at least 3 images</small>
+                        <div class="variant-images" id="variantImagesContainer">
+                            <!-- Initial Image Inputs (1-3) -->
+                            <div class="custom-file mb-3 styled-input">
+                                <input type="file" class="custom-file-input variant-image" id="imageInput1" name="image1[]" accept="image/*" required onchange="ProductVariants.handleFileSelect(this)">
+                                <label class="custom-file-label btn btn-outline-primary" for="imageInput1">Choose Image 1 (Required)</label>
+                                <img id="previewImage1" style="max-width: 100%; max-height: 150px; display: none;" class="mt-2"/>
+                            </div>
+                            <div class="custom-file mb-3 styled-input">
+                                <input type="file" class="custom-file-input variant-image" id="imageInput2" name="image2[]" accept="image/*" required onchange="ProductVariants.handleFileSelect(this)">
+                                <label class="custom-file-label btn btn-outline-primary" for="imageInput2">Choose Image 2 (Required)</label>
+                                <img id="previewImage2" style="max-width: 100%; max-height: 150px; display: none;" class="mt-2"/>
+                            </div>
+                            <div class="custom-file mb-3 styled-input">
+                                <input type="file" class="custom-file-input variant-image" id="imageInput3" name="image3[]" accept="image/*" required onchange="ProductVariants.handleFileSelect(this)">
+                                <label class="custom-file-label btn btn-outline-primary" for="imageInput3">Choose Image 3 (Required)</label>
+                                <img id="previewImage3" style="max-width: 100%; max-height: 150px; display: none;" class="mt-2"/>
+                            </div>
+                        </div>
+
+                        <!-- Container for Additional Image Cropping (Optional) -->
+                        <div id="cropContainer" style="display: none;">
+                            <img id="cropImage" style="max-width: 100%; max-height: 250px;">
+                            <button type="button" id="cropButton" onclick="ProductVariants.cropImage()" class="btn btn-outline-success mt-2">Save</button>
+                        </div>
+
+                        <!-- Button to Add More Images -->
+                        <button type="button" class="btn btn-primary mt-2" id="addImageButton" onclick="ProductVariants.addFileInput()">
+                            <i class="fas fa-plus-circle"></i> Add More Images
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Stock <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" name="stock" placeholder="Enter stock quantity" min="0" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <div class="text-right mb-4">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-save"></i> Save Product
+            </button>
+        </div>
+    </form>
+
+    {% if messages %}
+        <div class="alert alert-danger">
+            {% for message in messages %}
+                <div>{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+image
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script>
+    let fileInputCount = 3;
+
+    const ProductVariants = {
+        init() {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.setupExistingFileInputs();
+                if (document.querySelector('[name="categoryId"]').value) {
+                    document.getElementById('variantsContainer').style.display = 'block';
+                }
+            });
+        },
+
+        // Add new input field
+        
+        addFileInput() {
+            const container = document.getElementById('variantImagesContainer');
+            const newFileInputDiv = document.createElement('div');
+            newFileInputDiv.className = 'custom-file mb-3 styled-input';
+
+            const newInput = document.createElement('input');
+            newInput.type = 'file';
+            newInput.className = 'custom-file-input variant-image';
+            newInput.id = `imageInput${fileInputCount + 1}`;
+            newInput.name = `image${fileInputCount + 1}[]`;
+            newInput.accept = 'image/*';
+            newInput.onchange = function() { resetFileInputLabel(this); };
+
+            const newLabel = document.createElement('label');
+            newLabel.className = 'custom-file-label btn btn-outline-primary';
+            newLabel.setAttribute('for', newInput.id);
+            newLabel.textContent = `Choose Image ${fileInputCount + 1} (Optional)`;
+
+            newFileInputDiv.appendChild(newInput);
+            newFileInputDiv.appendChild(newLabel);
+            container.appendChild(newFileInputDiv);
+
+            fileInputCount++;
+            
+            this.setupExistingFileInputs();
+        },
+
+        /* resetFileInputLabel(input) {
+            const label = input.nextElementSibling;
+            const index = parseInt(input.name.match(/\d+/)[0]);
+
+            if (index >= 1 && index <= 3) {
+                label.textContent = `Choose image ${index} (Require)`;
+            } else {
+                label.textContent = `Choose image ${index} (Optional)`;
+            }
+        }, */
+
+
+        handleFileSelect(input) {
+            const files = input.files;
+            
+            if (files.length > 0) {
+                CropperModule.handleFileSelect(input, input.id); // Call cropping module function
+            } else {
+                this.resetFileInputLabel(input);
+            }
+        },
+
+        resetFileInputLabel(input) {
+            const label = input.nextElementSibling;
+            const index = parseInt(input.name.match(/\d+/)[0]); // Extract the index number from the input name
+
+            if (index >= 1 && index <= 3) {
+                label.textContent = `Choose image ${index} (Require)`;
+            } else {
+                label.textContent = `Choose image ${index} (Optional)`;
+            }
+        },
+
+        setupExistingFileInputs() {
+            document.querySelectorAll('.custom-file-input').forEach(input => {
+                input.addEventListener('change', (e) => this.handleFileSelect(e.target));
+            });
+        }
+    };
+
+    const CropperModule = {
+        cropper: null,
+        activeInputId: null,
+
+        handleFileSelect(input, inputId) {
+            this.activeInputId = inputId;
+            const file = input.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const cropContainer = document.getElementById('cropContainer');
+                    const cropImage = document.getElementById('cropImage');
+                    
+                    cropImage.src = e.target.result;
+                    cropContainer.style.display = 'block';
+
+                    // Initialize cropper
+                    if (this.cropper) this.cropper.destroy();
+                    this.cropper = new Cropper(cropImage, {
+                        aspectRatio: 1, // 1:1 aspect ratio
+                        viewMode: 1,
+                        dragMode:'crop',
+                        zoomable: true,
+                        cropBoxResizable: true,
+                        cropBoxMovable: true,
+                        crop: function(event) {
+                            // Optional: Handle crop events
+                            console.log(event.detail);
+                        }
+
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        },
+
+        saveCroppedImage() {
+            if (this.cropper) {
+                this.cropper.getCroppedCanvas().toBlob((blob) => {
+                    const file = new File([blob], "croppedImage.png", { type: "image/png" });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+
+                    // Set cropped image back to original input
+                    const input = document.getElementById(this.activeInputId);
+                    input.files = dataTransfer.files;
+
+                    // Hide and clean up crop container
+                    document.getElementById('cropContainer').style.display = 'none';
+                    this.cropper.destroy();
+                }, 'image/png');
+            }
+        }
+    };
+
+    // Event listener for the crop button
+    document.getElementById('cropButton').addEventListener('click', () => {
+        CropperModule.saveCroppedImage(); // Call save function from cropping module
+    });
+
+
+
+    // Initialize the ProductVariants module
+    ProductVariants.init();
+</script>
+
+
+{% endblock %}

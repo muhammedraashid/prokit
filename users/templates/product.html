@@ -1,0 +1,397 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Product - ProKit{% endblock %}
+
+{% block content %}
+ 
+    <main class="main">
+        <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+            <div class="container d-flex align-items-center">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="#">{{ category.name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+                </ol>
+
+                <!-- <nav class="product-pager ml-auto" aria-label="Product">
+                    <a class="product-pager-link product-pager-prev" href="#" aria-label="Previous" tabindex="-1">
+                        <i class="icon-angle-left"></i>
+                        <span>Prev</span>
+                    </a>
+
+                    <a class="product-pager-link product-pager-next" href="#" aria-label="Next" tabindex="-1">
+                        <span>Next</span>
+                        <i class="icon-angle-right"></i>
+                    </a>
+                </nav> -->
+            </div>
+        </nav>
+
+    <div class="page-content">
+        <div class="container">
+            <div class="product-details-top">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="product-gallery product-gallery-vertical">
+                            <div class="row">
+                                <!-- Main Image Section -->
+                                <figure class="product-main-image">
+                                    <img
+                                        id="product-zoom"
+                                        src="{{ images.first.image.url }}"
+                                        data-zoom-image="{% if image.image %}{{ image.image.url }}{% else %}{% static 'assets/images/default_product.png' %}{% endif %}"
+                                        alt=""{% if image.image %}{{ image.image.url }}{% else %}{% static 'assets/images/default_product.png' %}{% endif %}""
+                                    >
+                                    <a href="#" id="btn-product-gallery" class="btn-product-gallery">
+                                        <i class="icon-arrows"></i>
+                                    </a>
+                                </figure>
+
+                                <!-- Thumbnail Gallery -->
+                                <div id="product-zoom-gallery" class="product-image-gallery">
+                                    {% for image in images|slice:":4" %}
+                                    <a
+                                        class="product-gallery-item {% if forloop.first %}active{% endif %}"
+                                        href="#"
+                                        data-image="{{ image.image.url }}"
+                                        data-zoom-image="{{ image.image.url }}"
+                                    >
+                                        <img src="{{ image.image.url }}" alt="{{ product.name }} side view">
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="product-details">
+                            <h1 class="product-title">{{ product.name|capfirst }}</h1>
+
+                            <div class="ratings-container">
+                                <div class="ratings">
+                                    <div class="ratings-val"></div>
+                                </div>
+                                <a class="ratings-text" href="#" id="review-link">({{ reviews.count }} Reviews)</a>
+                            </div>
+
+                            <div class="product-price">₹{{ product.price }}</div>
+
+                            <div class="product-content">
+                                <p>{{ product.description }}</p>
+                            </div>
+
+                            <div class="details-filter-row details-row-size">
+                                <label>Color:</label>
+                                <div class="product-nav product-nav-thumbs">
+                                   {% for variant in product.variants.all %}
+                                    <a href="{% url 'user_product_view' variant.id %}" class="{% if v == variant %}active{% endif %}">
+                                    <img src="{{variant.images.first.image.url}}" alt="{{variant.images.first.image.url}}"style="width:50px;" >
+                                 </a>
+                                {% endfor %}
+                                   <!-- <img src="{{variant.images.first.image.url}}" alt="{{variant.images.first.image.url}}"style="width:40px;" > -->
+                                   <!-- <a href="#"><h5>{{varaint.color}}</h5></a> -->
+                                   
+                                    <!-- {% for v in product.variants.all %}
+                                    <a href="#" class="{% if v == variant %}active{% endif %}">
+                                        <img src="{{ v.color }}" alt="{{ v.color }}">
+                                    </a>
+                                    {% endfor %} -->
+                                </div>
+                            </div>
+
+                            <div class="details-filter-row details-row-size">
+                                <label for="size">Size:</label>
+                                <div class="select-custom">
+                                    <select name="size" id="size" class="form-control">
+                                        <option value="" selected>Select a size</option>
+                                        {% for size in variant.size %}
+                                        <option value="{{ size }}">{{ size|capfirst }}</option>
+                                       
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <!-- <a href="#" class="size-guide"><i class="icon-th-list"></i>size guide</a> -->
+                            </div>
+
+                            <div class="details-filter-row details-row-size">
+                                <label for="qty">Qty:</label>
+                                <div class="product-details-quantity">
+                                    <input type="number" id="qty" class="form-control" value="1" min="1" max="10" step="1" required>
+                                </div>
+                            </div>
+
+                            <div class="product-details-action">
+                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+
+                                <!-- <div class="details-action-wrapper">
+                                    <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+                                    <a href="#" class="btn-product btn-compare" title="Compare"><span>Add to Compare</span></a>
+                                </div> -->
+                            </div>
+
+                            <div class="product-details-footer">
+                                <div class="product-cat">
+                                    <span>Category:</span>
+                                    <a href="#">{{ category.name }}</a>
+
+                                </div>
+
+                                <div class="social-icons social-icons-sm">
+                                    <span class="social-label">Share:</span>
+                                    <a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
+                                    <a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
+                                    <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
+                                    <a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-details-tab">
+        <ul class="nav nav-pills justify-content-center" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="product-desc-link" data-toggle="tab" href="#product-desc-tab" role="tab" aria-controls="product-desc-tab" aria-selected="true">Description</a>
+            </li>
+            <!-- <li class="nav-item">
+                <a class="nav-link" id="product-info-link" data-toggle="tab" href="#product-info-tab" role="tab" aria-controls="product-info-tab" aria-selected="false">Additional information</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="product-shipping-link" data-toggle="tab" href="#product-shipping-tab" role="tab" aria-controls="product-shipping-tab" aria-selected="false">Shipping & Returns</a>
+            </li> -->
+            <li class="nav-item">
+                <a class="nav-link" id="product-review-link" data-toggle="tab" href="#product-review-tab" role="tab" aria-controls="product-review-tab" aria-selected="false">Reviews ({{ reviews.count }}0)</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="product-desc-tab" role="tabpanel" aria-labelledby="product-desc-link">
+                <div class="product-desc-content">
+                    <h3>Product Information</h3>
+                    <p>{{ product.description }}</p>
+                    <ul>
+                        <li>Nunc nec porttitor turpis. In eu risus enim. In vitae mollis elit.</li>
+                        <li>Vivamus finibus vel mauris ut vehicula.</li>
+                        <li>Nullam a magna porttitor, dictum risus nec, faucibus sapien.</li>
+                    </ul>
+                   
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="product-info-tab" role="tabpanel" aria-labelledby="product-info-link">
+                <div class="product-desc-content">
+                    <h3>Information</h3>
+                    <p>{{ product.information }}</p>
+
+                    <h3>Fabric & care</h3>
+                    <ul>
+                        <li>Faux suede fabric</li>
+                        <li>Gold tone metal hoop handles.</li>
+                        <li>RI branding</li>
+                        <li>Snake print trim interior</li>
+                        <li>Adjustable cross body strap</li>
+                        <li>Height: 31cm; Width: 32cm; Depth: 12cm; Handle Drop: 61cm</li>
+                    </ul>
+
+                    <h3>Size</h3>
+                    <p>One size</p>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="product-shipping-tab" role="tabpanel" aria-labelledby="product-shipping-link">
+                <div class="product-desc-content">
+                    <h3>Delivery & returns</h3>
+                    <p>We deliver to over 100 countries around the world. For full details of the delivery options we offer, please view our <a href="#">Delivery information</a><br>
+                        We hope you'll love every purchase, but if you ever need to return an item you can do so within a month of receipt. For full details of how to make a return, please view our <a href="#">Returns information</a></p>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="product-review-tab" role="tabpanel" aria-labelledby="product-review-link">
+                <div class="reviews">
+                    <h3>Reviews ({{ reviews.count }}0)</h3>
+                    <!-- {% for review in reviews %}
+                    <div class="review">
+                        <div class="row no-gutters">
+                            <div class="col-auto">
+                                <h4><a href="#">{{ review.user.username }}</a></h4>
+                                <div class="ratings-container">
+                                    <div class="ratings">
+                                        <div class="ratings-val" ></div>
+                                    </div>
+                                </div>
+                                <span class="review-date">{{ review.created_at|date:"d M Y" }}</span>
+                            </div>
+                            <div class="col">
+                                <h4>{{ review.title }}</h4>
+                                <div class="review-content">
+                                    <p>{{ review.body }}</p>
+                                </div>
+                                <div class="review-action">
+                                    <a href="#"><i class="icon-thumbs-up"></i>Helpful ({{ review.helpful_count }})</a>
+                                    <a href="#"><i class="icon-thumbs-down"></i>Unhelpful ({{ review.unhelpful_count }})</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %} -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="title text-center mb-4">You May Also Like</h2>
+
+    <div class="owl-carousel owl-simple carousel-equal-height carousel-with-shadow" data-toggle="owl" 
+     data-owl-options='{
+         "nav": false, 
+         "dots": true,
+         "margin": 20,
+         "loop": false,
+         "responsive": {
+             "0": {
+                 "items":1
+             },
+             "480": {
+                 "items":2
+             },
+             "768": {
+                 "items":3
+             },
+             "992": {
+                 "items":4
+             },
+             "1200": {
+                 "items":4,
+                 "nav": true,
+                 "dots": false
+             }
+         }
+     }'>
+    {% for product in related_products %}
+        <div class="product product-7 text-center">
+            <figure class="product-media">
+                {% if product in products.all|slice:':10' %}
+                <span class="product-label label-new">New</span>
+                {% elif product.variants.first.stock == 0 %}
+                <span class="product-label label-out">Out of Stock</span>
+                {% endif %}
+                {% if product.variants.first %}
+
+                {% if product.variants.first.images.first %}
+                    <a href="{% url 'user_product_view' product.variants.first.id %}">
+                        <img src="{{ product.variants.first.images.first.image.url }}" alt="{{ product.name }}" class="product-image">
+                    </a>
+                {% else %}
+                    <a href="{% url 'user_product_view' product.variants.first.id %}">
+                        <img src="{% static 'assets/static/default_product.jpg' %}" alt="{{ product.name }}" class="product-image">
+                    </a>
+                {% endif %}
+                {% else %}
+                    <span>Variant not available</span>
+                {% endif %}
+
+            
+                <div class="product-action">
+                    <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                </div>
+            </figure>
+            <div class="product-body">
+                <div class="product-cat">
+                    <a href="#">{{ product.category.name }}</a>
+                </div>
+                <div class="product-brand">
+                    <a href="#">{{ product.brand.name }}</a>
+                </div>
+
+                {% if product.variants.first %}
+                    <h3 class="product-title">
+                        <a href="{% url 'user_product_view' product.variants.first.id %}">{{ product.name }}</a>
+                    </h3>
+                {% else %}
+                    <h3 class="product-title">{{ product.name }}</h3>
+                {% endif %}        
+
+                <div class="product-price">${{ product.price }}</div>
+                <div class="ratings-container">
+                    <div class="ratings">
+                        <div class="ratings-val"></div>
+                    </div>
+                    <span class="ratings-text">({{ product.reviews.count }} Reviews)</span>
+                </div>
+                <div class="product-nav product-nav-thumbs">
+                    {% for variant in product.variants.all   %}
+                    <a href="#" class="{% if forloop.first %}active{% endif %}">
+                        <img src="{{ variant.images.first.image.url }}" alt="{{ product.name }} thumb">
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+</main>
+
+
+<script>
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        const mainImage = document.getElementById('product-zoom');
+        const galleryItems = document.querySelectorAll('.product-gallery-item');
+    
+        // Function to update the main image source and zoom image
+        function updateMainImage(imageSrc, zoomSrc) {
+            mainImage.src = imageSrc;
+            mainImage.setAttribute('data-zoom-image', zoomSrc);
+        }
+    
+        // Zoom effect that follows cursor
+        function zoomImage(e) {
+            const zoomLevel = 2; // Adjust zoom level as needed
+            const rect = mainImage.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+    
+            mainImage.style.transformOrigin = `${x}% ${y}%`;
+            mainImage.style.transform = `scale(${zoomLevel})`;
+        }
+    
+        // Zoom Effect on Hover
+        mainImage.addEventListener('mouseenter', function () {
+            mainImage.classList.add('zoomed');
+        });
+    
+        mainImage.addEventListener('mousemove', zoomImage);
+    
+        mainImage.addEventListener('mouseleave', function () {
+            mainImage.classList.remove('zoomed');
+            mainImage.style.transform = 'scale(1)';
+        });
+    
+        // Update Main Image on Thumbnail Click
+        galleryItems.forEach(item => {
+            item.addEventListener('click', function (e) {
+                e.preventDefault();
+    
+                // Remove 'active' class from all thumbnails
+                galleryItems.forEach(i => i.classList.remove('active'));
+    
+                // Add 'active' class to clicked thumbnail
+                this.classList.add('active');
+    
+                // Get new image source and zoom image
+                const newImageSrc = this.getAttribute('data-image');
+                const newZoomSrc = this.getAttribute('data-zoom-image');
+    
+                // Update the main image
+                updateMainImage(newImageSrc, newZoomSrc);
+            });
+        });
+    });
+    
+    </script>
+
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Users{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Users</li>
+{%endblock %}
+
+{% block content %}
+<h1>Users</h1>
+
+
+<table class="table table-dark table-striped table-hover table-bordered ">
+    <thead>
+        <tr style="color: aquamarine;">
+            <th scope="col">Username</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.first_name }}</td>
+            <td>{{ user.last_name }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+                <form method="post" action="{% url 'user_block_unblock' user.id %}">
+                    {% csrf_token %}
+                    {% if user.is_active %}
+                        <button type="submit" class="btn btn-danger btn-sm">Block</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-success btn-sm">Unblock</button>
+                    {% endif %}
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-center">No users found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>    
+</table>
+
+{% endblock %}
