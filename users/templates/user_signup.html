@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup Page</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #e3f2fd;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column; /* Allow for vertical stacking */
+    }
+    .h1 {
+      font-family: 'Protest Riot', sans-serif;
+      font-size: 4rem;
+      background: linear-gradient(45deg, #00c6ff, #0072ff, #d800ff);
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      margin-top: 20px; /* Reduced margin for better spacing */
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-control:focus {
+      box-shadow: none;
+      border-color: #293fa1; /* Change border color on focus */
+    }
+
+    .form-control {
+      border-color: #1c4dec; /* Change default border color */
+    }
+
+    .form-heading {
+      text-align: center;
+      font-size: 3rem;
+      margin-bottom: 20px;
+      color: #1d1b7a; /* Change heading color if needed */
+    }
+    .google-btn {
+      display: block;
+      align-items: center;
+      background-color: white;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-family: 'Roboto', Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #3c4043;
+      cursor: pointer;
+      transition: background-color 0.2s;
+  }
+  
+  .google-btn:hover {
+      background-color: #f8f9fa;
+      border-color: #dadce0;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .google-btn img {
+      width: 18px;
+      height: 18px;
+      margin-right: 8px;
+  }
+  </style>
+</head>
+<body>
+  <h1 class="form-heading">ProKit</h1> <!-- Moved outside the container -->
+  
+  <div class="container">
+    <h2 class="text-center mb-4">Sign Up</h2>
+    <form method="POST" action="{% url 'user_signup' %}">
+      {% csrf_token %}
+      {% if messages %}
+      <div class="error-message text-center">
+          {% for message in messages %}
+              <div>{{ message }}</div>
+          {% endfor %}
+      </div>
+      {% endif %}
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="firstName" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="firstName" name="firstName"  required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="lastName" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="lastName" name="lastName" required>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="userName" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 position-relative">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="col-md-6 position-relative">
+          <label for="confirmPassword" class="form-label">Confirm Password</label>
+          <input type="password" class="form-control" id="confirmPassword" name="coPassword" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary w-100 mt-4">Sign Up</button>
+    </form>
+  </div>
+     
+  <a class="google-btn container rounded" href="/accounts/login" >
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiLz48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ii8+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDLjkyIDE2LjQ2IDAgMjAuMTIgMCAyNGMwIDMuODguOTIgNy41NCAyLjU2IDEwLjc4bDcuOTctNi4xOXoiLz48cGF0aCBmaWxsPSIjMzRBODUzIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ii8+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiIvPjwvc3ZnPg==" alt="Google Logo">
+    Sign up with Google
+  </a>
+  
+  <a href="{% url 'user_signin' %}" style="margin: 20px; font-size: small;">Already have an account ?</a>
+  
+</body>
+</html>

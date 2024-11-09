@@ -1,0 +1,320 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - {% block title %}Panel{% endblock %}</title>
+
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+
+    <style>
+        /* Dark Cyan and Grey Theme */
+        body {
+            background-color: #18334d;
+            color: #d1d9e0;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent body scroll */
+        }
+
+        /* Fixed Top Navigation */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: #03353c;
+            color: #d1d9e0;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1030;
+        }
+
+        /* Main Container */
+        .wrapper {
+            display: flex;
+            height: calc(100vh - 60px);
+            margin-top: 60px;
+        }
+
+        /* Fixed Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 200px;
+            height: calc(100vh - 60px);
+            background-color: #1e474d;
+            padding-top: 20px;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            z-index: 1020;
+        }
+
+        /* Content Area */
+        .content-wrapper {
+            margin-left: 200px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #263440;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* Breadcrumb Styles */
+        .breadcrumb-container {
+            background-color: #334556;
+            padding: 10px 20px;
+            border-bottom: 1px solid #455a64;
+        }
+
+        .breadcrumb {
+            margin: 0;
+            background: transparent;
+        }
+
+        .breadcrumb-item a {
+            color: #90caf9;
+            text-decoration: none;
+            font-size: small;
+        }
+
+        .breadcrumb-item.active {
+            color: #d1d9e0;
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            color: #90caf9;
+        }
+
+        /* Scrollable Content Area */
+        .content {
+            margin-left: 20px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex-grow: 1;
+        }
+
+        /* Other existing styles */
+        .sidebar a {
+            color: #d1d9e0;
+            padding: 15px;
+            display: block;
+            text-decoration: none;
+            
+        }
+
+        .sidebar a:hover {
+            background-color: #046872;
+        }
+
+        .search-bar {
+            justify-content: space-between;
+            width: 40%;
+        }
+
+        .card {
+            background-color: #334556;
+            color: #d1d9e0;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .btn-logout {
+            background-color: transparent;
+            border: 2px solid #ee0707;
+            padding: 5px 10px;
+            color: #ee0707;
+            border-radius: 5px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+        }
+
+        .btn-logout:hover {
+            background-color: #ee0707;
+            color: white;
+        }
+
+        input.form-control {
+            background-color: #e0f7fa;
+            color: #006064;
+            border: 2px solid #006064;
+        }
+
+        input.form-control:focus {
+            background-color: #b2ebf2;
+            border-color: #004d40;
+            color: #004d40;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-250px);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .content-wrapper {
+                margin-left: 0;
+            }
+
+            .toggle-sidebar {
+                display: block;
+            }
+
+            .search-bar {
+                width: auto;
+            }
+        }
+
+        .toggle-sidebar {
+            display: none;
+        }
+
+        .styled-input {
+            position: relative;
+        }
+        
+        .custom-file-input {
+            position: absolute;
+            top: 0;
+            right: 0;
+            opacity: 0;
+            z-index: 2;
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+        }
+        
+        .custom-file-label {
+            width: 100%;
+            display: block;
+            padding: 0.375rem 1.5rem;
+            font-size: 1rem;
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .custom-file-label.btn-outline-primary {
+            color: #007bff;
+            border-color: #007bff;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .custom-file-label.btn-outline-primary:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+        
+        #addImageButton {
+            width: 100%;
+        }
+
+        #cropContainer { 
+            display: none;
+        } /* Hide crop container initially */
+
+        
+
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+        <div class="search-bar d-flex align-items-center">
+            <h2 class="text-white">ProKit</h2>
+            <div class="input-group" style="width: 300px;">
+                <input type="text" class="form-control" placeholder="{% if placeholder %}{{ placeholder }}{% else %}Search...{% endif %}">
+                <span class="input-group-text bg-dark text-white">
+                    <i class="fas fa-search"></i>
+                </span>
+            </div>
+        </div>
+        <div class="admin-info">
+            <a href="{% url 'admin_logout' %}" class="btn-logout">Logout</a>
+        </div>
+        <button class="btn btn-outline-light toggle-sidebar" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+
+    <div class="wrapper">
+        <!-- Side Navigation Bar -->
+        <div class="sidebar" id="sidebar">
+            <a href="{% url 'admin_dashboard' %}" {% if request.resolver_match.url_name == 'admin_dashboard' %}class="active"{% endif %}>
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="{% url 'admin_products' %}" {% if request.resolver_match.url_name == 'admin_products' %}class="active"{% endif %}>
+                <i class="fas fa-box"></i> Products
+            </a>
+            <a href="{% url 'admin_users' %}" {% if request.resolver_match.url_name == 'admin_users' %}class="active"{% endif %}>
+                <i class="fas fa-users"></i> Users
+            </a>
+            <a href="{% url 'admin_categories' %}" {% if request.resolver_match.url_name == 'admin_categories' %}class="active"{% endif %}>
+                <i class="fas fa-tags"></i> Categories
+            </a>
+            <a href="#"><i class="fas fa-shopping-cart"></i> Orders</a>
+            <a href="#"><i class="fas fa-ticket-alt"></i> Coupons</a>
+        </div>
+
+        <!-- Content Area with Breadcrumbs -->
+        <div class="content-wrapper">
+            <div class="breadcrumb-container">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+                        {% block breadcrumb %}
+                          <!-- Breadcrumbs -->
+                        {% endblock %}
+                    </ol>
+                </nav>
+            </div>
+            <div class="content">
+                {% block content %}
+                <!-- main content -->
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Sidebar Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('show');
+            });
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768) {
+                    if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
+                        sidebar.classList.remove('show');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

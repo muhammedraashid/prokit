@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Sign In</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #343a40; 
+            color: #ffffff;
+        }
+        .container {
+            margin-top: 100px;
+            background-color: #495057;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 30%;
+        }
+        .btn-cyan {
+            background-color: #17a2b8; 
+            color: #ffffff; 
+        }
+        .btn-cyan:hover {
+            background-color: #138496;
+        }
+        .form-control {
+            background-color: #6c757d; 
+            color: #ffffff;
+        }
+        .form-control:focus {
+            background-color: #6c757d; 
+            border-color: #17a2b8;
+            box-shadow: none; 
+        }
+        .error-message {
+            color: #ff0019;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" >
+        <h2 class="text-center">Admin Sign In</h2>
+        <form method="POST" action="{% url 'admin_signin' %}">
+            {% csrf_token %}
+            {% if messages %}
+                <div class="error-message text-center">
+                    {% for message in messages %}
+                        <div>{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-cyan btn-block">Sign In</button>
+        </form>
+        <div class="text-center mt-3">
+            <a href="#" class="text-light">Forgot Password?</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

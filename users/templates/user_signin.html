@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In Page</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #e3f2fd;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column; /* Allow for vertical stacking */
+    }
+    .form-heading {
+      text-align: center;
+      font-size: 3rem;
+      margin-bottom: 20px;
+      color: #1d1b7a; /* Change heading color if needed */
+    }
+    .container {
+      max-width: 600px;
+      margin-top: 20px; /* Reduced margin for better spacing */
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-control:focus {
+      box-shadow: none;
+      border-color: #293fa1; /* Change border color on focus */
+    }
+
+    .form-control {
+      border-color: #1c4dec; /* Change default border color */
+    }
+
+    .eye-icon {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      cursor: pointer;
+    }
+    
+    .forgot-password {
+      display: block;
+      margin-top: 10px;
+      text-align: right;
+    }
+    .google-btn {
+      display: block;
+      align-items: center;
+      background-color: white;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-family: 'Roboto', Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #3c4043;
+      cursor: pointer;
+      transition: background-color 0.2s;
+  }
+  
+  .google-btn:hover {
+      background-color: #f8f9fa;
+      border-color: #dadce0;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .google-btn img {
+      width: 18px;
+      height: 18px;
+      margin-right: 8px;
+  }
+  </style>
+</head>
+<body>
+  <h1 class="form-heading">ProKit</h1> <!-- Moved outside the container -->
+  
+  <div class="container">
+    <h2 class="text-center mb-4">Sign In</h2>
+    <form method="POST" action="{% url 'user_signin' %}">
+      {% csrf_token %}
+      
+      {% if messages %}
+        <div class="error-message text-center">
+              {% for message in messages %}
+                  <div>{{ message }}</div>
+              {% endfor %}
+        </div>
+      {% endif %}
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+      </div>
+      <div class="mb-3 position-relative">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="password" name="password" required>
+        <i class="fas fa-eye eye-icon mt-3" onclick="togglePassword('password')" style="color: #1d3ca1;"></i>
+      </div>
+      <a href="{% url 'initiate_password_reset' %}" class="forgot-password">forgot password?</a>
+      <button type="submit" class="btn btn-primary w-100  mt-4">Sign In</button>
+    </form>
+    
+  </div>
+    
+  <a href="/accounts/login" class="google-btn container rounded" role="button">
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiLz48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ii8+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDLjkyIDE2LjQ2IDAgMjAuMTIgMCAyNGMwIDMuODguOTIgNy41NCAyLjU2IDEwLjc4bDcuOTctNi4xOXoiLz48cGF0aCBmaWxsPSIjMzRBODUzIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ii8+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiIvPjwvc3ZnPg==" alt="Google Logo">
+    Sign in with Google
+  </a>
+  
+  
+  <a href="{% url 'user_signup' %}" style="margin: 20px; font-size: small;">Create an account</a>
+
+
+
+  <script>
+    function togglePassword(passwordFieldId) {
+      const passwordField = document.getElementById(passwordFieldId);
+      const eyeIcon = passwordField.nextElementSibling;
+      if (passwordField.type === "password") {
+        passwordField.type = "text";
+        eyeIcon.classList.remove("fa-eye");
+        eyeIcon.classList.add("fa-eye-slash");
+      } else {
+        passwordField.type = "password";
+        eyeIcon.classList.remove("fa-eye-slash");
+        eyeIcon.classList.add("fa-eye");
+      }
+    }
+  </script>
+</body>
+</html>

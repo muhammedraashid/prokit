@@ -1,0 +1,101 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Category List{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active"><a href="{% url 'admin_categories' %}">Categories</a></li>
+{%endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-light">Category List</h1>
+
+    <div class="row mb-3">
+        <div class="col">
+            <a onclick="addCategory()" class="btn btn-primary">Add New Category</a>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for category in categories %}
+        <div class="col-md-4">
+            <div class="card mb-4 bg-dark text-white">
+                <div class="card-body">
+                    <h5 class="card-title">{{ category.name }}</h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="ms-auto"> <!-- This pushes content to the right -->
+                            <a href="#" class="btn btn-primary py-1 me-2" onclick="openForm('{{category.name}}','{{category.id}}')">Edit</a>
+                            <form method="post" action="{% url 'category_list_unlist' category.id %}" class="d-inline mb-0">
+                                {% csrf_token %}
+                                {% if category.is_listed %}
+                                    <button type="submit" class="btn btn-danger btn-sm">Unlist</button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-success btn-sm">List</button>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <p class="text-light">No categories available.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="form-popup rounded" id="myForm" style="display: none; margin-left: 20px; justify-content: center; width: 40%;">
+    <form method="POST" class="form-container rounded" id="editCategory">
+        {% csrf_token %}
+        <label for="name"><b>Name</b></label>
+        <input type="text" name="name" id="categoryName" 
+               placeholder="{{ category.name }}" 
+               style="margin: 20px 0; border-radius: 8px; padding: 10px 20px; border: 1px solid #ccc; 
+                      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;">
+        <button type="submit" class="btn btn-outline-success me-2">Save</button>
+        <button type="button" class="btn btn-outline-danger" onclick="closeForm()">Close</button>
+    </form>
+</div>
+
+<div class="form-popup rounded" id="addForm" style="display: none; margin-left: 20px; justify-content: center; width: 40%;">
+    <form method="POST" class="form-container rounded" id="addCategory">
+        {% csrf_token %}
+        <label for="name"><b>Name</b></label>
+        <input type="text" name="name" id="categoryName" 
+               placeholder="Enter new category name" 
+               style="margin: 20px 0; border-radius: 8px; padding: 10px 20px; border: 1px solid #ccc; 
+                      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;">
+        <button type="submit" class="btn btn-outline-success me-2">Create</button>
+        <button type="button" class="btn btn-outline-danger" onclick="closeForm()">Close</button>
+    </form>
+</div>
+
+<script>
+    function openForm(categoryName,categoryId) { 
+      document.getElementById("myForm").style.display = "block";         
+      document.getElementById("categoryName").value = categoryName
+      form = document.getElementById("editCategory");
+      form.action = "{% url 'category_edit' category_id=0 %}".replace('0',categoryId)
+    }
+
+    function addCategory() { 
+        document.getElementById("addForm").style.display = "block";
+        document.getElementById("categoryName").value = ""
+        form = document.getElementById("addCategory");
+        form.action = "{% url 'category_add' %}"
+    }
+    
+    function closeForm() {
+      document.getElementById("myForm").style.display = "none";
+      document.getElementById("addForm").style.display = "none";
+    }
+
+    window.onload = function(){
+        document.getElementById("myForm").style.display = "none";
+        document.getElementById("addForm").style.display = "none";    
+    }
+</script>
+{% endblock %}

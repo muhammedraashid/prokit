@@ -1,0 +1,244 @@
+{% extends 'admin_panel/base.html' %}
+{% load static%}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active"><a href="{% url 'admin_products' %}">Products</a> </li>
+<li class="breadcrumb-item active">Add Variant </li>
+{%endblock %}
+
+{% block content %}
+ <h1>Add Variant Details</h1>
+ <div class="container mt-5 " style="width: 70%;">
+    <form method="POST" enctype="multipart/form-data"  >
+        {% csrf_token %}
+        <div id="variantsContainer">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Each variant requires:
+                <ul class="mb-0">
+                    <li>Size and Color selection</li>
+                    <li>At least 3 images</li>
+                    <li>Stock quantity</li>
+                </ul>
+            </div>
+    
+            <div id="variantsList">
+                <div class="variant-item border rounded p-3 mb-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Size <span class="text-danger">*</span></label>
+                                <select class="form-control" name="size" required>
+                                    <option value="">Select size</option>
+                                    {% for size in sizes %}
+                                        <option value="{{ size }}" {% if size == variant.size %}selected{% endif %}>{{ size }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Color <span class="text-danger">*</span></label>
+                                <select class="form-control" name="color" required>
+                                    <option value="">Select color</option>
+                                    {% for color in colors %}
+                                        <option value="{{ color }}" {% if color == variant.color %}selected{% endif %}>{{ color }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="form-group">
+                        <label>Stock <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" name="stock" value="{{ variant.stock }}" min="0" required>
+                    </div>
+    
+
+                        <label>Variant Images <span class="text-danger">*</span></label>
+                        <small class="text-secondary d-block mb-2">Upload at least 3 images</small>
+                        <div class="variant-images" id="variantImagesContainer">
+                            <!-- Initial Image Inputs (1-3) -->
+                            <div class="custom-file mb-3 styled-input">
+                                <input type="file" class="custom-file-input variant-image" id="imageInput1" name="image1[]" accept="image/*" required onchange="ProductVariants.handleFileSelect(this)">
+                                <label class="custom-file-label btn btn-outline-primary" for="imageInput1">Choose Image 1 (Required)</label>
+                                <img id="previewImage1" style="max-width: 100%; max-height: 150px; display: none;" class="mt-2"/>
+                            </div>
+                            <div class="custom-file mb-3 styled-input">
+                                <input type="file" class="custom-file-input variant-image" id="imageInput2" name="image2[]" accept="image/*" required onchange="ProductVariants.handleFileSelect(this)">
+                                <label class="custom-file-label btn btn-outline-primary" for="imageInput2">Choose Image 2 (Required)</label>
+                                <img id="previewImage2" style="max-width: 100%; max-height: 150px; display: none;" class="mt-2"/>
+                            </div>
+                            <div class="custom-file mb-3 styled-input">
+                                <input type="file" class="custom-file-input variant-image" id="imageInput3" name="image3[]" accept="image/*" required onchange="ProductVariants.handleFileSelect(this)">
+                                <label class="custom-file-label btn btn-outline-primary" for="imageInput3">Choose Image 3 (Required)</label>
+                                <img id="previewImage3" style="max-width: 100%; max-height: 150px; display: none;" class="mt-2"/>
+                            </div>
+                        </div>
+
+                        <!-- Container for Additional Image Cropping (Optional) -->
+                        <div id="cropContainer" style="display: none;">
+                            <img id="cropImage" style="max-width: 100%; max-height: 250px;">
+                            <button type="button" id="cropButton" onclick="ProductVariants.cropImage()" class="btn btn-outline-success mt-2">Save</button>
+                        </div>
+
+                        <!-- Button to Add More Images -->
+                        <button type="button" class="btn btn-primary mt-2" id="addImageButton" onclick="ProductVariants.addFileInput()">
+                            <i class="fas fa-plus-circle"></i> Add More Images
+                        </button>
+                    </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                </div> 
+            </div>
+        
+        </div> 
+    </form>
+      
+</div>    
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script>
+    let fileInputCount = 3;
+
+    const ProductVariants = {
+        init() {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.setupExistingFileInputs();
+                if (document.querySelector('[name="categoryId"]').value) {
+                    document.getElementById('variantsContainer').style.display = 'block';
+                }
+            });
+        },
+
+        // Add new input field
+        
+        addFileInput() {
+            const container = document.getElementById('variantImagesContainer');
+            const newFileInputDiv = document.createElement('div');
+            newFileInputDiv.className = 'custom-file mb-3 styled-input';
+
+            const newInput = document.createElement('input');
+            newInput.type = 'file';
+            newInput.className = 'custom-file-input variant-image';
+            newInput.id = `imageInput${fileInputCount + 1}`;
+            newInput.name = `image${fileInputCount + 1}[]`;
+            newInput.accept = 'image/*';
+            newInput.onchange = function() { resetFileInputLabel(this); };
+
+            const newLabel = document.createElement('label');
+            newLabel.className = 'custom-file-label btn btn-outline-primary';
+            newLabel.setAttribute('for', newInput.id);
+            newLabel.textContent = `Choose Image ${fileInputCount + 1} (Optional)`;
+
+            newFileInputDiv.appendChild(newInput);
+            newFileInputDiv.appendChild(newLabel);
+            container.appendChild(newFileInputDiv);
+
+            fileInputCount++;
+            
+            this.setupExistingFileInputs();
+        },
+
+       
+
+        handleFileSelect(input) {
+            const files = input.files;
+            
+            if (files.length > 0) {
+                CropperModule.handleFileSelect(input, input.id); // Call cropping module function
+            } else {
+                this.resetFileInputLabel(input);
+            }
+        },
+
+        resetFileInputLabel(input) {
+            const label = input.nextElementSibling;
+            const index = parseInt(input.name.match(/\d+/)[0]); // Extract the index number from the input name
+
+            if (index >= 1 && index <= 3) {
+                label.textContent = `Choose image ${index} (Require)`;
+            } else {
+                label.textContent = `Choose image ${index} (Optional)`;
+            }
+        },
+
+        setupExistingFileInputs() {
+            document.querySelectorAll('.custom-file-input').forEach(input => {
+                input.addEventListener('change', (e) => this.handleFileSelect(e.target));
+            });
+        }
+    };
+
+    const CropperModule = {
+        cropper: null,
+        activeInputId: null,
+
+        handleFileSelect(input, inputId) {
+            this.activeInputId = inputId;
+            const file = input.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const cropContainer = document.getElementById('cropContainer');
+                    const cropImage = document.getElementById('cropImage');
+                    
+                    cropImage.src = e.target.result;
+                    cropContainer.style.display = 'block';
+
+                    // Initialize cropper
+                    if (this.cropper) this.cropper.destroy();
+                    this.cropper = new Cropper(cropImage, {
+                        aspectRatio: 1, // 1:1 aspect ratio
+                        viewMode: 1,
+                        dragMode:'crop',
+                        zoomable: true,
+                        cropBoxResizable: true,
+                        cropBoxMovable: true,
+                        crop: function(event) {
+                            // Optional: Handle crop events
+                            console.log(event.detail);
+                        }
+
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        },
+
+        saveCroppedImage() {
+            if (this.cropper) {
+                this.cropper.getCroppedCanvas().toBlob((blob) => {
+                    const file = new File([blob], "croppedImage.png", { type: "image/png" });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+
+                    // Set cropped image back to original input
+                    const input = document.getElementById(this.activeInputId);
+                    input.files = dataTransfer.files;
+
+                    // Hide and clean up crop container
+                    document.getElementById('cropContainer').style.display = 'none';
+                    this.cropper.destroy();
+                }, 'image/png');
+            }
+        }
+    };
+
+    // Event listener for the crop button
+    document.getElementById('cropButton').addEventListener('click', () => {
+        CropperModule.saveCroppedImage(); // Call save function from cropping module
+    });
+
+
+
+    // Initialize the ProductVariants module
+    ProductVariants.init();
+</script>
+
+
+    
+{% endblock %}
