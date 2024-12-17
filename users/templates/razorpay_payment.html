@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Razorpay Payment
+{% endblock %}
+
+{% block content %}
+<div class="container mt-6 text-center" style="width: 600px;">
+    <div class="card shadow-lg">
+        <div class="card-header text-center">
+            <h4 style="margin-left: 23%;">Complete Your Payment</h4>
+        </div>
+        <div class="card-body" >
+            <p class="text-center text-success">You are about to pay <strong>₹{{ amount }}</strong> using Razorpay.</p>
+            <p class="text-center text-primary">Selected Address: {{ selected_address.street_address }}</p>
+            <hr>
+
+            <!-- Razorpay Payment Form -->
+            <form id="razorpay-form rounded " method="POST" action="{% url 'verify_payment' %}">
+                {% csrf_token %}
+                <input type="hidden" name="order_id" value="{{ razorpay_order_id }}">
+                <input type="hidden" name="address_id" value="{{ selected_address.id }}">
+                <input type="hidden" name="amount" value="{{ amount }}">
+                <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+                <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+                
+                <script src="https://checkout.razorpay.com/v1/checkout.js"
+                    data-key="{{ razorpay_key_id }}"
+                    data-amount="{{ amount|floatformat:2|default_if_none:0|floatformat:0 }}00"
+                    data-currency="INR"
+                    data-order_id="{{ razorpay_order_id }}"
+                    data-buttontext="Pay ₹{{ amount }}"
+                    data-name="Your Store Name"
+                    data-description="Order Payment"
+                    data-image="https://example.com/logo.png"
+                    data-theme.color= "#837u39"
+                    >
+                </script>
+                <!-- <input type="submit" class="btn btn-success rounded" value="Pay ₹ {{amount}}" class="razorpay-payment-button"> -->
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const razorpayForm = document.getElementById('razorpay-form');
+    razorpayForm.onsubmit = function(e) {
+        e.preventDefault();
+        const razorpayCheckout = new Razorpay({
+            key: "{{ razorpay_key_id }}",
+            order_id: "{{ razorpay_order_id }}",
+            amount: "{{ amount|floatformat:2|default_if_none:0|floatformat:0 }}00",
+            currency: "INR",
+            handler: function (response) {
+                // Custom payment success handler
+                console.log("Payment successful! Payment ID: " + response.razorpay_payment_id);
+                document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                razorpayForm.submit();  // Submit the form to the backend
+            },
+            theme: {
+                color: "#3399cc"
+            }
+        });
+        razorpayCheckout.open();
+    };
+</script>
+{% endblock %}

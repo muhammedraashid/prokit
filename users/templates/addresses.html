@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Product - ProKit{% endblock %}
+
+{% block content %}
+
+
+
+    <nav aria-label="breadcrumb" class="breadcrumb-nav" style="margin: 0px;">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'user_account' %}">Account</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Addresses</li>
+            </ol>
+        </div><!-- End .container -->
+    </nav><!-- End .breadcrumb-nav -->
+    <main class="main" style="background-color: rgb(237, 244, 244);padding-block: 5%;">
+
+    <div class="container" style="margin-top: -30px;">
+      <div class="card">
+        <div class="card-header" >
+          <div class="card-title">Addresses</div>
+          <button class="btn btn-success  rounded" style="margin-left: 70%; width:25%" onclick="AddAddress()">  <i class="fa fa-plus-circle "></i> Add New Address</button>
+        </div>
+        
+        <div class="card-content">
+          {% for address in addresses %}
+          <div class="address-item">
+            <div class="address-item-details">
+              <div class="address-item-type">
+                <span>{{address.address_type}}</span>
+                {% if address.is_default %}
+                <span class="default-tag">Default</span>
+                {% endif %}
+              </div>
+              <div class="address-item-address">
+                {{ address.name }} - {{ address.street_address }} |{{ address.pincode }} <br>
+                {{ address.city }} , {{ address.state }} , {{ address.country }}<br>
+                {{address.phone}} | {{ address.email }}
+              </div>
+            </div>
+            <div class="address-item-actions">
+              <button class="btn btn-outline rounded " onclick="editAddress('{{address.address_type}}','{{address.name}}','{{address.street_address}}','{{address.pincode}}','{{address.phone}}','{{address.email}}','{{address.is_default}}','{{address.id}}')"><i class="fa fa-edit"></i>Edit</button>
+              <form method="POST" action="{% url 'delete_address' address.id %}" style="display:inline;" onsubmit="return confirmDelete()">  
+                {% csrf_token %}
+                <button type="submit" name="delete_address" class="btn btn-outline-danger mx-3"><i class="fa fa-trash"></i>Delete</button>
+              </form> 
+            </div>
+          </div>
+          {% endfor %}
+          
+          
+        </div>
+      </div>
+
+      {% if messages %}
+      <div class="error-message text-center">
+          {% for message in messages %}
+              <div>{{ message }}</div>
+          {% endfor %}
+      </div>
+     {% endif %}
+      
+     <!-- add-address field -->
+      <div class="card" id="addAddress">
+        <div class="card-header">
+          <div class="card-title">Add New Address</div>
+        </div>
+        <div class="card-content">
+          <form method="POST" action="{% url 'add_address' %}">
+            {% csrf_token %}
+         
+            <div class="row">
+              <div class="form-group col-6">
+                <label for="address-type" class="form-label">Address Type</label>
+                <input type="text" id="address-type" class="form-input" name="address_type" placeholder="Home, Work, etc." required/>
+              </div>
+              <div class="form-group col-6">
+                <label for="name" class="form-label">Name</label>
+                <input type="input" id="name" class="form-input" name="name" placeholder="Reciever Name" required/>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <label for="street" class="form-label">Street Address</label>
+                <input type="text" id="street" class="form-input" name="street_address" placeholder="Enter street address " required/>
+              </div>
+              <div class="form-group col-6">
+                <label for="city" class="form-label">PIN Code</label>
+              <input type="number" id="city" class="form-input" name="pincode" required />
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <label for="state" class="form-label">Phone</label>
+              <input type="text" id="state" class="form-input" name="phone" required/>
+              </div>
+              <div class="form-group col-6">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="zip-code" class="form-input"name="email" required/>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <input type="checkbox" id="is-default" name="is_default" />
+              <label for="is-default" class="form-checkbox-label"  >Set as default address</label>
+            </div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-success rounded">Add Address</button>
+              <button type="button" class="btn btn-outline-danger rounded" onclick="closeAddAddress()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+<!-- edit-address field -->
+      <div class="card" id="editAddress" >
+        <div class="card-header">
+          <div class="card-title">Edit Address</div>
+        </div>
+        <div class="card-content">
+          <form method="POST" id="editForm" >
+            {% csrf_token %}
+            <div class="row">
+              <div class="form-group col-6">
+                <label for="address-type" class="form-label">Address Type</label>
+                <input type="text" id="addressType" class="form-input" name="address_type" placeholder="Home, Work, etc." />
+              </div>
+              <div class="form-group col-6">
+                <label for="name" class="form-label">Name</label>
+                <input type="input" id="recieverName" class="form-input" name="name" placeholder="Reciever Name" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <label for="street" class="form-label">Street Address</label>
+                <input type="text" id="streetAddress" class="form-input" name="street_address" placeholder="Enter street address " />
+              </div>
+              <div class="form-group col-6">
+                <label for="city" class="form-label">PIN Code</label>
+                <input type="text" id="pinCode" class="form-input" name="pincode" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <label for="state" class="form-label">Phone</label>
+              <input type="text" id="phone" class="form-input" name="phone" />
+              </div>
+              <div class="form-group col-6">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" class="form-input"name="email" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <input type="checkbox" id="isDefault" name="is_default" />
+              <label for="is-default" class="form-checkbox-label" >Set as default address</label>
+            </div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-success rounded">Save Changes</button>
+              <button type="button" class="btn btn-outline-danger rounded" onclick="closeEditAddress()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+     
+
+    </div>
+</main>
+
+<script>
+  function editAddress(addressType,recieverName,streetAddress,pinCode,phone,email,idDefault,Id){
+    document.getElementById("editAddress").style.display = "block";
+    document.getElementById("addressType").value = addressType;
+    document.getElementById("recieverName").value = recieverName;
+    document.getElementById("streetAddress").value = streetAddress;
+    document.getElementById("pinCode").value = pinCode;
+    document.getElementById("phone").value = phone;
+    document.getElementById("email").value = email;
+    document.getElementById("isDefault").checked = isDefault === 'True';
+
+    const form = document.getElementById("editForm");
+    form.action = "{% url 'update_address' address_id='0' %}".replace('0',Id)
+
+    
+  }
+  
+  function AddAddress() {
+    document.getElementById("addAddress").style.display = "block";
+  }
+
+  function closeEditAddress() {
+      document.getElementById("editAddress").style.display = "none";
+  }
+  function closeAddAddress() {
+    document.getElementById("addAddress").style.display = "none";
+  }
+
+  window.onload = function(){
+      document.getElementById("editAddress").style.display = "none";
+      document.getElementById("addAddress").style.display = "none";
+     }
+</script>
+
+{% endblock %}

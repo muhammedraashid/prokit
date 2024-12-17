@@ -33,7 +33,7 @@
             <td>{{ product.category }}</td>
             <td>₹{{ product.price }}</td>
             <td>
-            <form method="post" action="{% url 'list_unlist_product' product.id %}" class="d-inline mb-0">
+            <form method="post" action="{% url 'list_unlist_product' product.slug %}" class="d-inline mb-0">
                 {% csrf_token %}
                 {% if product.is_listed %}
                     <button type="submit" class="btn btn-danger btn-sm">Unlist</button>
@@ -43,7 +43,7 @@
             </form>
             </td>
             <td>
-                <a href="{% url 'admin_product_view' product.id %}" class="btn btn-outline-primary btn-sm">View</a> 
+                <a href="{% url 'admin_product_view' product.slug %}" class="btn btn-outline-primary btn-sm">View</a> 
             </td>
         </tr>
         {% empty %}

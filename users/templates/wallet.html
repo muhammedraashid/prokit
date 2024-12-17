@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}wallet - ProKit{% endblock %}
+
+{% block content %}
+
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'user_account' %}">Account</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Wallet</li>
+            </ol>
+        </div><!-- End .container -->
+    </nav><!-- End .breadcrumb-nav -->
+    
+ <main class="main" style="background-color:#dde8e9 ; padding-block: 20px;">
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0 text-white ml-5"><i class="fas fa-wallet mr-5 text-white "></i>My Wallet</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                
+                                <div class="ml-5 mt-2">
+                                    <h4 class="mb-1 text-primary">Current Balance</h4>
+                                    <h2 class="text-success font-weight-bold">₹ {{ wallet.balance|floatformat:2 }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button class="btn btn-outline-primary rounded px-5 ml-5" onclick="AddMoney()">
+                                <i class="fas fa-plus px-4"></i>Add Money
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if messages %}
+                {% for message in messages %}
+                <div class="card col-12 text-center ">
+                    <p class="text-danger">{{message}}</p>
+                </div>
+                {% endfor%}
+              {% endif %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0 text-primary">Transaction History</h4>
+                </div>
+                
+                <div class="card-body p-0">
+                    {% if wallet_transactions %}
+                        <div class="table-responsive ">
+                            <table class="table table-striped table-hover mb-0">
+                                <thead class="table-light text-center ">
+                                    <tr>
+                                        <th class="text-primary">Date</th>
+                                        <th class="text-primary">Time</th>
+                                        <th class="text-primary">Amount</th>
+                                        <th class="text-primary">Type</th>
+                                        <th class="text-primary">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-center">
+                                    {% for transaction in wallet_transactions %}
+                                        <tr>
+                                            <td>{{ transaction.transaction_at|date:"d M Y" }}</td>
+                                            <td>{{ transaction.transaction_at|time:"h:i" }}</td>
+                                            <td class="{% if transaction.transaction_type == 'credit' %}text-success{% else %}text-danger{% endif %}">
+                                                ₹{{ transaction.amount|floatformat:2 }}
+                                            </td>
+                                            <td>
+                                                <span class="badge {% if transaction.transaction_type == 'credit' %}bg-success{% else %}bg-danger{% endif %}">
+                                                    {{ transaction.get_transaction_type_display }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">Completed</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No transactions found</p>
+                        </div>
+                    {% endif %}
+                </div>
+                {% if wallet_transactions.has_other_pages %}
+                    <div class="card-footer">
+                        <nav aria-label="Transaction history pagination">
+                            {% include 'includes/pagination.html' %}
+                        </nav>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+</main>
+ <!-- add-address field -->
+ <form method="POST" action="{% url 'add_to_wallet' %}">
+    {% csrf_token %}
+ 
+ <div class="card" id="addMoney">
+    <div class="card-header ">
+      <div class="card-title"  style="margin-right: 70%;">Add Money</div> <button class="close-btn text-danger border-0 rounded"  type="button"  onclick="closeAddMoney()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="card-content">
+     
+        <div class="row">
+          <div class="form-group col-12">
+            <label for="amount" class="form-label">Amount *</label>
+            <input type="text" id="amount" class="form-input" name="amount" placeholder="₹" required/>
+          </div>
+      
+        <div class="form-group  col-12">
+          <button type="submit" class="btn btn-success rounded ">Add Money</button>
+          <!-- <button type="button" class="btn btn-outline-danger rounded" onclick="closeAddMoney()">Cancel</button> -->
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function AddMoney() {
+        document.getElementById("addMoney").style.display = "block";
+      }
+    
+      function closeAddMoney() {
+        document.getElementById("addMoney").style.display = "none";
+      }
+    
+      window.onload = function(){
+          document.getElementById("addMoney").style.display = "none";
+         }
+  </script>
+{% endblock %}

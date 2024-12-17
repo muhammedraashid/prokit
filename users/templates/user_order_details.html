@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order Details - ProKit{% endblock %}
+
+{% block content %}
+
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'user_account' %}">Account</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'user_account' %}">Orders</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Order # {{order.order_number}}</li>
+            </ol>
+        </div><!-- End .container -->
+    </nav><!-- End .breadcrumb-nav -->
+    
+ <main class="main" style="background-color:#dde8e9 ; height: 100%; padding-block: 20px;">
+    <div class="container mt-4 ">
+        <div class="card" >
+            <div class="card-header" style="background-color: rgb(15, 15, 73);" >
+                <h6 class="mb-0 text-white">Order No : #{{ order.order_number }}</h6>
+            </div>
+            <div class="card-body" >
+                <div class="row">
+                    <div class="col-md-6 ">
+                        <h4 style="color: rgb(15, 15, 73);">Order Information</h4>
+                        <table class="table table-borderless ">
+                            <tr>
+                                <th style="color: rgb(15, 15, 73);">Order Number:</th>
+                                <td>{{ order.order_number }}</td>
+                            </tr>
+                            <tr>
+                                <th style="color: rgb(15, 15, 73);" >Order Date:</th>
+                                <td>{{ order.order_date|date:"F d, Y H:i" }}</td>
+                            </tr>
+                            <tr>
+                                <th style="color: rgb(15, 15, 73);">Order Status:</th>
+                                <td>
+                                    <span class="badge 
+                                        {% if order.order_status == 'pending' %}bg-warning
+                                        {% elif order.order_status == 'processing' %}bg-info
+                                        {% elif order.order_status == 'shipped' %}bg-primary
+                                        {% elif order.order_status == 'delivered' %}bg-success
+                                        {% elif order.order_status == 'cancelled' %}bg-danger
+                                        {% elif order.order_status == 'returned' %}text-danger
+                                        {% endif %}">
+                                        {{ order.get_order_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% if order.order_status != 'cancelled' and order.order_status != 'returned' %}
+                            <tr>
+                                <th style="color: rgb(15, 15, 73);">Payment Status:</th>
+                                <td>
+                                    <span class="badge">{{ order.payment_status }}</span>
+                             
+                                </td>
+                            </tr>
+                            {% endif %}
+                            
+                            <tr>
+                                <th style="color: rgb(15, 15, 73);">Payment Method:</th>
+                                <td>{{ order.get_payment_method_display }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h4 style="color: rgb(15, 15, 73);">Receiver Details</h4>
+                        <table class="table table-borderless">
+                            <tr>
+                                <th style="color: rgb(15, 15, 73);">Addres Name:</th>
+                                <td>{{ order.address.name|capfirst }}</td>
+                            </tr>
+                            <tr>
+                                <th style="color: rgb(15, 15, 73);">Address Email:</th>
+                                <td>{{ order.address.email}}</td>
+                            </tr>
+                            
+                            <tr>
+                                <th style="color: rgb(15, 15, 73);">Shipping Address:</th>
+                                <td>
+                                    {{ order.address.street_address }} &nbsp;&nbsp;
+                                    {{ order.address.city }}, {{ order.address.state }} {{ order.address.postal_code }},
+                                    {{ order.address.country }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="color: rgb(15, 15, 73);">Address Phone:</th>
+                                <td>{{ order.address.phone}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+    
+                <h4 class="mt-4">Order Items</h4>
+                <table class="table  ">
+                    <thead >
+                   
+                        <tr >
+                            <th  style="color: rgb(15, 15, 73);">Image</th>
+                            <th  style="color: rgb(15, 15, 73);">Product</th>
+                           
+                            <th  style="color: rgb(15, 15, 73);">Variant</th>
+                            <th  style="color: rgb(15, 15, 73);">Quantity</th>
+                            <th  style="color: rgb(15, 15, 73);">Price</th>
+                            <th  style="color: rgb(15, 15, 73);">Subtotal</th>
+                            <th style="color: rgb(15, 15, 73);">Status</th>
+                            {% if item.item_status == 'delivered' or item.item_status == 'pending' %}
+                            <th  style="color: rgb(15, 15, 73);">Action</th>
+                            {% endif %}       
+                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.order_items.all %}
+                        <tr >
+                            <td >
+                                <figure class="product">
+                                    <a href="{%  url 'user_product_view' item.variant.slug %}" >
+                                        <img src="{{item.variant.variant.images.first.image.url}}" alt="Product image" style="width: 40px;" class="rounded" >
+                                    </a>
+                                </figure>
+    
+                            </td>
+                            
+                            <td class="text-dark ">{{ item.product.name|capfirst }}</td>
+                            
+                           
+
+                            <td class="text-dark">{{ item.variant.variant.color }} - {{ item.variant.size }}</td>
+                            <td class="text-dark">{{ item.quantity }}</td>
+                            <td class="text-dark">₹{{ item.price}}</td>
+                            <td class="text-dark">₹{{item.sub_total }}</td>
+                           
+                                 <td>
+                                     <span class="badge 
+                                         {% if item.item_status == 'pending' %}bg-warning
+                                         {% elif item.item_status == 'processing' %}bg-info
+                                         {% elif item.item_status == 'return_requested' %}bg-primary
+                                         {% elif item.item_status == 'delivered' %}bg-success
+                                         {% elif item.item_status == 'cancelled' %}bg-danger
+                                         {% elif item.item_status   == 'returned' %}text-danger
+                                         {% endif %}">
+                                         {{ item.get_item_status_display }}
+                                     </span>
+                                 </td>
+                                 {% if order.order_status == 'delivered' and  not order.applied_coupon %}
+                                 <td>
+                                  <a href="{% url 'return_order' item.id %}" class="btn btn-outline-info rounded"><i class="fas fa-undo"></i>Return Item</a>
+                                 </td>
+                                  {% endif %}
+                                  {% if item.item_status == 'pending' and  not order.applied_coupon %}
+                                  <td>
+                                      <a href="{% url 'cancel_order_item' item.id %}" class="btn btn-danger rounded">Cancel Item</a>
+                                  </td>
+                                  {% endif %}
+                             
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot  style="color: rgb(15, 15, 73);">
+                        <tr>
+                            <td colspan="7" class="text-right"><strong>Coupon Discount </strong></td>
+                            <td><strong>:  -  ₹ {{ order.discount_amount|default:0|floatformat:2}}</strong></td>
+                        </tr>
+                         <tr>
+                            <td colspan="7" class="text-right"><strong>Delivery Charge </strong></td>
+                            <td><strong>:  +  ₹ {{ order.delivery_charge|floatformat:2}}</strong></td>
+                        </tr>
+                        <tr>
+                            <td colspan="7" class="text-right pr-5"><strong>Total Amount:</strong></td>
+                            <td><strong>₹{{ order.total_amount|floatformat:2 }}</strong></td>
+                        </tr>
+                       
+                    </tfoot>
+                </table>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'user_orders' %}" class="btn btn-outline-primary rounded"><i class="fa fa-arrow-left"></i>  Back to Orders</a>
+                {% if order.order_status == 'pending' %}
+                    <a href="{% url 'cancel_order' order.id %}" class="btn btn-danger float-right">Cancel Order</a>
+                {% endif %}
+                {% if order.order_status == 'delivered' %}
+                <a href="{% url 'return_order' order.id %}" class="btn btn-info float-right"><i class="fas fa-undo"></i>Return</a>
+                {% endif %}
+                <a href="{% url 'export_invoice' order.id %}" class="btn btn-success px-5 rounded"><i class="fa fa-download"></i>Download Invoice</a>
+
+                {% if order.payment_status == 'pending' and order.payment_method == 'upi' %}
+                 <a href="{% url 'retry_payment' order.id %}" class="btn btn-outline-warning"> <i class="fa fa-credit-card"></i> Retry Payment</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+ 
+ </main>   
+ {% endblock %}

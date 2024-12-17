@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Orders - ProKit{% endblock %}
+
+{% block content %}
+
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'user_account' %}">Account</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Orders</li>
+            </ol>
+        </div><!-- End .container -->
+    </nav><!-- End .breadcrumb-nav -->
+    
+ <main class="main" style="background-color:#dde8e9 ; height: 100%; padding-block: 20px;">
+    <div class="container">
+        <h6 class="mb-4 card col-12 py-2 pr-2"> <span><i class="fas fa-box"></i> Orders</span></h6>
+        
+        {% if orders %}
+            <div class="row">
+                {% for order in orders %}
+                <div class="crow col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0"> Order#:{{ order.order_number }}</h5>
+                                <span class="badge {% if order.order_status == 'pending' %}bg-warning
+                                {% elif order.order_status == 'delivered' %}bg-success
+                                {% elif order.order_status == 'processing' %}bg-primary
+                                {% elif order.order_status == 'shipped' %}bg-info
+                                {% else %}bg-danger{% endif %}   text-white px-5 py-3"
+                                style="margin-left: 70%;">
+                                {{ order.order_status }}
+                                </span>
+                        </div>
+                        <div class="card-body d-flex justify-content-between">
+                            <p class="card-text">
+                                <strong>Date:</strong> {{ order.created_at|date:"F d, Y" }}<br>
+                                <strong>Total:</strong> ${{ order.total_amount|floatformat:2 }}<br>
+                                <strong>Items:</strong> {{ order.order_items.all.count }}
+                            </p>
+                            <div class="d-flex">
+                                <a class="btn btn-sm btn-outline-primary  mr-3 rounded"   
+                                        href = "{% url 'user_order_view' order.id %}"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#orderDetailsModal{{ order.id }}"
+                                        style="height: fit-content;">
+                                    View Details
+                                </a>
+                                {% if order.order_status == 'pending' %}
+                                <form action="{%url 'cancel_order' order.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded" 
+                                            onclick="return confirm('Are you sure you want to cancel this order?')">
+                                        Cancel Order
+                                    </button>
+                                </form>
+                                {% endif %}
+                                {% if order.order_status == 'delivered' %}
+                                <a href="{% url 'return_order' order.id %}" class="btn btn-info float-right rounded" style="height: 40px;"><i class="fas fa-undo"></i>Return</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal fade" id="orderDetailsModal{{ order.id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Order #{{ order.order_number}} Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <h6>Items:</h6>
+                                <ul class="list-group">
+                                    {% for item in order.orderitem_set.all %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ item.product.name }}
+                                        <span>
+                                            {{ item.quantity }} x ${{ item.price|floatformat:2 }}
+                                        </span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                <hr>
+                                <div class="text-end">
+                                    <strong>Total:</strong> ${{ order.total_price|floatformat:2 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {%endfor %}
+            </div>
+        {% else %}
+        <p class="text-warning card col-12 text-center py-4 ">No orders maked yet !</p>   
+        {% endif %} 
+    </div>    
+
+
+ </main>  
+
+ {% endblock %}

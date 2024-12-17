@@ -84,26 +84,15 @@
 
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea class="form-control" 
-                        id="description" 
-                        name="description" 
-                        rows="3" 
-                        placeholder="Enter product description"
-                        maxlength="1000"></textarea>
+                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter product description"  maxlength="1000">
+                    </textarea>
                 </div>
 
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="offer">Offer (%)</label>
-                            <input type="number" 
-                                step="0.01" 
-                                class="form-control" 
-                                id="offer" 
-                                name="offer" 
-                                placeholder="Discount percentage"
-                                min="0" 
-                                max="100">
+                            <input type="number" step="0.01"  class="form-control"  id="offer" name="offer"  placeholder="Discount percentage" min="0"  max="100">
                         </div>
                     </div>
                   
@@ -159,17 +148,6 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Size <span class="text-danger">*</span></label>
-                                <select class="form-control" name="size" required>
-                                    <option value="">Select size</option>
-                                    {% for size in sizes %}
-                                        <option value="{{ size }}">{{ size }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
                                 <label>Color <span class="text-danger">*</span></label>
                                 <select class="form-control" name="color" required>
                                     <option value="">Select color</option>
@@ -177,6 +155,17 @@
                                         <option value="{{ color }}">{{ color }}</option>
                                     {% endfor %}
                                 </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Sizes and Stock<span class="text-danger">*</span></label><br>
+                                {% for size in sizes %}
+                                    <div class="form-group ">
+                                        <label for="{{ size }}"></label>
+                                        <input type="number" name="{{ size }}" id="{{ size }}" class="form-control" min="0" placeholder="{{size}}" style="width: 60px;">
+                                    </div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -215,10 +204,7 @@
                         </button>
                     </div>
 
-                    <div class="form-group">
-                        <label>Stock <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" name="stock" placeholder="Enter stock quantity" min="0" required>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -240,7 +226,7 @@
         </div>
     {% endif %}
 </div>
-image
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script>

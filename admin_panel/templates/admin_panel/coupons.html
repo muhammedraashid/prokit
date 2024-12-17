@@ -1,0 +1,212 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Coupons{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active"><a href="{% url 'admin_coupons' %}">Coupons</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+    <div class="row mb-3">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">Coupon Management</h2>
+            <button onclick="addCoupon()" class="btn btn-outline-primary">
+                <i class="fas fa-plus me-2"></i>Create New Coupon
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        {% if coupons %}
+            {% for coupon in coupons %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm h-100 {% if not coupon.is_active %}border-danger{% endif %}">
+                    <div class="card-header d-flex justify-content-between align-items-center 
+                                {% if coupon.is_active %}bg-primary text-white{% else %}bg-light{% endif %} bg-dark" >
+                        <h5 class="mb-0 text-primary">{{ coupon.name }}</h5>
+                        <span class="badge {% if coupon.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ coupon.is_active|yesno:"Active,Inactive" }}
+                        </span>
+                    </div>
+                    <div class="card-body bg-dark ">
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                <small class="text-white">Coupon Code</small>
+                                <p class="fw-bold text-success">
+                                    {{ coupon.code }}
+                                </p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-white">Discount Value</small>
+                                <p class="fw-bold">
+                                    {% if coupon.discount_type != 'percentage' %}
+                                        {{ coupon.discount_value }}%
+                                    {% else %}
+                                        ₹{{ coupon.discount_value }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                <small class="text-white">Minimum Purchase</small>
+                                <p class="fw-bold">₹{{ coupon.min_amount }}</p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-white">Expiry Date</small>
+                                <p class="fw-bold {% if coupon.is_expired %}text-danger{% endif %}">
+                                    {{ coupon.expiry_at|date:"d M Y" }}
+                                </p>
+                            </div>
+                        </div>
+                        <p class="card-text text-white mb-0">
+                            <small>{{ coupon.description }}</small>
+                        </p>
+                    </div>
+                    <div class="card-footer bg-dark">
+                        <div class="d-flex justify-content-between">
+                            <!-- <a href="#" class="btn btn-sm btn-outline-primary col-5">
+                                <i class="fas fa-edit me-2"></i>Edit
+                            </a> -->
+                            <button class="btn btn-sm btn-outline-danger col-5" data-bs-toggle="modal" 
+                                    data-bs-target="#deleteCouponModal{{ coupon.id }}">
+                                <i class="fas fa-trash me-2"></i>Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete confirmation  -->
+            <div class="modal fade" id="deleteCouponModal{{ coupon.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark">
+                            <h5 class="modal-title text-info">Confirm Deletion</h5>
+                            <button type="button" class="btn-close danger" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-warning bg-dark">
+                            Are you sure you want to delete the coupon "{{ coupon.code }}"?
+                        </div>
+                        <div class="modal-footer bg-dark">
+                            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                            <form method="POST" action="{% url 'remove_coupon' coupon.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No coupons available. Create your first coupon!
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if coupons.has_other_pages %}
+    <div class="row mt-3">
+        <div class="col-12 d-flex justify-content-center">
+            {% include 'includes/pagination.html' %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+
+
+<div class="form-popup rounded" id="addForm" style="display: none; margin: 20px; width: 50%;">
+    <form method="POST" action="{% url 'create_coupon' %}" class="form-container rounded">
+        {% csrf_token %}
+        
+        <!-- Coupon Name and Coupon Code in a single row (2 columns) -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="id_name" class="form-label text-success"><b>Coupon Name</b></label>
+                {{ form.name }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_code" class="form-label text-success"><b>Coupon Code</b></label>
+                {{ form.code }}
+            </div>
+        </div>
+
+        <!-- Description and Discount Value in a single row (2 columns) -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="id_description" class="form-label text-success"><b>Description</b></label>
+                {{ form.description }}
+            </div>
+            
+            <div class="col-md-6">
+                <label for="id_discount_value" class="form-label text-success"><b>Discount Value (%)</b></label>
+                {{ form.discount_value }}
+            </div>
+        </div>
+
+        <!-- Minimum Amount and Maximum Discount in a single row (2 columns) -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="id_min_amount" class="form-label text-success"><b>Minimum Amount</b></label>
+                {{ form.min_amount }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_max_discount" class="form-label text-success"><b>Maximum Discount</b></label>
+                {{ form.max_discount }}
+            </div>
+        </div>
+
+        <!-- Used Limit and Expiry Date in a single row (2 columns) -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="id_used_limit" class="form-label text-success"><b>Used Limit</b></label>
+                {{ form.used_limit }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_expiry_at" class="form-label text-success"><b>Expiry Date</b></label>
+                {{ form.expiry_at }}
+            </div>
+        </div>
+
+        <!-- Submit and Close buttons -->
+        <div class="form-group">
+            <button type="submit" class="btn btn-outline-success me-2">Create Coupon</button>
+            <button type="button" class="btn btn-outline-danger" onclick="closeForm()">Close</button>
+        </div>
+    </form>
+</div>
+
+
+
+<script>
+    function openForm(categoryName,categoryOffer,categoryId) { 
+        document.getElementById("myForm").style.display = "block";         
+        document.getElementById("categoryName").value = categoryName
+        document.getElementById("categoryOffer").value = categoryOffer
+        form = document.getElementById("editCategory");
+        form.action = "{% url 'category_edit' category_id=0 %}".replace('0',categoryId)
+      }
+  
+      function addCoupon() { 
+          document.getElementById("addForm").style.display = "block";
+          form = document.getElementById("addCoupon");
+          form.action = "{% url 'create_coupon' %}"
+      }
+      
+      function closeForm() {
+       
+        document.getElementById("addForm").style.display = "none";
+      }
+  
+      window.onload = function(){
+          document.getElementById("myForm").style.display = "none";
+          document.getElementById("addForm").style.display = "none";    
+      }
+</script>
+{% endblock %}

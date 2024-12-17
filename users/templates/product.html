@@ -5,28 +5,17 @@
 
 {% block content %}
  
-    <main class="main">
+    <!-- <main class="main"> -->
         <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
             <div class="container d-flex align-items-center">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
-                    <li class="breadcrumb-item"><a href="#">{{ category.name }}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'user_shop' %}">{{ category.name }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
                 </ol>
-
-                <!-- <nav class="product-pager ml-auto" aria-label="Product">
-                    <a class="product-pager-link product-pager-prev" href="#" aria-label="Previous" tabindex="-1">
-                        <i class="icon-angle-left"></i>
-                        <span>Prev</span>
-                    </a>
-
-                    <a class="product-pager-link product-pager-next" href="#" aria-label="Next" tabindex="-1">
-                        <span>Next</span>
-                        <i class="icon-angle-right"></i>
-                    </a>
-                </nav> -->
             </div>
         </nav>
+<main class="main" style="background-color: rgba(222, 225, 225, 0.385);padding-block: 5%;">
 
     <div class="page-content">
         <div class="container">
@@ -36,12 +25,12 @@
                         <div class="product-gallery product-gallery-vertical">
                             <div class="row">
                                 <!-- Main Image Section -->
-                                <figure class="product-main-image">
+                                <figure class="product-main-image ">
                                     <img
                                         id="product-zoom"
                                         src="{{ images.first.image.url }}"
                                         data-zoom-image="{% if image.image %}{{ image.image.url }}{% else %}{% static 'assets/images/default_product.png' %}{% endif %}"
-                                        alt=""{% if image.image %}{{ image.image.url }}{% else %}{% static 'assets/images/default_product.png' %}{% endif %}""
+                                        alt="{% if image.image %}{{ image.image.url }}{% else %}{% static 'assets/images/default_product.png' %}{% endif %}"
                                     >
                                     <a href="#" id="btn-product-gallery" class="btn-product-gallery">
                                         <i class="icon-arrows"></i>
@@ -68,16 +57,16 @@
                     <div class="col-md-6">
                         <div class="product-details">
                             <h1 class="product-title">{{ product.name|capfirst }}</h1>
-
                             <div class="ratings-container">
                                 <div class="ratings">
-                                    <div class="ratings-val"></div>
+                                  <div class="ratings-val" style="width: {{ product.total_ratings }}%;"></div> 
                                 </div>
-                                <a class="ratings-text" href="#" id="review-link">({{ reviews.count }} Reviews)</a>
+                                <span class="ratings-text">({{ product.total_ratings }} Reviews)</span> 
                             </div>
-
-                            <div class="product-price">₹{{ product.price }}</div>
-
+                            {% if offer > 0 %}
+                            <div class="product-price">₹{{ offer_price }}</div>
+                            <div><h7 style="text-decoration: line-through;">₹{{ product.price }}</h7> <span class="text-info">{{product.offer}}%</span></div>
+                            {% endif %}
                             <div class="product-content">
                                 <p>{{ product.description }}</p>
                             </div>
@@ -85,56 +74,63 @@
                             <div class="details-filter-row details-row-size">
                                 <label>Color:</label>
                                 <div class="product-nav product-nav-thumbs">
-                                   {% for variant in product.variants.all %}
-                                    <a href="{% url 'user_product_view' variant.id %}" class="{% if v == variant %}active{% endif %}">
+                                {% for variant in product.variants.all %}
+                                    {% if variant.is_listed == True %}
+                                    <a href="{% url 'user_product_view' variant.sizes.first.slug %}" class="{% if v == variant %}active{% endif %}">
                                     <img src="{{variant.images.first.image.url}}" alt="{{variant.images.first.image.url}}"style="width:50px;" >
-                                 </a>
-                                {% endfor %}
-                                   <!-- <img src="{{variant.images.first.image.url}}" alt="{{variant.images.first.image.url}}"style="width:40px;" > -->
-                                   <!-- <a href="#"><h5>{{varaint.color}}</h5></a> -->
-                                   
-                                    <!-- {% for v in product.variants.all %}
-                                    <a href="#" class="{% if v == variant %}active{% endif %}">
-                                        <img src="{{ v.color }}" alt="{{ v.color }}">
                                     </a>
-                                    {% endfor %} -->
+                                    {% endif %}
+                                {% endfor %}
+    
                                 </div>
                             </div>
 
                             <div class="details-filter-row details-row-size">
                                 <label for="size">Size:</label>
-                                <div class="select-custom">
-                                    <select name="size" id="size" class="form-control">
+                                <div>
+                                    <select name="size" id="size" class="form-control rounded" onchange="redirectToPage()">
                                         <option value="" selected>Select a size</option>
-                                        {% for size in variant.size %}
-                                        <option value="{{ size }}">{{ size|capfirst }}</option>
-                                       
+                                        {% for size in variant.sizes.all %}
+                                            <option value="{{ size.slug }}">{{ size.size|capfirst }}</option>
                                         {% endfor %}
                                     </select>
+
+                                    <p class="text-primary" style="font-weight: bold;">{{variant.size}}</p>
                                 </div>
                                 <!-- <a href="#" class="size-guide"><i class="icon-th-list"></i>size guide</a> -->
                             </div>
-
                             <div class="details-filter-row details-row-size">
-                                <label for="qty">Qty:</label>
-                                <div class="product-details-quantity">
-                                    <input type="number" id="qty" class="form-control" value="1" min="1" max="10" step="1" required>
-                                </div>
+                                <label for="qty">Stock:</label>
+                                {% if variant_size.stock > 20 %}
+                                 <p class="text-primary"> In Stock</p>
+                                {% elif 0 < variant_size.stock <= 20 %}
+                                 <p class="text-danger">Only left : {{variant_size.stock}} pcs</p>
+                                {% else %} 
+                                <p class="text-danger">Out of Stock </p>
+                                {% endif %}
                             </div>
 
-                            <div class="product-details-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                            <!-- <div class="details-filter-row details-row-size">
+                                <label for="qty">Qty:</label>
+                                <div class="product-details-quantity">
+                                    <input type="number" id="qty" class="form-control rounded" value="1" min="1" max="10" step="1" required>
+                                </div>
+                            </div> -->
 
-                                <!-- <div class="details-action-wrapper">
-                                    <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
-                                    <a href="#" class="btn-product btn-compare" title="Compare"><span>Add to Compare</span></a>
-                                </div> -->
+                            <div class="product-details-action">
+                                    <form action="{% url 'add_to_cart' variant_size.slug  %}" method="post">
+                                      {% csrf_token %}
+                                      <button type="submit" class="btn-product btn-cart rounded " style=" padding-inline: 60px;" ><span>AddtoCart</span></a></button>
+                                    </form>
+                                <a href="{% url 'add_to_wishlist' variant_size.slug %}" class="btn-outline-danger text-center py-2 rounded" title="Wishlist" style="width: 30%;"><i class="far fa-heart"></i> ADD TO WISHLIST </a>   
                             </div>
 
                             <div class="product-details-footer">
                                 <div class="product-cat">
                                     <span>Category:</span>
-                                    <a href="#">{{ category.name }}</a>
+                                    <a href="#">{{ category.name }}</a> | 
+                                    <span>Brand:</span>
+                                    <a href="#">{{ product.brand }}</a>
 
                                 </div>
 
@@ -173,11 +169,6 @@
                 <div class="product-desc-content">
                     <h3>Product Information</h3>
                     <p>{{ product.description }}</p>
-                    <ul>
-                        <li>Nunc nec porttitor turpis. In eu risus enim. In vitae mollis elit.</li>
-                        <li>Vivamus finibus vel mauris ut vehicula.</li>
-                        <li>Nullam a magna porttitor, dictum risus nec, faucibus sapien.</li>
-                    </ul>
                    
                 </div>
             </div>
@@ -187,18 +178,6 @@
                     <h3>Information</h3>
                     <p>{{ product.information }}</p>
 
-                    <h3>Fabric & care</h3>
-                    <ul>
-                        <li>Faux suede fabric</li>
-                        <li>Gold tone metal hoop handles.</li>
-                        <li>RI branding</li>
-                        <li>Snake print trim interior</li>
-                        <li>Adjustable cross body strap</li>
-                        <li>Height: 31cm; Width: 32cm; Depth: 12cm; Handle Drop: 61cm</li>
-                    </ul>
-
-                    <h3>Size</h3>
-                    <p>One size</p>
                 </div>
             </div>
 
@@ -212,8 +191,8 @@
 
             <div class="tab-pane fade" id="product-review-tab" role="tabpanel" aria-labelledby="product-review-link">
                 <div class="reviews">
-                    <h3>Reviews ({{ reviews.count }}0)</h3>
-                    <!-- {% for review in reviews %}
+                    <h3>Reviews ({{ reviews.count|default:'0' }})</h3>
+                    {% for review in reviews %}
                     <div class="review">
                         <div class="row no-gutters">
                             <div class="col-auto">
@@ -223,21 +202,20 @@
                                         <div class="ratings-val" ></div>
                                     </div>
                                 </div>
+
                                 <span class="review-date">{{ review.created_at|date:"d M Y" }}</span>
                             </div>
                             <div class="col">
-                                <h4>{{ review.title }}</h4>
                                 <div class="review-content">
-                                    <p>{{ review.body }}</p>
+                                    <p>{{ review.comments }}</p>
                                 </div>
-                                <div class="review-action">
-                                    <a href="#"><i class="icon-thumbs-up"></i>Helpful ({{ review.helpful_count }})</a>
-                                    <a href="#"><i class="icon-thumbs-down"></i>Unhelpful ({{ review.unhelpful_count }})</a>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>
-                    {% endfor %} -->
+                    {%empty%}
+                    <p class="text-secondary">No Reviews yet</p>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -272,8 +250,8 @@
          }
      }'>
     {% for product in related_products %}
-        <div class="product product-7 text-center">
-            <figure class="product-media">
+        <div class="product product-10 text-center b">
+            <figure class="product-media bg-white">
                 {% if product in products.all|slice:':10' %}
                 <span class="product-label label-new">New</span>
                 {% elif product.variants.first.stock == 0 %}
@@ -282,11 +260,11 @@
                 {% if product.variants.first %}
 
                 {% if product.variants.first.images.first %}
-                    <a href="{% url 'user_product_view' product.variants.first.id %}">
+                    <a href="{% url 'user_product_view' product.variants.first.sizes.first.slug %}">
                         <img src="{{ product.variants.first.images.first.image.url }}" alt="{{ product.name }}" class="product-image">
                     </a>
                 {% else %}
-                    <a href="{% url 'user_product_view' product.variants.first.id %}">
+                    <a href="{% url 'user_product_view' product.variants.first.sizes.first.slug %}">
                         <img src="{% static 'assets/static/default_product.jpg' %}" alt="{{ product.name }}" class="product-image">
                     </a>
                 {% endif %}
@@ -295,9 +273,7 @@
                 {% endif %}
 
             
-                <div class="product-action">
-                    <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                </div>
+               
             </figure>
             <div class="product-body">
                 <div class="product-cat">
@@ -309,7 +285,7 @@
 
                 {% if product.variants.first %}
                     <h3 class="product-title">
-                        <a href="{% url 'user_product_view' product.variants.first.id %}">{{ product.name }}</a>
+                        <a href="{% url 'user_product_view' product.variants.first.sizes.first.slug %}">{{ product.name }}</a>
                     </h3>
                 {% else %}
                     <h3 class="product-title">{{ product.name }}</h3>
@@ -318,9 +294,9 @@
                 <div class="product-price">${{ product.price }}</div>
                 <div class="ratings-container">
                     <div class="ratings">
-                        <div class="ratings-val"></div>
+                      <div class="ratings-val" style="width: {{ product.total_ratings }}%;"></div> 
                     </div>
-                    <span class="ratings-text">({{ product.reviews.count }} Reviews)</span>
+                    <span class="ratings-text">({{ product.total_ratings }} Reviews)</span> 
                 </div>
                 <div class="product-nav product-nav-thumbs">
                     {% for variant in product.variants.all   %}
@@ -328,6 +304,13 @@
                         <img src="{{ variant.images.first.image.url }}" alt="{{ product.name }} thumb">
                     </a>
                     {% endfor %}
+                </div>
+
+                <div class="product-action" >
+                    <form action="{% url 'add_to_cart' product.variants.first.sizes.first.slug  %}" method="POST">
+                      {% csrf_token %}
+                      <button type="submit" class="btn-product btn-cart rounded bg-primary text-white py-3" style="width:350px;" ><span class="text-white"> ADD TO CART </span></a></button>
+                  </form>
                 </div>
             </div>
         </div>
@@ -391,6 +374,17 @@
             });
         });
     });
+
+    function redirectToPage() {
+        const sizeElement = document.getElementById("size");
+        const selectedSlug = sizeElement.value;
+
+        if (selectedSlug) {
+            
+            const url = `{% url 'user_product_view' 'placeholder_slug' %}`.replace('placeholder_slug', selectedSlug);
+            window.location.href = url;
+        }
+    }
     
     </script>
 

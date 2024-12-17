@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #dde8e9;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .confirmation-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            animation: fadeIn 1s ease-in;
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .checkmark {
+            color: white;
+            font-size: 40px;
+            transform: rotate(45deg);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .order-number {
+            background-color: #f8f9fa;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 1rem 0;
+            display: inline-block;
+        }
+        
+        .details {
+            margin: 1.5rem 0;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="confirmation-container">
+        <div class="success-icon">
+            <span class="checkmark">✓</span>
+        </div>
+        <h1>Order Placed Successfully!</h1>
+        <p>Thank you for your purchase. We've received your order and will process it right away.</p>
+        <div class="order-number">
+            Order #: {{order_number}}
+        </div>
+        <div class="details">
+            <p>A confirmation email has been sent to your registered email address.</p>
+            <p>Expected delivery: <strong>3-5 business days</strong></p>
+        </div>
+        <a href="{% url 'user_orders' %}" class="button">Track Order</a>
+        <a href="{% url 'user_shop' %}" class="button" style="background-color: #0b716a; margin-left: 10px;">Continue Shopping</a>
+
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Product - ProKit{% endblock %}
+
+
+{% block content %}
+
+
+<nav aria-label="breadcrumb" class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'user_account' %}">Account</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'cart' %}">Cart</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+        </ol>
+    </div><!-- End .container -->
+</nav>
+<main class="main" style="background-color:#dde8e9 ; padding-block: 20px;">
+<form method="POST" action="{% url 'order_placed' %}">
+  {% csrf_token %}
+  <div class="page-content">
+      <div class="checkout ">
+          <div class="container">
+            <h1 class="checkout-title card px-5 py-3"><span><i class="fa fa-credit-card"></i> Checkout</span></h1>
+              <div class="row">
+                  <div class="col-lg-6">
+                      <div class="row">
+                        {% if messages %}
+                          {% for message in messages %}
+                          <div class="card col-12 text-center ">
+                              <p class="text-danger">{{message}}</p>
+                          </div>
+                          {% endfor%}
+                        {% endif %}
+                          <div class="col-sm-12 card ">
+                              <h2 class="checkout-title text-center">Select Delivery Address</h2>
+                              {% if user.addresses.all %}
+                              <div class="checkout-address">
+                                  {% for address in user.addresses.all %}
+                                  <div class="form-check card py-5">
+                                      <input class="form-check-input " value="{{address.id}}" type="radio" name="address" id="address-{{ address.id }}" {% if address.is_default %} checked {% endif %}  required>
+                                      <label class="form-check-label text-success " for="address-{{ address.id }}">
+                                        <h5 class="text-dark">{{address.address_type|capfirst}}</h5>
+                                        {{ address.name }} - {{ address.street_address }}, {{ address.city }}, {{ address.state }} {{ address.zip_code }}
+                                      </label>
+                                  </div><!-- End .form-check -->
+                                  {% endfor %}
+                                   
+                              </div><!-- End .checkout-address -->
+                              {% else %}
+                              <p>You haven't added any addresses yet. Please<a class="btn text-success" onclick="AddAddress()">Add an address</a>.</p>
+
+                              {% endif %}
+                              
+                          </div>
+                      </div>
+                      <div>
+                        <a class="btn btn-success text-white rounded" onclick="AddAddress()">Add New address</a>
+                      </div> 
+                    
+                  
+                  </div>
+
+                  <aside class="col-lg-6">
+                      <div class="summary summary-cart">
+                          <h3 class="summary-title">Order Summary</h3><!-- End .summary-title -->
+
+                          <table class="table table-summary">
+                              <tbody>
+                                  {% for item in cart_items %}
+                                  <tr class="summary-cart-item">
+                                      <td class="summary-cart-product">
+                                          <a href="{%  url 'user_product_view' item.variant_size.slug %}"> {{ item.variant_size.variant.product.name|capfirst}}</a>
+                                      </td>
+                                      <td class="summary-cart-price">₹{{ item.variant_size.variant.product.price}}</td>
+                                      <td class="summary-cart-quantity">X{{ item.quantity }}</td>
+                                      <td class="summary-cart-total">₹{{ item.total_price }}</td>
+                                  </tr><!-- End .summary-cart-item -->
+                                  {% endfor %}
+
+                                  <tr class="summary-subtotal">
+                                      <td>Subtotal:</td>
+                                      <td>₹{{ sub_total }}</td>
+                                  </tr><!-- End .summary-subtotal -->
+                                  <tr id="discount-row" >
+                                    <td>Discount:</td>
+                                    <td id="discount-amount">-₹{{discount_amount}}</td>
+                                 </tr>
+                                 <tr>
+                                  <td>Applied Coupon:</td>
+                                  <td >{{applied_coupon}} ({{applied_coupon.discount_value}} %) discount</td>
+                                 </tr>
+                                  <tr class="summary-shipping">
+                                      <td>Shipping:</td>
+                                      <td>&nbsp;</td>
+                                  </tr>
+
+                                  <!-- <tr class="summary-shipping-row" >
+                                      <td>
+                                          <div class="custom-control custom-radio">
+                                              <input type="radio" id="free-shipping" name="shipping"  class="custom-control-input" checked>
+                                              <label class="custom-control-label" for="free-shipping">Free Shipping</label>
+                                          </div>
+                                      </td>
+                                      <td>₹0.00</td>
+                                  </tr> -->
+
+                                  <tr class="summary-shipping-row">
+                                      <td>
+                                          <div class="custom-control custom-radio">
+                                              <input type="radio" id="standart-shipping" name="shipping" class="custom-control-input" checked>
+                                              <label class="custom-control-label" for="standart-shipping">Standard</label>
+                                          </div>
+                                      </td>
+                                      <td>₹{{ delivery_charge }}</td>
+                                  </tr>
+
+                                  <!-- <tr class="summary-shipping-row">
+                                      <td>
+                                          <div class="custom-control custom-radio">
+                                              <input type="radio" id="express-shipping" name="shipping" class="custom-control-input">
+                                              <label class="custom-control-label" for="express-shipping">Express</label>
+                                          </div>
+                                      </td>
+                                      <td>₹20.00</td>
+                                  </tr>    -->
+                                  <tr class="summary-shipping-row">
+                                    <div class="col-sm-12 card">
+                                      <h2 class="checkout-title">Payment Method</h2><!-- End .checkout-title -->
+                                      <div class="checkout-payment">
+                                        
+                                        {% for value, label in payment_choices %}
+                                        {% if total_price < 1000 %}
+                                        <div>
+                                          <input type="radio" name="payment_method" value="{{ value }}" id="payment-method-{{ value }}" {% if value == 'cod' %}checked{% endif %}>
+                                          <label for="payment-method-{{ value }}">{{ label }}</label>
+                                        </div>
+                                        {% else %}
+                                        <div>
+                                            <input type="radio" name="payment_method" value="{{ value }}" id="payment-method-{{ value }}" {% if value == 'upi' %}checked{% endif %}{% if value == 'cod' %}disabled{% endif %}>
+                                            {% if value == 'cod' %}
+                                            <label for="payment-method-{{ value }} " class="text-muted">( Cash on Delivery (COD) is only available for purchases up to ₹1000 ) </label>
+                                            {% else %}
+                                            <label for="payment-method-{{ value }}" class="text-dark">{{ label }}</label>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                       {% endfor %}
+                                          
+                                      </div><!-- End .checkout-payment -->
+                                  </div><!
+                                  </tr>
+                                  <tr >
+                                    <td>Delivery Charge:</td>
+                                    <td>₹{{ delivery_charge }}</td>
+                                  </tr>
+                                  <tr class="summary-total">
+                                      <td>Total:</td>
+                                      <td>₹{{ total_price }}</td>
+                                  </tr><!-- End .summary-total -->
+                              </tbody>
+                          </table><!-- End .table table-summary -->
+
+                          <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block" id="place-order-btn">
+                              <span class="btn-text">Place Order</span>
+                              <span class="btn-hover-text">Proceed to Checkout</span>
+                          </button>
+                      </div><!-- End .summary -->
+                  </aside><!-- End .col-lg-4 -->
+              </div><!-- End .row -->
+             
+          </div><!-- End .container -->
+      </div><!-- End .checkout -->
+
+  </div><!-- End .page-content -->
+
+
+</form>
+</main> 
+
+      
+      <!-- add-address field -->
+      <div class="card" id="addAddress">
+        <div class="card-header">
+          <div class="card-title">Add New Address</div>
+        </div>
+        <div class="card-content">
+          <form method="POST" action="{% url 'checkout' %}">
+            {% csrf_token %}
+         
+            <div class="row">
+              <div class="form-group col-6">
+                <label for="address-type" class="form-label">Address Type</label>
+                <input type="text" id="address-type" class="form-input" name="address_type" placeholder="Home, Work, etc." required/>
+              </div>
+              <div class="form-group col-6">
+                <label for="name" class="form-label">Name</label>
+                <input type="input" id="name" class="form-input" name="name" placeholder="Reciever Name" required/>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <label for="street" class="form-label">Street Address</label>
+                <input type="text" id="street" class="form-input" name="street_address" placeholder="Enter street address " required/>
+              </div>
+              <div class="form-group col-6">
+                <label for="city" class="form-label">PIN Code</label>
+              <input type="number" id="city" class="form-input" name="pincode" required />
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <label for="state" class="form-label">Phone</label>
+              <input type="text" id="state" class="form-input" name="phone" required/>
+              </div>
+              <div class="form-group col-6">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="zip-code" class="form-input"name="email" required/>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <input type="checkbox" id="is-default" name="is_default" />
+              <label for="is-default" class="form-checkbox-label"  >Set as default address</label>
+            </div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-success rounded">Add Address</button>
+              <button type="button" class="btn btn-outline-danger rounded" onclick="closeAddAddress()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+
+<script>
+    function AddAddress() {
+        document.getElementById("addAddress").style.display = "block";
+      }
+    
+      function closeAddAddress() {
+        document.getElementById("addAddress").style.display = "none";
+      }
+    
+      window.onload = function(){
+          document.getElementById("editAddress").style.display = "none";
+          document.getElementById("addAddress").style.display = "none";
+         }
+</script>
+<!-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  const options = {
+      key: "{{ razorpay_key_id }}",  // Razorpay key ID from backend
+      amount: "{{ razorpay_order_amount }}",  // Amount in paise
+      currency: "INR",
+      name: "Prokit",
+      description: "Order Payment",
+      image: "https://example.com/your-logo.png",
+      order_id: "{{ razorpay_order_id }}",  // Razorpay Order ID
+      handler: function (response) {
+        fetch("#", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",  // CSRF token for security
+            },
+            body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+            }),
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            if (data.status === "success") {
+                window.location.href = "#";
+            } else {
+                alert("Payment verification failed!");
+            }
+        });
+    },
+      prefill: {
+          name: "{{ user.first_name }} {{ user.last_name }}",
+          email: "{{ user.email }}",
+          contact: "{{ user.profile.phone }}",
+      },
+      theme: {
+          color: "#3399cc",
+      },
+  };
+
+  // Open Razorpay Checkout on button click
+  document.getElementById("place-order-btn").addEventListener("click", function (e) {
+      e.preventDefault();
+      const rzp = new Razorpay(options);
+      rzp.open();
+  });
+</script> -->
+{% endblock %}
