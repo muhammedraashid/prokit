@@ -26,13 +26,15 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Size <span class="text-danger">*</span></label>
-                                <select class="form-control" name="size" required>
-                                    <option value="">Select size</option>
+                                <div class="form-group">
+                                    <label>Sizes and Stock<span class="text-danger">*</span></label><br>
                                     {% for size in sizes %}
-                                        <option value="{{ size }}" {% if size == variant.size %}selected{% endif %}>{{ size }}</option>
+                                        <div class="form-group ">
+                                            <label for="{{ size }}">{{size}} :</label>
+                                            <input type="number" name="{{ size }}" id="{{ size }}" class="form-control" min="0" placeholder="{{size}}" style="width: 100px;">
+                                        </div>
                                     {% endfor %}
-                                </select>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -46,11 +48,6 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
-    
-                    <div class="form-group">
-                        <label>Stock <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" name="stock" value="{{ variant.stock }}" min="0" required>
                     </div>
     
 

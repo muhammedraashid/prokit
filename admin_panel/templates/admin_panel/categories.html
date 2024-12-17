@@ -22,9 +22,13 @@
             <div class="card mb-4 bg-dark text-white">
                 <div class="card-body">
                     <h5 class="card-title">{{ category.name }}</h5>
+                    
                     <div class="d-flex justify-content-between align-items-center">
+                        {% if category.offer > 0 %}
+                    <button  class="btn btn-outline-danger btn-sm">{{category.offer}} %</button>
+                    {% endif %}
                         <div class="ms-auto"> <!-- This pushes content to the right -->
-                            <a href="#" class="btn btn-primary py-1 me-2" onclick="openForm('{{category.name}}','{{category.id}}')">Edit</a>
+                            <a href="#" class="btn btn-primary py-1 me-2" onclick="openForm('{{category.name}}','{{category.offer}}','{{category.id}}')">Edit</a>
                             <form method="post" action="{% url 'category_list_unlist' category.id %}" class="d-inline mb-0">
                                 {% csrf_token %}
                                 {% if category.is_listed %}
@@ -46,15 +50,20 @@
         {% endfor %}
     </div>
 </div>
-
+ <!--edit-form  -->
 <div class="form-popup rounded" id="myForm" style="display: none; margin-left: 20px; justify-content: center; width: 40%;">
     <form method="POST" class="form-container rounded" id="editCategory">
         {% csrf_token %}
-        <label for="name"><b>Name</b></label>
+        <label for="name" class="text-success"><b>Name</b></label>
         <input type="text" name="name" id="categoryName" 
                placeholder="{{ category.name }}" 
                style="margin: 20px 0; border-radius: 8px; padding: 10px 20px; border: 1px solid #ccc; 
                       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;">
+        <label for="offer" class="text-success"><b>Offer (%)</b></label>
+        <input type="numbe" name="offer" id="categoryOffer" 
+                placeholder="{{ category.offer}}" 
+                style="margin: 20px 0; border-radius: 8px; padding: 10px 20px; border: 1px solid #ccc; 
+                    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;">              
         <button type="submit" class="btn btn-outline-success me-2">Save</button>
         <button type="button" class="btn btn-outline-danger" onclick="closeForm()">Close</button>
     </form>
@@ -63,20 +72,26 @@
 <div class="form-popup rounded" id="addForm" style="display: none; margin-left: 20px; justify-content: center; width: 40%;">
     <form method="POST" class="form-container rounded" id="addCategory">
         {% csrf_token %}
-        <label for="name"><b>Name</b></label>
+        <label for="name" class="text-success"><b>Name</b></label>
         <input type="text" name="name" id="categoryName" 
                placeholder="Enter new category name" 
                style="margin: 20px 0; border-radius: 8px; padding: 10px 20px; border: 1px solid #ccc; 
                       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;">
+        <label for="name" class="text-success"><b>Offer (%)</b></label>              
+        <input type="number" name="offer" id="categoryOffer" 
+                      placeholder="Enter set category offer (%)" 
+                      style="margin: 20px 0; border-radius: 8px; padding: 10px 20px; border: 1px solid #ccc; 
+                             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;">              
         <button type="submit" class="btn btn-outline-success me-2">Create</button>
         <button type="button" class="btn btn-outline-danger" onclick="closeForm()">Close</button>
-    </form>
+    </form> 
 </div>
 
 <script>
-    function openForm(categoryName,categoryId) { 
+    function openForm(categoryName,categoryOffer,categoryId) { 
       document.getElementById("myForm").style.display = "block";         
       document.getElementById("categoryName").value = categoryName
+      document.getElementById("categoryOffer").value = categoryOffer
       form = document.getElementById("editCategory");
       form.action = "{% url 'category_edit' category_id=0 %}".replace('0',categoryId)
     }

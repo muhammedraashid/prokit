@@ -52,6 +52,13 @@ INSTALLED_APPS = [
     "admin_panel",
     "products",
     "categories",
+    "order_management",
+    "cart",
+    "address",
+    "coupon",
+    "wishlist",
+    "wallet",
+
 ]
 
 
@@ -82,7 +89,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "context_preprocessors.global_data",
+                "context_processors.global_data",
             ],
         },
     },
@@ -152,7 +159,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
+from decouple import config
 #smtp configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # SMTP Server
@@ -161,6 +168,7 @@ EMAIL_USE_TLS = True  # Use TLS
 EMAIL_HOST_USER = 'muhammedrashidn881@gmail.com'
 EMAIL_HOST_PASSWORD = 'mpxl lfss cqih qiqc'  # Use App Password
 DEFAULT_FROM_EMAIL = 'muhammedrashidn881@gmail.com'
+FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:8000')
 
 
 #authenticaton backends
@@ -188,3 +196,6 @@ LOGOUT_REDIRECT_URL = '/signin/'           #redirect after logout
 #     }
 # }
 SOCIALACCOUNT_QUERY_EMAIL = True
+
+RAZORPAY_KEY_ID = 'rzp_test_F6HvgkhI98quBC'
+RAZORPAY_SECRET_KEY = 'TmxdDAIWatCEugQgdfJog5pC'

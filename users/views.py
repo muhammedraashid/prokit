@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.models import User
+from .models import Profile, EmailVerification
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
@@ -33,16 +34,16 @@ def UserSignUp(request):
  
         error_messages = []
 
-        if firstname.isspace():
-            error_messages.append('Firstname not be spaces')
-        if lastname.isspace():
-            error_messages.append('Lastname not be spaces')
+        if not firstname.strip():
+            error_messages.append('First name cannot be empty or spaces.')
+        if not lastname.strip():
+            error_messages.append('Last name cannot be empty or spaces.')
 
         if User.objects.filter(username=username).exists():
             error_messages.append('Try another username')
 
         if User.objects.filter(email=email).exists():
-            error_messages.append('account already exists in this email id')    
+            error_messages.append('Account already exists in this email id')    
 
         try:
              validate_email(email)
@@ -63,13 +64,24 @@ def UserSignUp(request):
 
 
         user = User.objects.create_user(username=username, email=email, password=password, first_name=firstname, last_name=lastname)
+        user.is_active = False
         user.save()
-        messages.success(request,'Regidtration completed Successfully') 
+        messages.success(request,'Registration successful! Please check your email to verify your account.') 
         return redirect('user_signin')
     
     return render(request,'user_signup.html')
 
+def verify_email(request, token):
+    verification = get_object_or_404(EmailVerification, token=token)
 
+    if verification.user.is_active :
+        messages.info(request,"Your email alredy verified")
+    else:
+        verification.user.is_active = True
+        verification.user.save()
+        verification.delete()
+        messages.success(request, "Your email verified successfully! Now you can sign in ")    
+    return redirect('user_signin')
 
 def UserSignIn(request):
     if request.method == 'POST':
@@ -109,7 +121,6 @@ def generate_otp():
     return ''.join([str(random.randint(0, 9)) for _ in range(6)]) #gnerate an 6 digit OTP
 
 def send_otp_email(email, otp):
-    """Send OTP via email."""
     subject = 'Your Password Reset OTP'
     message = f'Your OTP is: {otp}\n\n This OTP will expire in 5 minutes.'
     try:
@@ -128,19 +139,15 @@ def send_otp_email(email, otp):
 
 
 def initiate_password_reset(request):
-    """Start password reset process by sending OTP."""
+    
     if request.method == 'POST':
         email = request.POST.get('email')
         
-        try:
-            # Verify user exists
-            user = User.objects.get(email=email)
-            
-            # Generate OTP
-            otp = generate_otp()
-            
-            # Create OTP session data
-            otp_data = {
+        try: 
+            user = User.objects.get(email=email) # check user exists        
+            otp = generate_otp() # generate otp
+                  
+            otp_data = {   
                 'otp': otp,
                 'email': email,
                 'created_at': timezone.now().isoformat(),
@@ -150,9 +157,9 @@ def initiate_password_reset(request):
             
             # Send OTP email
             if send_otp_email(email, otp):
-                                                # Store OTP data in session
-                request.session['password_reset_otp'] = json.dumps(otp_data)
-                request.session.set_expiry(600)                              # 10 minutes session timeout
+                                               
+                request.session['password_reset_otp'] = json.dumps(otp_data)  # create otp session
+                request.session.set_expiry(600)      # after 10 minutes session timeout
                 
                 messages.success(request, 'OTP sent successfully!')
                 return redirect('verify_otp')
@@ -166,50 +173,50 @@ def initiate_password_reset(request):
 
 
 def verify_otp(request):
-    """Verify the OTP entered by the user."""
+   
     if request.method == 'POST':
-        # Retrieve OTP data from session
-        stored_otp_json = request.session.get('password_reset_otp')
+        
+        stored_otp_json = request.session.get('password_reset_otp') 
         
         if not stored_otp_json:
             messages.error(request, 'OTP session expired. Please restart the process.')
             return redirect('initiate_password_reset')
         
-        # Parse stored OTP data
+      
         stored_otp_data = json.loads(stored_otp_json)
         
-        # Check OTP attempts
+       
         if stored_otp_data['attempts'] >= 3:
             del request.session['password_reset_otp']
             messages.error(request, 'Too many incorrect attempts. Please restart the process.')
             return redirect('initiate_password_reset')
         
-        # Get current time and created time
+        
         created_at = timezone.datetime.fromisoformat(stored_otp_data['created_at'])
         current_time = timezone.now()
         
-        # Check OTP timeout (5 minutes)
-        if (current_time - created_at).total_seconds() > 300:
+        
+        if (current_time - created_at).total_seconds() > 300: # check otp timeout - 5 minutes
             del request.session['password_reset_otp']
             messages.error(request, 'OTP has expired. Please request a new one.')
             return redirect('initiate_password_reset')
         
-        # Verify OTP
-        otp_entered = request.POST.get('otp')
+       
+        otp_entered = request.POST.get('otp') # get the otp from user
         
         if otp_entered == stored_otp_data['otp']:
-            # Reset session for password reset
             email = stored_otp_data['email']
             del request.session['password_reset_otp']
             
-            # Set a new session for password reset
-            request.session['password_reset_email'] = email
-            request.session.set_expiry(600)  # 10 minutes
+            
+            request.session['password_reset_email'] = email    # creating new session for reset password
+            request.session.set_expiry(600) 
             
             messages.success(request, 'OTP verified successfully!')
             return redirect('reset_password')
         else:
-            # Increment attempts
+            
+
             stored_otp_data['attempts'] += 1
             request.session['password_reset_otp'] = json.dumps(stored_otp_data)
             
@@ -219,25 +226,24 @@ def verify_otp(request):
 
 
 def resend_otp(request):
-    """Resend OTP with rate limiting."""
-    # Retrieve OTP data from session
+   
     stored_otp_json = request.session.get('password_reset_otp')
     
     if not stored_otp_json:
         messages.error(request, 'No active OTP session. Please restart.')
         return redirect('initiate_password_reset')
     
-    # Parse stored OTP data
+   
     stored_otp_data = json.loads(stored_otp_json)
     
-    # Check resend count (max 3 resends)
-    if stored_otp_data.get('resend_count', 0) >= 3:
+    #
+    if stored_otp_data.get('resend_count', 0) >= 3: # check resend attempts 
         del request.session['password_reset_otp']
         messages.error(request, 'Maximum resend attempts reached. Please restart.')
         return redirect('initiate_password_reset')
     
-    # Generate new OTP
-    new_otp = generate_otp()
+    
+    new_otp = generate_otp() # generatenew otp
     
     # Update OTP data
     stored_otp_data['otp'] = new_otp
@@ -290,3 +296,89 @@ def reset_password(request):
             messages.error(request, 'User not found.')
     
     return render(request, 'reset_password.html')
+
+# ----------------------------------------------------------------------------------------------
+#   user-profile
+# ---------------------------------------------------------------------------------------------
+@login_required
+def UserAccount(request):
+    user = request.user
+    total_orders = user.orders.all().count()
+    total_wishlist = user.wishlist.items.all().count()
+    total_cart = user.cart.cartitems.all().count()
+    # total_reviews = user.reviews.all().count()
+
+    context = {
+        "total_orders":total_orders,
+        "total_wishlist":total_wishlist,
+        "total_cart":total_cart,
+        # "total_reviews":total_reviews
+    }
+    return render(request, 'account.html',context)
+
+@login_required
+def UserProfile(request):
+    user = request.user
+    user_id = user.id
+    if request.method == "POST":
+        firstname = request.POST.get('first_name') 
+        lastname = request.POST.get('last_name')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        password = request.POST.get('password')
+        copassword = request.POST.get('co_password')
+ 
+        error_messages = []
+
+        if firstname.isspace():
+            error_messages.append('Firstname not be spaces')
+        if lastname.isspace():
+            error_messages.append('Lastname not be spaces')
+
+        if User.objects.filter(username=username).exclude(id=user_id).exists():
+            error_messages.append('Try another username')
+        
+        if User.objects.filter(email=email).exclude(id=user_id).exists():
+            error_messages.append('account already exists in this email id')    
+
+        try:
+             validate_email(email)
+        except:
+            error_messages.append('Invalid email address')  
+
+        if password :
+            if len(str(password)) < 8 :
+                error_messages.append('Password must contains 8  characters long')  
+
+            if password != copassword :
+                error_messages.append('Password not matching !')      
+
+
+        if error_messages:
+            for message in error_messages:
+                messages.error(request,message)
+                
+            return  render(request, 'profile.html',{'first_name':firstname,'last_name': lastname, 'username':username,'email':email})          
+
+
+        user.username = username
+        user.first_name = firstname
+        user.last_name = lastname
+        if password:
+            user.set_password(password)
+            user.save()
+            messages.success(request,'Password succesfully reseted')
+        if phone :
+            user.profile.phone_number = phone
+            user.profile.save()    
+            messages.success(request, 'Phone Number Updated')
+        user.save()
+        
+        messages.success(request,'Profile Updated Successfully') 
+        return render(request,'profile.html',{"user":user})
+
+    context ={
+        'user':user
+    }
+    return render(request,'profile.html',context)

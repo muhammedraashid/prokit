@@ -3,36 +3,31 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.urls import reverse
+from django.http import HttpResponse,JsonResponse
 from django.core.exceptions import ObjectDoesNotExist,ValidationError
-from products.models import Product,Variant,VariantImages
-from categories.models import Category
+from products.models import Product,Variant,VariantImages,VariantSize
+from categories.models import Category,Size
+from order_management.models import Order,OrderItems
 from django.db import transaction
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q, Count
+from django.db.models import Q, Count,Sum, Prefetch
+
 
 @require_http_methods(["GET", "POST"])
 def add_product(request):
    
-    # Define category-specific size options
-    size_options = {
-        "Boots": ["38", "39", "40", "41", "42", "43", "44", "45"],
-        "Shorts": ["XS", "S", "M", "L", "XL"],
-        "Balls": ["Size 3", "Size 4", "Size 5"],
-        "Jersey": ["XS", "S", "M", "L", "XL"],
-        "Socks": ["S", "M", "L"],
-    }
-
-    # Handle GET request
+ 
     if request.method == 'GET':
         categories = Category.objects.all()
         category_id = request.GET.get("category", "1")
-        
-        # Get selected category and its name
+
+      
         selected_category = get_object_or_404(Category, id=category_id)
         category_name = selected_category.name
 
-        # Get size options for selected category
-        sizes = size_options.get(category_name, ['unavailable'])
+        sizes = Size.objects.filter(category=selected_category).values_list('size', flat=True) # it return a list of sizes
+
         
         context = {
             "sizes": sizes,
@@ -41,17 +36,16 @@ def add_product(request):
         }
         return render(request, 'admin_panel/add_product.html', context)
 
-    # Handle POST request
+ 
     try:
         with transaction.atomic():
-            # Extract basic product information
+          
             category_id = request.POST.get('categoryId')
-            
-            # Validate category
+
             if not category_id:
                 raise ValidationError("Category is required")
             
-            # Create product
+          
             product = Product.objects.create(
                 name=request.POST.get('name'),
                 price=request.POST.get('price'),
@@ -62,25 +56,21 @@ def add_product(request):
                 is_listed=request.POST.get('is_listed') == 'on'
             )
 
-            # handle the  first variant   
-            size = request.POST.get('size')
+            # sizes = request.POST.getlist('sizes')
             color = request.POST.get('color')
-            stock = request.POST.get('stock')
-
-            # Create a single variant
+            # stock = request.POST.get('stock')
+            
             variant = Variant.objects.create(
                 product=product,
-                size=size,
                 color=color,
-                stock=stock
+                # stock=stock
             )
-
-            # Process images for this variant
+                        
             variant_images = []
-            required_images_count = 3  # Minimum required images
+            required_images_count = 3  
 
-            # Handle images (both required and optional)
-            for j in range(1, 6):
+            
+            for j in range(1, 6): # max 5 imgs
                 image_key = f'image{j}[]'
                 if image_key in request.FILES:
                     images = request.FILES.getlist(image_key)
@@ -89,40 +79,47 @@ def add_product(request):
                             VariantImages(variant=variant, image=image)
                         )
 
-            # Validate image count
+           
             if len(variant_images) < required_images_count:
                 raise ValidationError(
-                    f"The variant ({size}-{color}) requires at least {required_images_count} images"
+                    f"The variant ({product}-{color}) requires at least {required_images_count} images"
                 )
 
-            # Bulk create variant images
-            VariantImages.objects.bulk_create(variant_images)
+            VariantImages.objects.bulk_create(variant_images) # bulk create the list of  variant images
+            
+            selected_category = get_object_or_404(Category, id=category_id)
+            sizes = Size.objects.filter(category=selected_category).values_list('size', flat=True)
+            for size in sizes:
+                stock = request.POST.get(f"{size}")
+                
+                VariantSize.objects.create(
+                    variant = variant,
+                    size = size,
+                    stock = int(stock) if stock and stock.isdigit() and int(stock) >= 0 else 0
+                )
 
             messages.success(request, "Product and variant created successfully!")
             return redirect('admin_products')
+            
 
 
     except ValidationError as e:
         messages.error(request, str(e))
     except Exception as e:
         messages.error(request, f"An error occurred: {str(e)}")
-        # In production, you might want to log the full error
-        
-    # If there's an error, re-render the form with the current category
+               
     categories = Category.objects.all()
     selected_category = get_object_or_404(Category, id=category_id)
-    sizes = size_options.get(selected_category.name, ['unavailable'])
-    
     context = {
         'categories': categories,
         'category_id': category_id,
-        'sizes': sizes,
+        'total_stock': total_stock
     }
     return render(request, 'admin_panel/add_product.html', context)
 
 
-def update_product(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
+def update_product(request, slug):
+    product = get_object_or_404(Product, slug=slug)
     category_id = product.category.id
 
     if request.method == "POST":
@@ -135,7 +132,7 @@ def update_product(request, product_id):
             return render(request, 'admin_panel/product_details.html', {'product': product})
 
         # Check if a product with the same name already exists (excluding the current product)
-        if Product.objects.filter(name=name).exclude(id=product_id).exists():
+        if Product.objects.filter(name=name).exclude(slug=slug).exists():
             messages.error(request, "A product with this name already exists.")
             return render(request, 'admin_panel/product_details.html', {'product': product})
 
@@ -150,148 +147,197 @@ def update_product(request, product_id):
 
         product.save() #product saved
         messages.success(request, "Product updated successfully.")
-        return redirect('admin_product_view',product_id=product.id)
+        return redirect('admin_product_view',slug=slug)
 
     return render(request, 'admin_panel/product_details.html', {'product': product})
 
-def delete_product(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    if request.method == "POST":
-        product.delete()
-        return redirect('admin_products')
-    return render(request, 'admin_panel/products.html')
+
 
 
 def Shop(request):
-    products = Product.objects.filter(is_listed = True)
-    categories = Category.objects.filter(is_listed=True)
-    size_options = {
-        "Boots": ["38", "39", "40", "41", "42", "43", "44", "45"],
-        "Shorts": ["XS", "S", "M", "L", "XL"],
-        "Balls": ["Size 3", "Size 4", "Size 5"],
-        "Jersey": ["XS", "S", "M", "L", "XL"],
-        "Socks": ["S", "M", "L"],
-    }
-    category_name = 'Jersey'  #defaultly set
-    sizes = size_options.get(category_name, ['unavailable'])
-    # Define color options
    
+    categories = Category.objects.filter(is_listed=True)
+    category_ids = request.GET.getlist('category_ids') 
+    # selected_sizes = request.GET.getlist('sizes')
+    category_ids = [int(cid) for cid in category_ids if cid.isdigit()]
+    brand_names = request.GET.getlist('brand_ids')
+    
+    selected_categories = Category.objects.filter(id__in=category_ids, is_listed=True) 
+    
+    # selected_sizes = [size for size in selected_sizes if size]
+    # sizes = Size.objects.filter(category__in=selected_categories).values_list('size', flat=True)
+
+    query = request.GET.get('qry','')
+    sortby= request.POST.get('sortby','name')
+   
+    print(sortby)
+    if request.method == 'POST' and sortby:
+        if sortby == 'popular':
+           top_selling_products = (
+                OrderItems.objects.values('product__id') 
+                .annotate(total_quantity=Sum('quantity'))  
+                .order_by('-total_quantity')  
+                .values_list('product__id', flat=True)  
+            )
+           
+           products = Product.objects.filter(id__in=top_selling_products, is_listed=True).prefetch_related(
+               Prefetch('variants',queryset=Variant.objects.filter(is_listed=True))
+           )
+        else:
+            products = Product.objects.filter(is_listed = True).prefetch_related(
+                Prefetch('variants', queryset= Variant.objects.filter(is_listed=True))
+            ).order_by(sortby)
+       
+    elif request.method == 'GET': 
+
+        if  query:
+            products =Product.objects.filter(
+                Q(name__icontains=query) | Q(brand__istartswith=query) | Q(category__name__istartswith=query) 
+                ).order_by('category')             
+        elif category_ids: 
+            products = Product.objects.filter(Q(is_listed=True) & Q(category__in=selected_categories)  ).prefetch_related(
+                Prefetch('variants', queryset= Variant.objects.filter(is_listed=True))
+            ).order_by('name')
+            if brand_names:
+                products = products.filter(Q(brand__in=brand_names))
+        elif brand_names:
+                 products = Product.objects.filter(Q(is_listed=True) & (Q(brand__in=brand_names)) ).prefetch_related(
+                Prefetch('variants', queryset= Variant.objects.filter(is_listed=True))
+            ).order_by('name')
+        else:
+             products = Product.objects.filter(is_listed=True).prefetch_related(
+                Prefetch('variants', queryset= Variant.objects.filter(is_listed=True))
+            ).order_by('name')             
+        
+    
     context = {
         'products': products,
         'categories': categories,
-        'sizes' : sizes,
+        # 'sizes' : list(set(sizes)),
+        'query':query,
+        # 'selected_sizes':selected_sizes,
+        'category_ids':category_ids,
+        'brand_names':brand_names,
+        # 'sortby':sortby,
     }
     return render(request, 'shop.html', context)
 
 
 
-def userProductView(request,variant_id):
-    variant = get_object_or_404(Variant, id=variant_id)
+def userProductView(request,variant_size_slug):
+    variant_size = get_object_or_404(VariantSize, slug=variant_size_slug)
+    variant  = variant_size.variant
     product = variant.product
     category = product.category
-    images = variant.images.all()
+    images = variant.images.all() if variant else []
     # reviews = product.reviews.all()
-    size_options = {
-        "Boots": ["38", "39", "40", "41", "42", "43", "44", "45"],
-        "Shorts": ["XS", "S", "M", "L", "XL"],
-        "Balls": ["Size 3", "Size 4", "Size 5"],
-        "Jersey": ["XS", "S", "M", "L", "XL"],
-        "Socks": ["S", "M", "L"],
-    }
-    sizes = size_options.get(category.name, ['unavailable'])
+   
+    sizes = Size.objects.filter(category=category).values_list('size', flat=True)  # it return a list of sizes
 
     products = Product.objects.filter(is_listed = True)
     related_products = Product.objects.filter(Q(category = category) & Q(is_listed=True)).exclude(id=product.id)[:4]
+    
+    offer = category.offer if category.offer >= product.offer else product.offer
+    offer_price = round(product.price * (1 - offer / 100),2)
+
+
     context = {
         'product':product,
         'category':category,
         'variant' : variant,
+        'variant_size':variant_size,
         'images' : images,
         'sizes' : sizes,
         'products': products,
         'related_products':related_products,
+        'offer_price':offer_price,
+        "offer":offer,
         # 'reviews':reviews
     }
     return render(request, 'product.html', context)
 
-def adminProductView(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
+def adminProductView(request, slug):
+    product = get_object_or_404(Product, slug=slug)
     variants = product.variants.prefetch_related('images').all()
-
+    total_stock = Variant.objects.annotate(total_stock=Sum('sizes__stock'))
     context = {
         'product': product,
         'variants': variants,
+        'total_stock':total_stock
     }
     return render(request, 'admin_panel/product_details.html', context)
 
-def list_unlist_product(request,product_id):
-    product = get_object_or_404(Product, id=product_id)
+def list_unlist_product(request,slug):
+    product = get_object_or_404(Product, slug=slug)
     if request.method == "POST":
         product.is_listed = not product.is_listed
         product.save()
     return redirect('admin_products')
 
-def del_product(request,product_id):
-    product = get_object_or_404(Product, id=product_id)
-    if request.method == 'POST':
-        product.delete()
-    return redirect('admin_products')
 
+def update_variant(request, variant_slug ):
 
-
-def update_variant(request, variant_id):
-
-    variant = get_object_or_404(Variant, id=variant_id)
+    variant = get_object_or_404(Variant, slug=variant_slug )   
     category_name = variant.product.category.name
-    size_options = {
-        "Boots": ["38", "39", "40", "41", "42", "43", "44", "45"],
-        "Shorts": ["XS", "S", "M", "L", "XL"],
-        "Balls": ["Size 3", "Size 4", "Size 5"],
-        "Jersey": ["XS", "S", "M", "L", "XL"],
-        "Socks": ["S", "M", "L"],
-    }
-    sizes = size_options.get(category_name,['unavailable'])
+    category = variant.product.category
+    existing_images = variant.images.all()
+    sizes = variant.sizes.all()
+    variants =variant.sizes.all()
     if request.method == 'POST':
         # Update variant fields
-        variant.size = request.POST.get('size')
         variant.color = request.POST.get('color')
-        variant.stock = request.POST.get('stock')
         variant.save()
-
+        sizes = Size.objects.filter(category=category).values_list('size', flat=True)
+        for size in sizes:
+            stock = request.POST.get(f"{size}")
+            
+            variant_size = get_object_or_404(VariantSize, variant=variant, size=size)
+            variant_size.stock = stock if stock is not None and stock.isdigit() and int(stock) >= 0 else 0
+            variant_size.save()
+        
+        variant_images = []
        
+        for i in range(1,6):
+            image_key = f'image{i}[]'
+            if image_key in request.FILES:
+                images = request.FILES.getlist(image_key)
+                for image in images:
+                    variant_images.append(
+                        VariantImages(variant=variant, image=image)
+                    )         
+                           
+        VariantImages.objects.bulk_create(variant_images)
+        
+        if variant_images :
+            return redirect('variant_edit',variant.slug)
+        else:
+            return redirect('admin_product_view',variant.product.slug)
     
     context = {
         'variant':variant,
-        'sizes': sizes
+        'variants': variants,
+        'existing_images':existing_images,
+        'sizes':sizes,  
+        
     }
     return render(request, 'admin_panel/edit_variant.html',context)
 
 
 
-def add_variant(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
+def add_variant(request, slug):
+    product = get_object_or_404(Product, slug=slug)
     category_name = product.category.name
-    size_options = {
-        "Boots": ["38", "39", "40", "41", "42", "43", "44", "45"],
-        "Shorts": ["XS", "S", "M", "L", "XL"],
-        "Balls": ["Size 3", "Size 4", "Size 5"],
-        "Jersey": ["XS", "S", "M", "L", "XL"],
-        "Socks": ["S", "M", "L"],
-    }
-    sizes = size_options.get(category_name,['unavailable'])
+    category = product.category
+    sizes = Size.objects.filter(category=category).values_list('size', flat=True) # it return a list of sizes
     if request.method == "POST":
-        size = request.POST.get('size')
-        color = request.POST.get('color')
-        stock = request.POST.get('stock')
-
         
-       
+        color = request.POST.get('color')
+      
         variant = Variant.objects.create(
-            product=product,
-            size=size,
-            color=color,
-            stock=stock
-        )
+                product=product,
+                color=color,
+                # stock=stock
+                )
 
         
         variant_images = []
@@ -308,10 +354,20 @@ def add_variant(request, product_id):
         if variant_images:
             VariantImages.objects.bulk_create(variant_images)
 
-        messages.success(request, "Variant created successfully!")
-        return redirect('admin_product_view', product_id=product.id)
+        selected_category = get_object_or_404(Category, id=product.category.id)
+        sizes = Size.objects.filter(category=selected_category).values_list('size', flat=True)
+        for size in sizes:
+            stock = request.POST.get(f"{size}")
+            if stock is not None and stock.isdigit() and int(stock) > 0:
+                VariantSize.objects.create(
+                    variant = variant,
+                    size = size,
+                    stock = int(stock),
+                )    
 
-                    
+        messages.success(request, "Variant created successfully!")
+        return redirect('admin_product_view', slug=slug)
+                
     context = {
         'product':product,
         'sizes':sizes
@@ -321,8 +377,21 @@ def add_variant(request, product_id):
     return render(request, 'admin_panel/add_variant.html', context)
 
 
-def delete_variant(request,variant_id):
-    variant = get_object_or_404(Variant, id=variant_id)
+def delete_variant(request,variant_slug):
+    variant = get_object_or_404(Variant, slug=variant_slug)
     if request.method == "POST":
-        variant.delete()
-    return redirect('admin_product_view',product_id=variant.product.id)
+        variant.is_listed = not variant.is_listed
+        variant.save()
+    return redirect('admin_product_view',slug=variant.product.slug)
+
+def delete_image(request, image_id):
+    image = get_object_or_404(VariantImages, id=image_id)
+    variant = image.variant
+    if request.method == 'POST':
+        if variant.images.count() <= 3:
+            messages.warning(request, "Minimum 3 images required . Add more images !")
+        else:
+            image.delete()
+            messages.success(request, "Image deleted auccess")
+            
+    return redirect('variant_edit',variant_slug=variant.slug)

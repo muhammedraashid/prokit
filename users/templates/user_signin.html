@@ -103,15 +103,15 @@
       <div class="mb-3 position-relative">
         <label for="password" class="form-label">Password</label>
         <input type="password" class="form-control" id="password" name="password" required>
-        <i class="fas fa-eye eye-icon mt-3" onclick="togglePassword('password')" style="color: #1d3ca1;"></i>
+        <i class="fas fa-eye eye-icon mt-3" onclick="togglePassword('password')" style="color: #081337;"></i>
       </div>
-      <a href="{% url 'initiate_password_reset' %}" class="forgot-password">forgot password?</a>
-      <button type="submit" class="btn btn-primary w-100  mt-4">Sign In</button>
+      <a href="{% url 'initiate_password_reset' %}" class="forgot-password" style=" text-decoration: none;">Forgot password ?</a>
+      <button type="submit" class="btn  text-white w-100  mt-4" style="background-color: #081337;">Sign In</button>
     </form>
     
   </div>
     
-  <a href="/accounts/login" class="google-btn container rounded" role="button">
+  <a href="/accounts/login" class="google-btn container rounded text-center" role="button" style="text-decoration: none;">
     <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiLz48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ii8+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDLjkyIDE2LjQ2IDAgMjAuMTIgMCAyNGMwIDMuODguOTIgNy41NCAyLjU2IDEwLjc4bDcuOTctNi4xOXoiLz48cGF0aCBmaWxsPSIjMzRBODUzIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ii8+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiIvPjwvc3ZnPg==" alt="Google Logo">
     Sign in with Google
   </a>

@@ -7,8 +7,8 @@
 {%endblock %}
 
 {% block content %}
- <h1>Edit Variant Details</h1>
- <div class="container mt-5 " style="width: 70%;">
+<h1>Edit Variant Details</h1>
+<div class="container mt-5 " style="width: 80%;">
     <form method="POST" enctype="multipart/form-data" >
         {% csrf_token %}
         <div id="variantsContainer">
@@ -25,13 +25,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Size <span class="text-danger">*</span></label>
-                                <select class="form-control" name="size" required>
-                                    <option value="">Select size</option>
-                                    {% for size in sizes %}
-                                        <option value="{{ size }}" {% if size == variant.size %}selected{% endif %}>{{ size }}</option>
-                                    {% endfor %}
-                                </select>
+                                <label>Sizes and Stock<span class="text-danger">*</span></label><br>
+                                {% for size in sizes %}
+                                    <div class="form-group ">
+                                        <label for="{{ size.size }}">{{size.size}} :</label>
+                                        <input type="number" value="{{size.stock}}" name="{{ size.size }}" id="{{ size.size }}" class="form-control" min="0" placeholder="{{size.size}}" style="width: 100px;">
+                                    </div>
+                                {% endfor %}
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -46,12 +46,6 @@
                             </div>
                         </div>
                     </div>
-    
-                    <div class="form-group">
-                        <label>Stock <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" name="stock" value="{{ variant.stock }}" min="0" required>
-                    </div>
-    
 
 
                         <label>Add More Images </label>
@@ -83,12 +77,51 @@
             <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-success">Save Changes</button>
             </div> 
+            
+            <div class="existing-images-section border rounded p-3 mt-4 mb-4">
+                <h5>Existing Images</h5>
+                <div class="row" id="existingImagesContainer">
+                    {% if existing_images %}
+                        {% for image in existing_images %}
+                            <div class="col-md-2 col-sm-6 mb-3">
+                                <div class="card">
+                                    <img src="{{ image.image.url }}" class="card-img-top" alt="Product Image">
+                                    <!-- <input type="file" class="custom-file-input variant-image" id="imageInput1" name="image1[]" accept="image/*"  onchange="ProductVariants.handleFileSelect(this)"> -->
 
+                                    <div class="card-body p-2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-white">Image {{forloop.counter}}</small>
+                                   
+                                            <form action="{% url  'delete_image' image.id %}" method="POST">
+                                                {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-danger" >
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12">
+                            <p class="text-muted">No existing images found.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
             </div>
             
         </div> 
     </form>
-      
+
+    {% if messages %}
+       {% for message in messages %}
+          <div class="card col-12 text-center text-warning ">{{message}}</div>
+       {% endfor %}
+    {% endif %}
+  
 </div>    
 
 

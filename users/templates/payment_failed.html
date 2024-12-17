@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .failure-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            animation: fadeIn 1s ease-in;
+        }
+        
+        .failure-icon {
+            width: 80px;
+            height: 80px;
+            background-color: #FF6B6B;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .x-mark {
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .order-number {
+            background-color: #f8f9fa;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 1rem 0;
+            display: inline-block;
+        }
+        
+        .details {
+            margin: 1.5rem 0;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .button {
+            background-color: #FF6B6B;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        
+        .alternate-button {
+            background-color: #0b716a;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+            margin-left: 10px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .button:hover, .alternate-button:hover {
+            opacity: 0.9;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="failure-container">
+        <div class="failure-icon">
+            <span class="x-mark">×</span>
+        </div>
+        <h1>Payment Failed</h1>
+        <p>We're sorry, but your payment could not be processed.</p>
+        <div class="order-number">
+            Order #: {{order_number}}
+        </div>
+        <div class="details">
+            <p>Please check your payment method and try again.</p>
+            <p>Possible reasons include:</p>
+            <ul style="text-align: left; max-width: 300px; margin: 0 auto;">
+                <li>Insufficient funds</li>
+                <li>Card expired</li>
+                <li>Billing address mismatch</li>
+                <li>Payment gateway error</li>
+            </ul>
+        </div>
+        <a href="{% url 'retry_payment' order.id %}" class="button">Retry Payment</a>
+        <a href="{% url 'user_order_view' order.id %}" class="alternate-button">View Order Details</a>
+    </div>
+</body>
+</html>

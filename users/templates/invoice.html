@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .main {
+            background-color: #dde8e9;
+            padding-block: 20px;
+        }
+
+        /* Main header centered */
+        .card-header {
+            background-color: rgb(15, 15, 73);
+            text-align: center;
+            padding: 10px;
+        }
+
+        .card-header h6 {
+            margin-bottom: 0;
+            color: white;
+        }
+
+        .table th,
+        .table td {
+            color: rgb(15, 15, 73);
+        }
+
+        .badge {
+            font-size: 0.9em;
+        }
+
+        .product img {
+            width: 40px;
+        }
+
+        .text-dark {
+            color: #000;
+        }
+
+        .pr-5 {
+            padding-right: 5px;
+        }
+
+        .mt-4 {
+            margin-top: 20px;
+        }
+
+        /* Subheading styling (background blue and text white) */
+        h4 {
+            background-color: rgb(15, 15, 73);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            .main {
+                background-color: #fff;
+                padding-block: 10px;
+            }
+
+            .container {
+                width: 100%;
+                max-width: none;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .card {
+                margin: 0;
+                box-shadow: none;
+            }
+
+            .card-body {
+                padding: 10px;
+            }
+
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .table th,
+            .table td {
+                padding: 8px;
+                text-align: left;
+                border: 0.5px solid #b6bdd6d7;
+            }
+
+            .badge {
+                font-size: 1em;
+                padding: 5px 10px;
+            }
+
+            /* Make sure the image is loaded for printing */
+            .product img {
+                max-width: 80px;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="main">
+        <div class="container mt-4">
+            <div class="card">
+                <!-- Main Header (Centered) -->
+                <div class="card-header">
+                    <h6>Invoice - Order No : {{ order.order_number }}</h6>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Order Information -->
+                        <div class="col-md-6">
+                            <h4>Order Information</h4>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th>Order Number:</th>
+                                    <td>{{ order.order_number }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Order Date:</th>
+                                    <td>{{ order.order_date|date:"F d, Y H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Order Status:</th>
+                                    <td>
+                                        <span class="badge 
+                                            {% if order.order_status == 'pending' %}bg-warning
+                                            {% elif order.order_status == 'processing' %}bg-info
+                                            {% elif order.order_status == 'shipped' %}bg-primary
+                                            {% elif order.order_status == 'delivered' %}bg-success
+                                            {% elif order.order_status == 'cancelled' %}bg-danger
+                                            {% elif order.order_status == 'returned' %}text-danger
+                                            {% endif %}">
+                                            {{ order.get_order_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% if order.order_status != 'cancelled' and order.order_status != 'returned' %}
+                                <tr>
+                                    <th>Payment Status:</th>
+                                    <td>
+                                        <span class="badge">{{ order.payment_status }}</span>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <th>Payment Method:</th>
+                                    <td>{{ order.get_payment_method_display }}</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Receiver Details -->
+                        <div class="col-md-6">
+                            <h4>Receiver Details</h4>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th>Address Name:</th>
+                                    <td>{{ order.address.name|capfirst }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Address Email:</th>
+                                    <td>{{ order.address.email }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Shipping Address:</th>
+                                    <td>
+                                        {{ order.address.street_address }} &nbsp;&nbsp;
+                                        {{ order.address.city }}, {{ order.address.state }} {{ order.address.postal_code }},
+                                        {{ order.address.country }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Address Phone:</th>
+                                    <td>{{ order.address.phone|default:"N/A" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <h4 class="mt-4">Order Items</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Product</th>
+                                <th>Variant</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.order_items.all %}
+                            <tr>
+                                <td>
+                                    <figure class="product">
+                                        <a href="{% url 'user_product_view' item.variant.slug %}">
+                                            <img src="{{ item.variant.variant.images.first.image.url }}" alt="Product image"
+                                                class="rounded">
+                                        </a>
+                                    </figure>
+                                </td>
+                                <td class="text-dark">{{ item.product.name|capfirst }}</td>
+                                <td class="text-dark">{{ item.variant.variant.color }} - {{ item.variant.size }}</td>
+                                <td class="text-dark">{{ item.quantity }}</td>
+                                <td class="text-dark">{{ item.price }}</td>
+                                <td class="text-dark">{{ item.sub_total }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="5" class="text-right"><strong>Coupon Discount</strong></td>
+                                <td><strong>: {{ order.discount_amount|default:0|floatformat:2 }}</strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" class="text-right"><strong>Delivery Charge </strong></td>
+                                <td><strong>: {{ order.delivery_charge|floatformat:2}}</strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" class="text-right pr-5"><strong>Total Amount:</strong></td>
+                                <td><strong>{{ order.total_amount|floatformat:2 }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

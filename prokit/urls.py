@@ -27,7 +27,14 @@ urlpatterns = [
     path('',include('users.urls')),
     path('products/',include('products.urls')),
     path('categories/',include('categories.urls')),
+    path('coupon/',include('coupon.urls')),
+    path('cart/',include('cart.urls')),
+    path('address/',include('address.urls')),
+    path('order/',include('order_management.urls')),
+    path('wishlist/',include('wishlist.urls')),
+    path('wallet/',include('wallet.urls')),
 
+    
     path('accounts/', include('allauth.urls')),  # Allauth URLs
  
 ]

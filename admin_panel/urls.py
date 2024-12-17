@@ -14,5 +14,6 @@ urlpatterns = [
   path('logout',views.adminLogout,name='admin_logout'),
 
   path('users/toggle/<int:user_id>/', views.user_block_unblock, name='user_block_unblock'),
+ 
 
 ]

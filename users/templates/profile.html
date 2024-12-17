@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Product - ProKit{% endblock %}
+
+
+{% block content %}
+
+
+<nav aria-label="breadcrumb" class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'user_account' %}">Account</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Profile</li>
+        </ol>
+    </div><!-- End .container -->
+</nav>
+
+<main class="main" style="background-color:#dde8e9 ; padding-block: 20px;">
+
+<div class="container mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <!-- Left Sidebar Navigation -->
+        <div class="md:col-span-2">
+            <div class="sidebar-nav">
+                <nav>
+                    <a href="#" class="nav-item {% if active_tab == 'profile' %}active{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        Profile
+                    </a>
+                    <!-- Other navigation items remain the same -->
+                </nav>
+            </div>
+        </div>
+   
+
+        <!-- Right Profile Details Container -->
+        <div class="md:col-span-3">
+            <div class="content-card">
+                {% if messages %}
+            <div class="error-message text-center text-primary card success mt-2 py-2">
+                    {% for message in messages %}
+                        <div>{{ message }}</div>
+                    {% endfor %}
+            </div>
+            {% endif %}
+                <form method="post" action="{% url 'user_profile' %}">
+                    {% csrf_token %}
+                     
+      
+                    <div class="space-y-4">
+
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" name="username" value="{{ user.username }}" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name" value="{{ user.first_name }}" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name" value="{{ user.last_name }}" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" value="{{ user.email }}" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" name="phone" value="{{ user.profile.phone_number }}" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Reset Password </label>
+                            <input type="password" name="password"  class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Conform Password </label>
+                            <input type="password" name="co_password"  class="form-control">
+                        </div>
+
+
+                        <button type="submit" class="btn btn-success rounded">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</main>
+{% endblock %}

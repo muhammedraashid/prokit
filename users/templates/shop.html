@@ -6,16 +6,12 @@
 {% block content %}
 
 <main class="main">
-    <div class="page-header text-center" style="background-image: url('{% static "assets/images/page-header-bg.jpg" %}');">
-        <div class="container">
-            <h1 class="page-title">PRODUCTS<span>Shop</span></h1>
-        </div><!-- End .container -->
-    </div><!-- End .page-header -->
+   
     <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
         <div class="container">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active"><a href="#">Shop</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item active"><a>Shop</a></li>
             </ol>
         </div><!-- End .container -->
     </nav><!-- End .breadcrumb-nav -->
@@ -25,14 +21,14 @@
         <div class="container">
             <div class="row">
 
-              <aside class="col-lg-3 order-lg-first">
+              <aside class="col-lg-3 order-lg-first rounded" style="box-shadow: 0px 0px 1px 0.2px;">
                 <div class="sidebar sidebar-shop">
                   <div class="widget widget-clean">
                     <label>Filters:</label>
-                    <a href="#" class="sidebar-filter-clear">Clean All</a>
+                    <a href="{% url 'user_shop' %}" name="clean_all" class="sidebar-filter-clear">Clean All</a>
                   </div><!-- End .widget widget-clean -->
 
-                  <div class="widget widget-collapsible">
+                  <div class="widget widget-collapsible" >
               <h3 class="widget-title">
                 <a data-toggle="collapse" href="#widget-1" role="button" aria-expanded="true" aria-controls="widget-1">
                     Category
@@ -42,53 +38,62 @@
             <div class="collapse show" id="widget-1">
               <div class="widget-body">
                 <div class="filter-items filter-items-count">
-                  {% for category in categories %}
-                  <div class="filter-item">
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" id="cat-{{forloop.counter}}">
-                      <label class="custom-control-label" for="cat-{{forloop.counter}}">{{category.name}}</label>
-                    </div><!-- End .custom-checkbox -->
-                    <span class="item-count">{{ category.products.count }}</span>
-                  </div><!-- End .filter-item -->
-                  {% endfor %}
+
+                  <form action="{% url 'user_shop' %}" method="GET">
+                    {% for category in categories %}
+                    <div class="filter-item">
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="cat-{{forloop.counter}}"  name="category_ids"  value="{{category.id}}" onchange="this.form.submit()"
+                               {% if category.id in category_ids  %} checked {% endif %}>
+                        <label class="custom-control-label" for="cat-{{forloop.counter}}">{{category.name}}</label>
+                      </div><!-- End .custom-checkbox -->
+                      <span class="item-count">{{ category.products.count }}</span>
+                    </div><!-- End .filter-item -->
+                    {% endfor %}
+                 
                  
                 </div><!-- End .filter-items -->
               </div><!-- End .widget-body -->
             </div><!-- End .collapse -->
               </div><!-- End .widget -->
 
-              <div class="widget widget-collapsible">
+              <!-- <div class="widget widget-collapsible">
               <h3 class="widget-title">
-                <a data-toggle="collapse" href="#widget-2" role="button" aria-expanded="true" aria-controls="widget-2">
+                <a data-toggle="collapse" href="#widget-2" role="button" aria-expanded="true" aria-controls="widget-2" >
                     Size
                 </a>
-            </h3><!-- End .widget-title -->
+            </h3> -->
 
-            <div class="collapse show" id="widget-2">
+            <div class="collapse" id="widget-2">
               <div class="widget-body">
                 <div class="filter-items">
-                 {% for size in sizes %} 
-                  <div class="filter-item">
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" id="size-{{forloop.counter}}">
-                      <label class="custom-control-label" for="size-{{forloop.counter}}">{{size}}</label>
-                    </div><!-- End .custom-checkbox -->
-                  </div><!-- End .filter-item -->
-                  {% endfor %}
-                  
+                {% if sizes %}
+                {% for size in sizes %} 
+                <div class="filter-item">
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="size-{{forloop.counter}}" value="{{size}}" name="sizes" onchange="this.form.submit()"
+                    {% if size in selected_sizes %} checked {% endif %} >
+                    <label class="custom-control-label" for="size-{{forloop.counter}}">{{size}}</label>
+                  </div><!-- End .custom-checkbox -->
+                </div><!-- End .filter-item -->
+                {% endfor %}
+                {% else %}
+                <div class="card"><p class="text-primary text-center ">Select Category</p></div>
+                {% endif %}
+          
                 </div><!-- End .filter-items -->
               </div><!-- End .widget-body -->
             </div><!-- End .collapse -->
               </div><!-- End .widget -->
-
+<!-- 
               <div class="widget widget-collapsible">
               <h3 class="widget-title">
                 <a data-toggle="collapse" href="#widget-3" role="button" aria-expanded="true" aria-controls="widget-3">
                     Colour
                 </a>
-            </h3><!-- End .widget-title -->
+            </h3> -->
 
-            <div class="collapse show" id="widget-3">
+            <!-- <div class="collapse show" id="widget-3">
               <div class="widget-body">
                 <div class="filter-colors">
                 {%for color in colors %}
@@ -102,9 +107,9 @@
                   <a href="#" style="background: #f2719c;"><span class="sr-only">Color Name</span></a>
                   <a href="#" style="background: #ebebeb;"><span class="sr-only">Color Name</span></a>
                 </div><!-- End .filter-colors -->
-              </div><!-- End .widget-body -->
-            </div><!-- End .collapse -->
-              </div><!-- End .widget -->
+              <!-- </div><!-- End .widget-body -->
+            <!-- </div>
+              </div> -->
 
               <div class="widget widget-collapsible">
               <h3 class="widget-title">
@@ -120,36 +125,36 @@
                   {% for brand in brands %}
                   <div class="filter-item">
                     <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" id="brand-{{forloop.counter}}">
-                      <label class="custom-control-label" for="brand-{{forloop.counter}}">{{ brand }}</label>
+                      <input type="checkbox" class="custom-control-input" id="brand-{{ forloop.counter }}" name="brand_ids" value="{{ brand.name }}" onchange="this.form.submit()"
+                            {% if brand.name in brand_names %} checked {% endif %}>
+                      <label class="custom-control-label" for="brand-{{ forloop.counter }}">{{ brand.name }}</label>
                     </div><!-- End .custom-checkbox -->
                   </div><!-- End .filter-item -->
-                  {% endfor %}
-                 
+                {% endfor %}
+                </form>  
                                  </div><!-- End .filter-items -->
                             </div><!-- End .widget-body -->
                        </div><!-- End .collapse -->
                     </div><!-- End .widget -->
-                    <div class="widget widget-collapsible">
+                    <!-- <div class="widget widget-collapsible">
                       <h3 class="widget-title">
                         <a data-toggle="collapse" href="#widget-5" role="button" aria-expanded="true" aria-controls="widget-5">
                             Price
                         </a>
-                    </h3><!-- End .widget-title -->
+                    </h3>
   
                     <div class="collapse show" id="widget-5">
                       <div class="widget-body">
                         <div class="filter-price">
                           <div class="filter-price-text">
-                            Price Range: <span id="filter-price-range">₹0 - ₹500</span>
-                          </div><!-- End .filter-price-text -->
+                            Price Range: <span id="filter-price-range"> </span>
+                          </div>
                     
-                          <div id="price-slider" style="margin-top: 10px;"></div><!-- End #price-slider -->
-                        </div><!-- End .filter-price -->
-                      </div><!-- End .widget-body -->
-                    </div><!-- End .collapse -->
-                  
-              </div><!-- End .sidebar sidebar-shop -->
+                          <div id="price-slider" style="margin-top: 10px;"></div>
+                        </div>
+                      </div>
+                    </div>
+              </div> -->
            </aside><!-- End .col-lg-3 -->
 
 
@@ -165,56 +170,22 @@
                             <div class="toolbox-sort">
                                 <label for="sortby">Sort by:</label>
                                 <div class="select-custom">
-                                    <select name="sortby" id="sortby" class="form-control">
-                                        <option value="popularity" selected="selected">Most Popular</option>
-                                        <option value="rating">Most Rated</option>
-                                        <option value="date">Date</option>
+                                  <form action="{% url 'user_shop' %}" method="POST">
+                                    {% csrf_token %}
+                                    <select name="sortby" id="sortby" class="form-control" onchange="this.form.submit() ">
+                                      <option value="popular">Most Popular</option>
+                                      <!-- <option value="#">Most Rated</option> -->
+                                      <option value="price">Price</option>
+                                      <option value="name">A-Z</option>
+                                      <option value="category">Category</option>
+                                      <option value="popular">Most Popular</option>
                                     </select>
+
+                                  </form>
+                                   
                                 </div>
                             </div><!-- End .toolbox-sort -->
-                            <div class="toolbox-layout">
-                                <a href="category-list.html" class="btn-layout">
-                                    <svg width="16" height="10">
-                                        <rect x="0" y="0" width="4" height="4" />
-                                        <rect x="6" y="0" width="10" height="4" />
-                                        <rect x="0" y="6" width="4" height="4" />
-                                        <rect x="6" y="6" width="10" height="4" />
-                                    </svg>
-                                </a>
-
-                                <a href="category-2cols.html" class="btn-layout">
-                                    <svg width="10" height="10">
-                                        <rect x="0" y="0" width="4" height="4" />
-                                        <rect x="6" y="0" width="4" height="4" />
-                                        <rect x="0" y="6" width="4" height="4" />
-                                        <rect x="6" y="6" width="4" height="4" />
-                                    </svg>
-                                </a>
-
-                                <a href="category.html" class="btn-layout">
-                                    <svg width="16" height="10">
-                                        <rect x="0" y="0" width="4" height="4" />
-                                        <rect x="6" y="0" width="4" height="4" />
-                                        <rect x="12" y="0" width="4" height="4" />
-                                        <rect x="0" y="6" width="4" height="4" />
-                                        <rect x="6" y="6" width="4" height="4" />
-                                        <rect x="12" y="6" width="4" height="4" />
-                                    </svg>
-                                </a>
-
-                                <a href="category-4cols.html" class="btn-layout active">
-                                    <svg width="22" height="10">
-                                        <rect x="0" y="0" width="4" height="4" />
-                                        <rect x="6" y="0" width="4" height="4" />
-                                        <rect x="12" y="0" width="4" height="4" />
-                                        <rect x="18" y="0" width="4" height="4" />
-                                        <rect x="0" y="6" width="4" height="4" />
-                                        <rect x="6" y="6" width="4" height="4" />
-                                        <rect x="12" y="6" width="4" height="4" />
-                                        <rect x="18" y="6" width="4" height="4" />
-                                    </svg>
-                                </a>
-                            </div><!-- End .toolbox-layout -->
+                            <!-- End .toolbox-layout -->
                         </div><!-- End .toolbox-right -->
                     </div><!-- End .toolbox -->
 
@@ -223,28 +194,31 @@
                       <div class="products mb-3">
                         <div class="row justify-content-center">
                           {% for product in products %}
+                          
                             <div class="col-6 col-md-4 col-lg-4 col-xl-3">
                               <div class="product product-7 text-center">
-                                <figure class="product-media">
-                                 
-                                  <a href="{% url 'user_product_view' product.variants.first.id %}"> 
+                                <figure class="product-media rounded" style="background-color: white;" >
+                
+                                  <a href="{% url 'user_product_view' product.variants.first.sizes.first.slug  %}"> 
                                     {% with product.variants.first.images.first as main_image %}
                                       {% if main_image %}
                                         <img src="{{ main_image.image.url }}" alt="{{ product.name }}" class="product-image">
                                       {% else %}
-                                        <img src="/static/placeholder.jpg" alt="{{ product.name }}" class="product-image">
+                                        <img src="{% static 'assets/images/default_product.png' %}" alt="{{ product.name }}" class="product-image">
                                       {% endif %}
                                     {% endwith %}
                                   </a>
-<!--                     
+                    
                                   <div class="product-action-vertical">
-                                    <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                                    <a href="#" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
-                                    <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
+                                    <a href="{% url 'add_to_wishlist' product.variants.first.sizes.first.slug %}" class="btn-product-icon btn-wishlist btn-expandable" style="color:#cc3333";><span style="align-content: center;">Add to Wishlist</span></a>
+                                   
                                   </div>
-                     -->
-                                  <div class="product-action">
-                                    <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                    
+                                  <div class="product-action" >
+                                    <form action="{% url 'add_to_cart' product.variants.first.sizes.first.slug  %}" method="post">
+                                      {% csrf_token %}
+                                      <button type="submit" class="btn-product btn-cart rounded " style=" padding-inline: 60px;" ><span>AddtoCart</span></a></button>
+                                  </form>
                                   </div>
                                 </figure>
                     
@@ -252,15 +226,15 @@
                                   <div class="product-cat">
                                     <a href="#">{{ product.category.name }}</a>
                                   </div>
-                                  <h3 class="product-title"><a href="#">{{ product.name }}</a></h3>
+                                  <h3 class="product-title"><a href="#">{{ product.name |capfirst}}</a></h3>
                                   <div class="product-price">
                                     ₹{{ product.price }}
                                   </div>
                                   <div class="ratings-container">
                                     <div class="ratings">
-                                      <div class="ratings-val""></div>
+                                      <div class="ratings-val" style="width: {{ product.total_ratings }}%;"></div> 
                                     </div>
-                                    <span class="ratings-text">( {{ product.review_count }} Reviews )</span>
+                                    <span class="ratings-text">({{ product.total_ratings }} Reviews)</span> 
                                   </div>
                     
                                   <div class="product-nav product-nav-thumbs">
@@ -284,8 +258,8 @@
 </main>
 
 
-
-<<script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
   // Wait for the document to load
   document.addEventListener("DOMContentLoaded", function() {
     const slider = document.getElementById('price-slider');
@@ -294,20 +268,21 @@
     // Initialize noUiSlider if the slider exists
     if (slider) {
       noUiSlider.create(slider, {
-        start: [0, 500],
+        start: [500, 5000],
         connect: true,
         range: {
           'min': 0,
-          'max': 1000
+          'max': 20000
         }
       });
 
       // Update the displayed price range as the slider moves
       slider.noUiSlider.on('update', function(values) {
-        rangeText.textContent = `$${Math.round(values[0])} - $${Math.round(values[1])}`;
+        rangeText.textContent = `₹${Math.round(values[0])} - ₹${Math.round(values[1])}`;
       });
     }
   });
+
 </script>
 
 

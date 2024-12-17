@@ -13,17 +13,21 @@
         <p><strong>Price:</strong> ₹{{ product.price }}</p>
         <p><strong>Description:</strong> {{ product.description }}</p>
         <p><strong>Category:</strong> {{ product.category}}</p>
-        <p><strong>Offer:</strong> {{ product.offer }} %</p>
+        <p><strong>Offer:</strong> <span class="text-info"> {{ product.offer }} % </span></p>
         <p><strong>Brand :</strong> {{ product.brand }}</p>
         <p><strong>Listed:</strong> {{ product.is_listed }}</p>
 
        
-        <a href="javascript:void(0);" onclick="openForm('{{ product.name|escapejs }}', '{{ product.price }}', '{{ product.description|escapejs }}', '{{ product.offer }}', '{{ product.is_listed }}','{{ product.brand }}', '{{ product.id }}' )" class="btn btn-outline-primary">Edit Product</a>
+        <a href="javascript:void(0);" onclick="openForm('{{ product.name|escapejs }}', '{{ product.price }}', '{{ product.description|escapejs }}', '{{ product.offer }}', '{{ product.is_listed }}','{{ product.brand }}', '{{ product.slug }}' )" class="btn btn-outline-primary">Edit Product</a>
       
-        <form method="POST" action="{% url 'del_product' product.id %}" style="display:inline;" onsubmit="return confirmDelete()">  
+        <form method="POST" action="{% url 'list_unlist_product' product.slug %}" style="display:inline;">  
             {% csrf_token %}
             <input type="hidden" name="product_id" value="{{ product.id }}">
-            <button type="submit" name="delete_product" class="btn btn-outline-danger mx-3">Delete Product</button>
+            {% if product.is_listed %}
+            <button type="submit" name="delete_product" class="btn btn-outline-danger mx-3">Unlist Product</button>
+            {% else %}
+            <button type="submit" name="delete_product" class="btn btn-outline-success mx-3">list Product</button>
+             {% endif %}
         </form>
 
     
@@ -78,13 +82,12 @@
         
                 <div class="mb-3">
                     <label for="productBrand" class="form-label"><b>Brand</b></label>
-                    <select name="brand" 
-                            id="productBrand"
-                            class="form-control">
+                    <select name="brand" id="productBrand" class="form-control">
+                        <option value="{{product.brand}}" disabled {% if not product.brand %}selected{% endif %}>{{product.brand}}</option>
                         {% for brand in brands %}
-                            <option value="{{ brand }}" 
-                                {% if product.brand == brand %}selected{% endif %}>
-                                {{ brand }}
+                            <option value="{{ brand.name }}" 
+                                {% if product.brand == brand.name %}selected{% endif %}>
+                                {{ brand.name }}
                             </option>
                         {% endfor %}
                     </select>
@@ -128,30 +131,47 @@
    
 
         <h2>Variants</h2>
-        <a href="{% url 'add_variant' product.id %}" class="btn btn-outline-success mb-3">Add New Variant</a>
+        <a href="{% url 'add_variant' product.slug %}" class="btn btn-outline-success mb-3">Add New Variant</a>
            
             <div class="row">
-                {% for variant in variants %}
+                 {% for variant in variants %}
                     <div class="col-md-2">
                         <div class="card mb-4 ">
                             {% if variant.images.all %}
-                            <!-- {% for variant in variant.images.all %}
-                            <img src="{{ variant.image.url }}" alt="Image of {{ variant.size }} - {{ variant.color }}" />
-                            {% endfor %} -->
                                 <img src="{{ variant.images.first.image.url }}" alt="Image of {{ variant.size }} - {{ variant.color }}" />
                             {% else %}
                                 <img src="{% static 'assets/images/default_product.png' %}" alt="No Image Available" class="card-img-top">      
                             {% endif %}
                             <div class="card-body">
-                                <h5 class="card-title";">Size: {{ variant.size }} | Color: {{ variant.color }}</h5>
-                                <p class="card-text">Stock: {{ variant.stock }}</p>
+                                <h5 class="card-title"> Color: {{ variant.color }}</h5>
+                                
+                                <h5 class="card-title";">Sizes:
+                                    {% for variant in variant.sizes.all %}
+                                     {{ variant.size }}
+                                     {% endfor %}
+                                 </h5>
+                                <p class="card-text">Stocks:
+                                    <!-- {% for variant in total_stock %}
+                                    {{ variant.stock }},
+                                    {% endfor %} -->
+                                    {{ variant.total_stock }}
+                                </p>
+                                <!-- <p class="card-t
                                 <!-- <p class="card-text text-secondary">Variant ID: {{ variant.id }}</p> -->
-                                <a href="{% url 'variant_edit' variant.id %}" class="btn btn-outline-primary">Edit <i class="fa fa-pencil-alt fa-xs"></i></a>
-                                <form method="POST" style="display:inline;" action="{% url 'delete_variant' variant.id %}"  onsubmit="return confirmDelete()">
+                               
+                                <form method="POST" style="display:inline;" action="{% url 'delete_variant' variant.slug %}">
                                     {% csrf_token %}
-                                    <input type="hidden" name="variant_id" value="{{ variant.id }}">
+                                    <!-- <input type="hidden" name="variant_id" value="{{ variant.id }}">
                                     <button type="submit" name="delete_variant" class="btn btn-outline-danger mx-1"><i class="fa fa-trash-o"></i> Delete <i class="fa fa-trash fa-xs"></i></button>
+                                     -->
+                                    <input type="hidden" name="variant_slug" value="{{ variant.slug }}">
+                                    {% if variant.is_listed %}
+                                    <button type="submit" name="delete_variant" class="btn btn-outline-danger ">Unlist</button>
+                                    {% else %}
+                                    <button type="submit" name="delete_variant "class="btn btn-outline-success ">list Variant</button>
+                                     {% endif %}
                                 </form>
+                                <a href="{% url 'variant_edit' variant.slug %}" class="btn btn-outline-primary px-3 "><i class="fa fa-pencil-alt fa-xs"></i></a>
                             </div>
                         </div>
                     </div>
@@ -179,7 +199,7 @@
         
     </script>
     <script>
-        function openForm(productName, productPrice, productDescription, productOffer, productBrand, isListed, productId) {
+        function openForm(productName, productPrice, productDescription, productOffer, productBrand, isListed, productSlug) {
             document.getElementById("productForm").style.display = "block";
             document.getElementById("productName").value = productName;
             document.getElementById("productPrice").value = productPrice;
@@ -189,7 +209,7 @@
             document.getElementById("productIsListed").checked = isListed === 'True';
             
             const form = document.getElementById("editProduct");
-            form.action = "{% url 'product_edit' product_id=0 %}".replace('0', productId);
+            form.action = "{% url 'product_edit' slug='0' %}".replace('0', productSlug);
         }
         
         

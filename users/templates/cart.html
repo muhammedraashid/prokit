@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cart - ProKit{% endblock %}
+
+{% block content %}
+
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'user_shop' %}">Shop</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
+            </ol>
+        </div><!-- End .container -->
+    </nav><!-- End .breadcrumb-nav -->
+    
+    <main class="main" style="background-color:#dde8e9; padding-block: 20px;">
+        <div class="page-content">
+            <div class="cart">
+                <div class="container">
+                    {% if cart_items %}
+                    <div class="row">
+                        <div class="col-lg-9 card">
+                            <table class="table table-cart table-mobile">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Size</th>
+                                        <th>Color</th>
+                                        <th>Price</th>
+                                        <th>Stock</th>
+                                        <th>Quantity</th>
+                                        <th>Total</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in cart_items %}
+                                    <tr>
+                                        <td class="product-col">
+                                            <div class="product">
+                                                <figure class="product-media">
+                                                    <a href="{% url 'user_product_view' item.variant_size.slug %}">
+                                                        <img src="{{ item.variant.images.first.image.url }}" alt="Product image">
+                                                    </a>
+                                                </figure>
+                                                <h3 class="product-title">
+                                                    <a href="{% url 'user_product_view' item.variant_size.slug %}">
+                                                        {{ item.variant.product.name }}
+                                                    </a>
+                                                </h3>
+                                            </div>
+                                        </td>
+                                        <td>{{ item.selected_size }}</td>
+                                        <td>{{ item.variant.color }}</td>
+                                        <td class="price-col">₹{{ item.price_at_time }}</td>
+                                        <td>{{ item.current_stock }}</td>
+                                        <td class="quantity-col">
+                                            <div class="cart-product-quantity">
+                                                <input type="number" class="form-control" 
+                                                    value="{{ item.quantity }}" 
+                                                    min="1" max="{{ item.current_stock }}" 
+                                                    step="1" 
+                                                    data-item-id="{{ item.id }}" 
+                                                    data-variant-id="{{ item.variant.id }}" 
+                                                    name="quantity" required>
+                                            </div>
+                                        </td>
+                                        <td class="total-col">₹{{ item.total_price }}</td>
+                                        <td class="remove-col">
+                                            <a class="btn-remove" href="{% url 'remove_from_cart' item.id %}">
+                                                <i class="icon-close"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+    
+                            <div class="cart-bottom">
+                                <select id="coupon-select" name="coupon" class="form-control rounded">
+                                    <option value="" disabled selected>{% if applied_coupon %}{{applied_coupon}}{% else %}Select a coupon{% endif %}</option>
+                                    
+                                    {% for coupon in coupons %}
+                                    <option value="{{ coupon.id }}" 
+                                            data-code="{{ coupon.code }}" 
+                                            data-discount="{{ coupon.discount_value }}" 
+                                            data-min-amount="{{ coupon.min_amount }}" 
+                                            data-max-discount="{{ coupon.max_discount }}">
+                                        {{ coupon.name }} - Code: {{ coupon.code }} | Discount: {{ coupon.discount_value }}%
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                              
+                                
+    
+                                <a href="{% url 'cart' %}" class="btn btn-outline-dark-2">
+                                    <span>UPDATE CART</span><i class="icon-refresh"></i>
+                                </a>
+                               
+                            </div>
+                            
+                           
+                            {% if applied_coupon %}
+                            <div class="card text-center p-3">
+                                
+                                <p class="text-success font-weight-bold">
+                                    Coupon {{ applied_coupon }} applied
+                                </p>
+                            
+                              
+                                <form method="POST" action="{% url 'remove_coupon' %}" style="display: inline-block;">
+                                    {% csrf_token %}
+                                    <button type="submit" id="remove-coupon" class="btn btn-outline-danger mt-2 rounded">
+                                        <i class="fas fa-times"></i> Remove Applied Coupon
+                                    </button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+                       
+                        <aside class="col-lg-3">
+                            <div class="summary summary-cart">
+                                <h3 class="summary-title">Cart Total</h3>
+                                <form method="POST" id="cart-form" action="{% url 'cart' %}">
+                                    {% csrf_token %}
+                                    <table class="table table-summary">
+                                        <tbody>
+                                            <tr class="summary-subtotal">
+                                                <td>Total Items:</td>
+                                                <td>{{ items_count }}</td>
+                                            </tr>
+                                            <tr class="summary-subtotal">
+                                                <td>Subtotal:</td>
+                                                <td id="subtotal">₹{{ sub_total }}</td>
+                                            </tr>
+                                            <tr id="discount-row" >
+                                                <td>Discount:</td>
+                                                <td id="discount-amount">-₹{{discount_amount}}</td>
+                                            </tr>
+                                            <tr class="summary-total">
+                                                <td>Total:</td>
+                                                <td id="cart-total">₹{{ total_price }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </form>
+                                <a href="{% url 'checkout' %}" class="btn btn-outline-primary-2 btn-order btn-block">
+                                    PROCEED TO CHECKOUT
+                                </a>
+                            </div>
+                        </aside>
+                    </div>
+                    {% else %}
+                    <div class="row justify-content-center">
+                        <div class="col-lg-6 text-center">
+                            <p class="text-primary mb-4">Your cart is empty</p>
+                            <a href="{% url 'user_shop' %}" class="btn btn-outline-primary btn-block mb-3">
+                                <span>CONTINUE SHOPPING</span>
+                                <i class="icon-refresh"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const quantityInputs = document.querySelectorAll('.cart-product-quantity input');
+        const subtotalElement = document.getElementById('subtotal');
+        const totalElement = document.querySelector('.summary-total td:last-child');
+        const couponSelect = document.getElementById('coupon-select');
+        const discountRow = document.getElementById('discount-row');
+        const discountAmountElement = document.getElementById('discount-amount');
+    
+        async function updateCart(itemId, variantId, quantity, couponId) {
+            try {
+                const response = await fetch('/cart/update-cart/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        item_id: itemId || null,
+                        variant_id: variantId || null,
+                        quantity: quantity || null,
+                        coupon_id: couponId || null
+                    })
+                });
+    
+                const result = await response.json();
+    
+                if (result.status === 'success') {
+                    // Update totals
+                    subtotalElement.textContent = `₹${result.cart_subtotal}`;
+                    totalElement.textContent = `₹${result.cart_total || result.cart_subtotal}`;
+    
+                    // Update discount details
+                    if (result.discount_amount > 0) {
+                        discountRow.style.display = 'table-row';
+                        discountAmountElement.textContent = `-₹${result.discount_amount}`;
+                    } else {
+                        discountRow.style.display = 'none';
+                    }
+    
+                    // Update row total if itemId is provided
+                    if (itemId) {
+                        const rowTotalElement = document.querySelector(`[data-item-id="${itemId}"]`)
+                            .closest('tr')
+                            .querySelector('.total-col');
+                        rowTotalElement.textContent = `₹${result.item_total}`;
+                    }
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error('Cart update error:', error);
+                alert('An error occurred while updating the cart.');
+            }
+        }
+    
+        // Handle quantity changes
+        quantityInputs.forEach(input => {
+            input.addEventListener('change', (event) => {
+                const inputElement = event.target;
+                const itemId = inputElement.dataset.itemId;
+                const variantId = inputElement.dataset.variantId;
+                const newQuantity = parseInt(inputElement.value);
+                const selectedCouponId = couponSelect ? couponSelect.value : null;
+    
+                updateCart(itemId, variantId, newQuantity, selectedCouponId);
+            });
+        });
+    
+        // Handle coupon changes
+        if (couponSelect) {
+            couponSelect.addEventListener('change', () => {
+                const selectedCouponId = couponSelect.value;
+    
+                // Trigger cart update for all items when coupon changes
+                quantityInputs.forEach(input => {
+                    const itemId = input.dataset.itemId;
+                    const variantId = input.dataset.variantId;
+                    const currentQuantity = parseInt(input.value);
+    
+                    updateCart(itemId, variantId, currentQuantity, selectedCouponId);
+                });
+            });
+        }
+    });
+    
+</script>
+{%endblock %}
