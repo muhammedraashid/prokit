@@ -62,6 +62,20 @@ INSTALLED_APPS = [
 ]
 
 
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'OAUTH_PKCE_ENABLED': True,
+    }
+}
+
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -172,29 +186,31 @@ FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:8000')
 
 
 #authenticaton backends
-AUTHENTICATION_BACKENDS = [
+AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',            # Default backend
     'allauth.account.auth_backends.AuthenticationBackend',  # allauth backend
-]
+)
 
 SITE_ID = 1 
+# Automatically generate a username if not provided
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_SIGNUP_FORM_CLASS = None
+SOCIALACCOUNT_AUTO_SIGNUP = True
+
+# Ensure email is mandatory
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True   
 
 LOGIN_REDIRECT_URL = '/home/'            # redirect after login
 LOGOUT_REDIRECT_URL = '/signin/'           #redirect after logout
 
+GOOGLE_CLIENT_ID = "277240722903-s5rfpo709qh4ej7makm8rti26f8vei66.apps.googleusercontent.com"
+GOOGLE_REDIRECT_URI = 'http://127.0.0.1:8000/accounts/google/login/callback/'
 
-# SOCIALACCOUNT_PROVIDERS = {
-#     'google': {
-#         'SCOPE': [
-#             'profile',
-#             'email',
-#         ],
-#         'AUTH_PARAMS': {
-#             'access_type': 'online',
-#         },
-#         'OAUTH_PKCE_ENABLED': True,
-#     }
-# }
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
 SOCIALACCOUNT_QUERY_EMAIL = True
 
 RAZORPAY_KEY_ID = 'rzp_test_F6HvgkhI98quBC'

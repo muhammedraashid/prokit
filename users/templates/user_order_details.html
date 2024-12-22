@@ -93,7 +93,18 @@
                         </table>
                     </div>
                 </div>
-    
+                
+               
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show text-center mb-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn" data-bs-dismiss="alert" aria-label="Close"> <i class="fas fa-times"></i></button>
+                </div>
+            {% endfor %}
+            {% endif %}
+             
+
                 <h4 class="mt-4">Order Items</h4>
                 <table class="table  ">
                     <thead >
@@ -146,15 +157,18 @@
                                          {{ item.get_item_status_display }}
                                      </span>
                                  </td>
-                                 {% if order.order_status == 'delivered' and  not order.applied_coupon %}
+                                 {% if item.item_status == 'delivered' %}
                                  <td>
-                                  <a href="{% url 'return_order' item.id %}" class="btn btn-outline-info rounded"><i class="fas fa-undo"></i>Return Item</a>
+                                  <a href="{% url 'return_order_item' item.id %}" class="btn btn-outline-info rounded"><i class="fas fa-undo"></i>Return Item</a>
                                  </td>
                                   {% endif %}
-                                  {% if item.item_status == 'pending' and  not order.applied_coupon %}
+                                  {% if item.item_status == 'pending' %}
                                   <td>
-                                      <a href="{% url 'cancel_order_item' item.id %}" class="btn btn-danger rounded">Cancel Item</a>
-                                  </td>
+                                    <a href="{% url 'cancel_order_item' item.id %}" class="btn btn-outline-danger btn-sm rounded p-1">
+                                        <i class="fa fa-times"></i> Cancel Item
+                                    </a>
+                                                                      
+                                </td>
                                   {% endif %}
                              
                         </tr>

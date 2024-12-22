@@ -8,6 +8,16 @@
 
 {% block content %}
 <h1>Users</h1>
+{% if messages %}
+<div>
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
 
 
 <table class="table table-dark table-striped table-hover table-bordered ">

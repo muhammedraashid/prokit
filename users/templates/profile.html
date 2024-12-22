@@ -41,12 +41,13 @@
         <div class="md:col-span-3">
             <div class="content-card">
                 {% if messages %}
-            <div class="error-message text-center text-primary card success mt-2 py-2">
-                    {% for message in messages %}
-                        <div>{{ message }}</div>
-                    {% endfor %}
-            </div>
-            {% endif %}
+                {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show text-center" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn" data-bs-dismiss="alert" aria-label="Close"> <i class="fas fa-times"></i></button>
+                </div>
+            {% endfor %}
+           {% endif %}
                 <form method="post" action="{% url 'user_profile' %}">
                     {% csrf_token %}
                      

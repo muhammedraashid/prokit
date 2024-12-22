@@ -170,7 +170,7 @@ def Shop(request):
     query = request.GET.get('qry','')
     sortby= request.POST.get('sortby','name')
    
-    print(sortby)
+    
     if request.method == 'POST' and sortby:
         if sortby == 'popular':
            top_selling_products = (

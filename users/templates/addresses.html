@@ -17,8 +17,9 @@
         </div><!-- End .container -->
     </nav><!-- End .breadcrumb-nav -->
     <main class="main" style="background-color: rgb(237, 244, 244);padding-block: 5%;">
-
+     
     <div class="container" style="margin-top: -30px;">
+      
       <div class="card">
         <div class="card-header" >
           <div class="card-title">Addresses</div>
@@ -26,6 +27,14 @@
         </div>
         
         <div class="card-content">
+          {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-success alert-dismissible fade show text-center mb-3" role="alert">
+          {{ message }}
+          <button type="button" class="btn" data-bs-dismiss="alert" aria-label="Close"> <i class="fas fa-times"></i></button>
+      </div>
+  {% endfor %}
+ {% endif %}
           {% for address in addresses %}
           <div class="address-item">
             <div class="address-item-details">
@@ -55,13 +64,7 @@
         </div>
       </div>
 
-      {% if messages %}
-      <div class="error-message text-center">
-          {% for message in messages %}
-              <div>{{ message }}</div>
-          {% endfor %}
-      </div>
-     {% endif %}
+      
       
      <!-- add-address field -->
       <div class="card" id="addAddress">

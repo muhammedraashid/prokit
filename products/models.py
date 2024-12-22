@@ -44,7 +44,7 @@ class Variant(models.Model):
     color = models.CharField(max_length=50)
     slug = models.SlugField(unique=True, blank=True)
     is_listed = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True,default=timezone.now()) 
+    created_at = models.DateTimeField(auto_now_add=True) 
     
     
     def save(self, *args, **kwargs):
@@ -88,9 +88,12 @@ class VariantImages(models.Model):
    
    
 class Review(models.Model):
+
+    RATING_CHOICES = [(i, i) for i in range(1, 6)]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
-    rating = models.PositiveIntegerField()
+    rating = models.PositiveIntegerField(choices=RATING_CHOICES)
     comments = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

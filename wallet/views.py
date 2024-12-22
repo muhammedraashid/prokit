@@ -35,7 +35,7 @@ def add_to_wallet(request):
 
 def wallet(request):
     wallet = request.user.wallet
-    wallet_transactions = wallet.transactions.all()
+    wallet_transactions = wallet.transactions.all().order_by('-transaction_at')
     context={
         "wallet":wallet,
         'wallet_transactions':wallet_transactions

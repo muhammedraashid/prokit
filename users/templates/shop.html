@@ -21,8 +21,9 @@
         <div class="container">
             <div class="row">
 
-              <aside class="col-lg-3 order-lg-first rounded" style="box-shadow: 0px 0px 1px 0.2px;">
+              <aside class="col-lg-3 order-lg-first rounded filter-sidebar" id="filterSidebar">
                 <div class="sidebar sidebar-shop">
+                  <button class="close-filter d-lg-none">×</button>
                   <div class="widget widget-clean">
                     <label>Filters:</label>
                     <a href="{% url 'user_shop' %}" name="clean_all" class="sidebar-filter-clear">Clean All</a>
@@ -285,5 +286,34 @@
 
 </script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterBtn = document.getElementById('filterBtn');
+    const filterSidebar = document.getElementById('filterSidebar');
+    const closeFilter = document.querySelector('.close-filter');
+    
+    // Open filter sidebar
+    filterBtn.addEventListener('click', function() {
+      filterSidebar.classList.add('show');
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    });
+    
+    // Close filter sidebar
+    closeFilter.addEventListener('click', function() {
+      filterSidebar.classList.remove('show');
+      document.body.style.overflow = ''; // Restore scrolling
+    });
+    
+    // Close sidebar when clicking outside
+    document.addEventListener('click', function(event) {
+      if (filterSidebar.classList.contains('show') && 
+          !filterSidebar.contains(event.target) && 
+          event.target !== filterBtn) {
+        filterSidebar.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    });
+  });
+  </script>
 
 {% endblock %}

@@ -9,6 +9,16 @@
 {% block content %}
 <div class="container">
     <h1 class="text-light">Category List</h1>
+    {% if messages %}
+    <div>
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <div class="row mb-3">
         <div class="col">
@@ -24,11 +34,11 @@
                     <h5 class="card-title">{{ category.name }}</h5>
                     
                     <div class="d-flex justify-content-between align-items-center">
-                        {% if category.offer > 0 %}
-                    <button  class="btn btn-outline-danger btn-sm">{{category.offer}} %</button>
+                    {% if category.offer > 0 %}
+                    <button  class="btn btn-outline-info btn-sm">{{category.offer}} %</button>
                     {% endif %}
                         <div class="ms-auto"> <!-- This pushes content to the right -->
-                            <a href="#" class="btn btn-primary py-1 me-2" onclick="openForm('{{category.name}}','{{category.offer}}','{{category.id}}')">Edit</a>
+                            <a href="#" class="btn btn-primary py-1 me-2" onclick="openForm('{{category.name}}','{{category.offer}}','{{category.sizes_text}}','{{category.id}}')">Edit</a>
                             <form method="post" action="{% url 'category_list_unlist' category.id %}" class="d-inline mb-0">
                                 {% csrf_token %}
                                 {% if category.is_listed %}
@@ -58,12 +68,21 @@
         <input type="text" name="name" id="categoryName" 
                placeholder="{{ category.name }}" 
                style="margin: 20px 0; border-radius: 8px; padding: 10px 20px; border: 1px solid #ccc; 
-                      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;">
+                      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;" required>
+
         <label for="offer" class="text-success"><b>Offer (%)</b></label>
-        <input type="numbe" name="offer" id="categoryOffer" 
-                placeholder="{{ category.offer}}" 
+        <input type="number" name="offer" id="categoryOffer" 
+                placeholder="{{ category.offer }}" 
+                value="0.00" 
+                step="0.01" min="0" max="100"
                 style="margin: 20px 0; border-radius: 8px; padding: 10px 20px; border: 1px solid #ccc; 
-                    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;">              
+                    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;">   
+
+        <label for="sizes" class="text-success"><b>Available Sizes</b></label>
+        <input type="text" name="sizes" id="categorySizes" 
+            placeholder="Enter available sizes (e.g., S, M, L, XL)  seperated by ',' !"   
+            style="margin: 20px 0; border-radius: 8px; padding: 10px 20px; border: 1px solid #ccc; 
+                    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;" required>           
         <button type="submit" class="btn btn-outline-success me-2">Save</button>
         <button type="button" class="btn btn-outline-danger" onclick="closeForm()">Close</button>
     </form>
@@ -72,26 +91,37 @@
 <div class="form-popup rounded" id="addForm" style="display: none; margin-left: 20px; justify-content: center; width: 40%;">
     <form method="POST" class="form-container rounded" id="addCategory">
         {% csrf_token %}
+
         <label for="name" class="text-success"><b>Name</b></label>
         <input type="text" name="name" id="categoryName" 
                placeholder="Enter new category name" 
                style="margin: 20px 0; border-radius: 8px; padding: 10px 20px; border: 1px solid #ccc; 
-                      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;">
+                      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;" required>
+
         <label for="name" class="text-success"><b>Offer (%)</b></label>              
         <input type="number" name="offer" id="categoryOffer" 
                       placeholder="Enter set category offer (%)" 
+                      value = "0.00"
                       style="margin: 20px 0; border-radius: 8px; padding: 10px 20px; border: 1px solid #ccc; 
-                             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;">              
+                             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;">   
+
+        <label for="sizes" class="text-success"><b>Available Sizes</b></label>
+        <input type="text" name="sizes" id="categorySizes" 
+            placeholder="Enter available sizes (e.g., S, M, L, XL)  seperated by ',' !"   
+            style="margin: 20px 0; border-radius: 8px; padding: 10px 20px; border: 1px solid #ccc; 
+                    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 16px; width: 100%;" required>
+                            
         <button type="submit" class="btn btn-outline-success me-2">Create</button>
         <button type="button" class="btn btn-outline-danger" onclick="closeForm()">Close</button>
     </form> 
 </div>
 
 <script>
-    function openForm(categoryName,categoryOffer,categoryId) { 
+    function openForm(categoryName,categoryOffer,sizesText,categoryId) { 
       document.getElementById("myForm").style.display = "block";         
       document.getElementById("categoryName").value = categoryName
       document.getElementById("categoryOffer").value = categoryOffer
+      document.getElementById("categorySizes").value = sizesText
       form = document.getElementById("editCategory");
       form.action = "{% url 'category_edit' category_id=0 %}".replace('0',categoryId)
     }

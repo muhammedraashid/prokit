@@ -45,12 +45,13 @@
         </div>
     </div>
     {% if messages %}
-                {% for message in messages %}
-                <div class="card col-12 text-center ">
-                    <p class="text-danger">{{message}}</p>
-                </div>
-                {% endfor%}
-              {% endif %}
+    {% for message in messages %}
+    <div class="alert alert-info alert-dismissible fade show text-center mb-3" role="alert">
+        {{ message }}
+        <button type="button" class="btn " data-bs-dismiss="alert" aria-label="Close"> <i class="fas fa-times"></i></button>
+    </div>
+{% endfor %}
+{% endif %}
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm">
