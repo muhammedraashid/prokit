@@ -9,8 +9,11 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
+from dotenv import load_dotenv
 from pathlib import Path
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,7 +27,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-2u($0e8=q%hfyu8f53jz0y+qpog8of8k-aey5f=(&h0*r=lgvk"
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -118,11 +121,11 @@ WSGI_APPLICATION = "prokit.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        'NAME': 'prokit',     # Replace with your PostgreSQL database name
-        'USER': 'postgres',     # Your PostgreSQL username
-        'PASSWORD': 'passroot',  # Your PostgreSQL password
-        'HOST': 'localhost',          # Set to 'localhost' or your server's address
-        'PORT': '5432', 
+        'NAME': os.getenv("DB_NAME"),    
+        'USER': os.getenv("DB_USER"),    
+        'PASSWORD': os.getenv("DB_PASSWORD"), 
+        'HOST': os.getenv("DB_HOST"),         
+        'PORT': os.getenv("DB_PORT"), 
     }
 }
 
@@ -179,9 +182,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # SMTP Server
 EMAIL_PORT = 587  # TLS Port
 EMAIL_USE_TLS = True  # Use TLS
-EMAIL_HOST_USER = 'muhammedrashidn881@gmail.com'
-EMAIL_HOST_PASSWORD = 'mpxl lfss cqih qiqc'  # Use App Password
-DEFAULT_FROM_EMAIL = 'muhammedrashidn881@gmail.com'
+
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")  # Use App Password
+DEFAULT_FROM_EMAIL =  os.getenv("DEFAULT_FROM_EMAIL")
+
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:8000')
 
 
@@ -205,13 +210,13 @@ ACCOUNT_UNIQUE_EMAIL = True
 LOGIN_REDIRECT_URL = '/home/'            # redirect after login
 LOGOUT_REDIRECT_URL = '/signin/'           #redirect after logout
 
-GOOGLE_CLIENT_ID = "277240722903-s5rfpo709qh4ej7makm8rti26f8vei66.apps.googleusercontent.com"
-GOOGLE_REDIRECT_URI = 'http://127.0.0.1:8000/accounts/google/login/callback/'
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
 
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
 SOCIALACCOUNT_QUERY_EMAIL = True
 
-RAZORPAY_KEY_ID = 'rzp_test_F6HvgkhI98quBC'
-RAZORPAY_SECRET_KEY = 'TmxdDAIWatCEugQgdfJog5pC'
+RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
+RAZORPAY_SECRET_KEY = os.getenv("RAZORPAY_SECRET_KEY")
