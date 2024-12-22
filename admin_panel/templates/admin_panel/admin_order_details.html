@@ -69,6 +69,16 @@
                     </table>
                 </div>
             </div>
+            {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
 
             <h4 class="mt-4">Order Items</h4>
             <table class="table text-white">
@@ -80,7 +90,10 @@
                         <th>Quantity</th>
                         <th>Price</th>
                         <th>Subtotal</th>
+
                         <th>Status</th>
+                      
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,19 +113,31 @@
                         <td class="text-white ">{{ item.quantity }}</td>
                         <td class="text-white ">₹{{ item.price}}</td>
                         <td class="text-white ">₹{{item.sub_total}}</td>
-                        <td class="text-white ">{{item.item_status}}</td>
+                        <td class="text-white ">{{ item.get_item_status_display }}</td>
+                        {% if item.item_status == 'return_requested' %}
+                        <td>
+                            <a href="{% url 'return_order_item' item.id %}" class="btn btn-outline-primary rounded">
+                                <i class="fa fa-check"></i> Accept
+                            </a>
+                        </td>
+                    {% endif %}
+                    
                     </tr>
                     {% endfor %}
                 </tbody>
                 <tfoot>
                     {% if order.applied_coupon %}
                     <tr>
-                        <td colspan="6" class="text-right"><strong>Coupon Discount:</strong></td>
+                        <td colspan="7" class="text-right"><strong>Coupon Discount:</strong></td>
                         <td><strong>-₹{{ order.discount_amount|floatformat:2 }}</strong></td>
                     </tr>
                     {% endif %}
                     <tr>
-                        <td colspan="6" class="text-right"><strong>Total Amount:</strong></td>
+                        <td colspan="7" class="text-right"><strong>Delivery Charge:</strong></td>
+                        <td><strong>₹{{ order.delivery_charge|floatformat:2 }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" class="text-right"><strong>Total Amount:</strong></td>
                         <td><strong>₹{{ order.total_amount|floatformat:2 }}</strong></td>
                     </tr>
                     

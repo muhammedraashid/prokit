@@ -4,10 +4,20 @@
 {% block title %}Home - ProKit{% endblock %}
 
 {% block content %}
+
+
 <main class="main">
+
     <div class="intro-slider-container mb-5">
-        <div class="intro-slider owl-carousel owl-theme owl-nav-inside owl-light" data-toggle="owl" 
-            data-owl-options='{
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                {{ message }}
+                <button type="button" class="btn" data-bs-dismiss="alert" aria-label="Close"><i class="fas fa-times"></i></button>
+            </div>
+        {% endfor %}
+       {% endif %}
+        <div class="intro-slider owl-carousel owl-theme owl-nav-inside owl-light" data-toggle="owl" data-owl-options='{
                 "dots": true,
                 "nav": false, 
                 "responsive": {
@@ -17,11 +27,12 @@
                     }
                 }
             }'>
-            <div class="intro-slide" style="background-image: url('{% static "assets/images/main-banner.jpg" %}');">
+            <div class="intro-slide" style="background-image: url('{% static 'assets/images/main-banner.jpg' %}'); margin: 10px; border-radius:5px; box-shadow: 3px 4px 6px rgba(0, 0, 0, 0.5);">
+               
                 <div class="container intro-content">
                     <div class="row">
                         <div class="intro">
-                            <div class="title" >
+                            <div class="title">
                                 <h3 style="color:orange">Men's</h3>
                             </div>
                             <div class="content">
@@ -30,9 +41,9 @@
                             </div>
                             <div class="price">
                                 <h3 style="color:rgba(255, 166, 0, 0.838)">SAVE UP TO 30%</h3>
-                                </div>
+                            </div>
                             <div class="action">
-                                <a href="category.html" class="btn btn-primary">
+                                <a href="{% url 'user_shop' %}" class="btn btn-primary">
                                     <span>DISCOVER NOW</span>
                                 </a>
                             </div>
@@ -56,7 +67,7 @@
                                 <h3 class="darkWhite">SAVE UP TO 15%</h3>
                             </div>
                             <div class="action">
-                                <a href="category.html" class="btn btn-primary">
+                                <a href="{% url 'user_shop' %}" class="btn btn-primary">
                                     <span>DISCOVER NOW</span>
                                 </a>
                             </div>
@@ -66,7 +77,7 @@
             </div><!-- End .intro-slide -->
 
 
-            
+
         </div><!-- End .intro-slider owl-carousel owl-simple -->
 
         <span class="slider-loader"></span><!-- End .slider-loader -->
@@ -75,19 +86,25 @@
 
     <div class="container banner-container">
         <div class="col-lg-4 col-md-8 col-sm-10 col-12 col-pd1">
-            <a href="category.html">
-                <img src="{% static 'assets/images/banner1.png' %}">
+            <a href="{% url 'user_shop' %}">
+                <img src="{% static 'assets/images/banner1.png' %} "  style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;">
             </a>
             <div class="banner-content">
                 <div class="title">
-                    <a href="category.html"><h3 class="darkWhite">It's a lifestyle.</h3></a>
+                    <a href="{% url 'user_shop' %}">
+                        <h3 class="darkWhite">It's a lifestyle.</h3>
+                    </a>
                 </div>
                 <div class="content">
-                    <a href="category.html"><h3>Running Apparel</h3></a>
-                    <a href="category.html"><h3>END OF SEASON SALE</h3></a>
+                    <a href="{% url 'user_shop' %}">
+                        <h3>Running Apparel</h3>
+                    </a>
+                    <a href="{% url 'user_shop' %}">
+                        <h3>END OF SEASON SALE</h3>
+                    </a>
                 </div>
                 <div class="action">
-                    <a href="category.html" class="btn btn-demoprimary">
+                    <a href="{% url 'user_shop' %}" class="btn btn-demoprimary">
                         <span>SHOP NOW</span>
                         <i class="icon-long-arrow-right"></i>
                     </a>
@@ -95,19 +112,25 @@
             </div><!-- End .row -->
         </div>
         <div class="col-lg-4 col-md-8 col-sm-10 col-12 col-pd1">
-            <a href="category.html">
+            <a href="{% url 'user_shop' %}">
                 <img src="{% static 'assets/images/banner2.jpg' %}">
             </a>
             <div class="banner-content">
                 <div class="title">
-                    <a href="category.html"><h3 class="darkWhite">Hike Your Next Trail </h3></a>
+                    <a href="{% url 'user_shop' %}">
+                        <h3 class="darkWhite">Hike Your Next Trail </h3>
+                    </a>
                 </div>
                 <div class="content">
-                    <a href="category.html"><h3>NEW SEASON</h3></a>
-                    <a href="category.html"><h3>NEW GEAR</h3></a>
+                    <a href="{% url 'user_shop' %}">
+                        <h3>NEW SEASON</h3>
+                    </a>
+                    <a href="{% url 'user_shop' %}">
+                        <h3>NEW GEAR</h3>
+                    </a>
                 </div>
                 <div class="action">
-                    <a href="category.html" class="btn btn-demoprimary">
+                    <a href="{% url 'user_shop' %}" class="btn btn-demoprimary">
                         <span>DISCOVER NOW</span>
                         <i class="icon-long-arrow-right"></i>
                     </a>
@@ -115,19 +138,25 @@
             </div><!-- End .row -->
         </div>
         <div class="col-lg-4 col-md-8 col-sm-10 col-12 col-pd1">
-            <a href="category.html">
-                <img src="{% static 'assets/images/banner3.jpg' %}">
+            <a href="{% url 'user_shop' %}">
+                <img src="{% static 'assets/images/banner3.jpg' %}"  style="border-top-right-radius: 4px; border-bottom-right-radius: 4px;">
             </a>
             <div class="banner-content">
                 <div class="title">
-                    <a href="category.html"><h3 class="darkWhite">Summer Sale</h3></a>
+                    <a href="{% url 'user_shop' %}">
+                        <h3 class="darkWhite">Summer Sale</h3>
+                    </a>
                 </div>
                 <div class="content">
-                    <a href="category.html"><h3>Swimwear sale</h3></a>
-                    <a href="category.html"><h3>Save up to 30%</h3></a>
+                    <a href="{% url 'user_shop' %}">
+                        <h3>Summer sale</h3>
+                    </a>
+                    <a href="c{% url 'user_shop' %}">
+                        <h3>Save up to 30%</h3>
+                    </a>
                 </div>
                 <div class="action">
-                    <a href="category.html" class="btn btn-demoprimary">
+                    <a href="{% url 'user_shop' %}" class="btn btn-demoprimary">
                         <span>SHOP NOW</span>
                         <i class="icon-long-arrow-right"></i>
                     </a>
@@ -137,78 +166,41 @@
     </div>
 
 
-    <!-- <div class="container logos">
-        <div class="owl-carousel mb-5 owl-simple" data-toggle="owl" 
-            data-owl-options='{
-                "nav": true, 
-                "dots": false,
-                "margin": 10,
-                "loop": false,
-                "responsive": {
-                    "0": {
-                        "items":2
-                    },
-                    "420": {
-                        "items":3
-                    },
-                    "600": {
-                        "items":4
-                    },
-                    "900": {
-                        "items":5
-                    },
-                    "1024": {
-                        "items":6
-                    }
-                }
-            }'>
-            <a href="#" class="brand">
-                <img src="assets/images/brands/1.png" alt="Brand Name">
-            </a>
 
-            <a href="#" class="brand">
-                <img src="assets/images/brands/2.png" alt="Brand Name">
-            </a>
-
-            <a href="#" class="brand">
-                <img src="assets/images/brands/3.png" alt="Brand Name">
-            </a>
-
-            <a href="#" class="brand">
-                <img src="assets/images/brands/4.png" alt="Brand Name">
-            </a>
-
-            <a href="#" class="brand">
-                <img src="assets/images/brands/5.png" alt="Brand Name">
-            </a>
-
-            <a href="#" class="brand">
-                <img src="assets/images/brands/6.png" alt="Brand Name">
-            </a>
-
-            <a href="#" class="brand">
-                <img src="assets/images/brands/7.png" alt="Brand Name">
-            </a>
-        </div>End .owl-carousel -->
-    <!-- </div>End .container -->
-   
-    
     <div class="container category-banner">
         <div class="row">
             {% for category in categories %}
-            <div class="col-lg-3 col-md-6 col-sm-6">
-                <a href="{{ category.url }}">
-                    <img src="{% static 'assets/images/boots-modal.jpg' %}" alt="{{ category.name }}">
-                </a>
-                <div class="banner-content">
-                    <a href="{{ category.url }}"><h3 class="category">{{ category.name|upper }}</h3></a>
-                    <a href="{{ category.url }}" class="action">SHOP NOW</a>
+            <div class="col-lg-3 col-md-6 col-sm-6 my-3">
+                <div class="category-container">
+                    <a href="{% url 'user_shop' %}?category={{ category.id }}">
+                        <img src="{% static 'assets/images/boots-modal.jpg' %}" 
+                             alt="{{ category.name }}" 
+                             style="height: auto; max-height: 200px; width: 100%; object-fit: cover; border-radius: 6px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease-in-out;" 
+                             onmouseover="this.style.transform='scale(1.05)'" 
+                             onmouseout="this.style.transform='scale(1)'">
+
+                    </a>
+
+                    <div class="category-details">
+                        <a href="{% url 'user_shop' %}?category={{ category.id }}">
+                            <h3 class="category" style="color: rgb(31, 36, 142); font-size: 2.5rem; font-weight: 700; border: 2px solid rgba(255, 255, 255, 0); padding: 10px; border-radius: 4px; text-align: center; background-color: rgba(0, 0, 0, 0.432); margin-bottom: 15px;">
+                                <a href="{% url 'user_shop' %}?category={{ category.id }}" style="color: rgb(255, 255, 255); text-decoration: none;">
+                                    {{ category.name|upper }}
+                                </a>
+                            </h3>
+                            <a href="{% url 'user_shop' %}?category={{ category.id }}" class="action btn btn-outline-primary text-primary" style="text-decoration: none; padding: 10px 20px; font-size: 1rem; border-radius: 5px;">
+                                SHOP NOW
+                            </a>
+                            
+                    </div>
                 </div>
             </div>
             {% endfor %}
         </div>
     </div>
-
+    
+    
+    
 
 
     <div class="container new-arrivals">
@@ -220,25 +212,92 @@
 
             <ul class="nav nav-pills justify-content-center" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="arrivals-all-link" data-toggle="tab" href="#arrivals-all-tab" role="tab" aria-controls="arrivals-all-tab" aria-selected="true">All</a>
+                    <a class="nav-link active" id="arrivals-all-link" data-toggle="tab" href="#arrivals-all-tab"
+                        role="tab" aria-controls="arrivals-all-tab" aria-selected="true">All</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="arrivals-women-link" data-toggle="tab" href="#arrivals-women-tab" role="tab" aria-controls="arrivals-women-tab" aria-selected="false">Boots</a>
+                    <a class="nav-link" id="arrivals-women-link" data-toggle="tab" href="#arrivals-women-tab" role="tab"
+                        aria-controls="arrivals-women-tab" aria-selected="false">Boots</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="arrivals-men-link" data-toggle="tab" href="#arrivals-men-tab" role="tab" aria-controls="arrivals-men-tab" aria-selected="false">Jersey</a>
+                    <a class="nav-link" id="arrivals-men-link" data-toggle="tab" href="#arrivals-men-tab" role="tab"
+                        aria-controls="arrivals-men-tab" aria-selected="false">Jersey</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="arrivals-shoes-link" data-toggle="tab" href="#arrivals-shoes-tab" role="tab" aria-controls="arrivals-shoes-tab" aria-selected="false">Shorts</a>
+                    <a class="nav-link" id="arrivals-shoes-link" data-toggle="tab" href="#arrivals-shoes-tab" role="tab"
+                        aria-controls="arrivals-shoes-tab" aria-selected="false">Shorts</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="arrivals-acc-link" data-toggle="tab" href="#arrivals-acc-tab" role="tab" aria-controls="arrivals-acc-tab" aria-selected="false">Socks</a>
+                    <a class="nav-link" id="arrivals-acc-link" data-toggle="tab" href="#arrivals-acc-tab" role="tab"
+                        aria-controls="arrivals-acc-tab" aria-selected="false">Socks</a>
                 </li>
             </ul>
         </div><!-- End .heading -->
-      
+
         <!-- New Arrivals -->
-        <div class="tab-content tab-content-carousel">
+        <div class="products mb-3">
+            <div class="row justify-content-center">
+              {% for product in products %}
+              
+                <div class="col-6 col-md-4 col-lg-4 col-xl-3 my-5 rounded">
+                  <div class="product product-7 text-center">
+                    <figure class="product-media rounded" style="background-color: white;" >
+    
+                      <a href="{% url 'user_product_view' product.variants.first.sizes.first.slug  %}"> 
+                        {% with product.variants.first.images.first as main_image %}
+                          {% if main_image %}
+                            <img src="{{ main_image.image.url }}" alt="{{ product.name }}" class="product-image">
+                          {% else %}
+                            <img src="{% static 'assets/images/default_product.png' %}" alt="{{ product.name }}" class="product-image">
+                          {% endif %}
+                        {% endwith %}
+                      </a>
+        
+                      <div class="product-action-vertical">
+                        <a href="{% url 'add_to_wishlist' product.variants.first.sizes.first.slug %}" class="btn-product-icon btn-wishlist btn-expandable" style="color:#cc3333";><span style="align-content: center;">Add to Wishlist</span></a>
+                       
+                      </div>
+        
+                      <div class="product-action" style="display: flex; justify-content: center; align-items: center;">
+                        <form action="{% url 'add_to_cart' product.variants.first.sizes.first.slug %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-product btn-cart rounded text-center" style="padding: 10px 20px; white-space: nowrap;">
+                                <span>Add to Cart</span>
+                            </button>
+                        </form>
+                    </div>
+                    </figure>
+        
+                    <div class="product-body">
+                      <div class="product-cat">
+                        <a href="#">{{ product.category.name }}</a>
+                      </div>
+                      <h3 class="product-title"><a href="#">{{ product.name |capfirst}}</a></h3>
+                      <div class="product-price">
+                        ₹{{ product.price }}
+                      </div>
+                      <div class="ratings-container">
+                        <div class="ratings">
+                          <div class="ratings-val" style="width: {{ product.total_ratings }}%;"></div> 
+                        </div>
+                        <span class="ratings-text">({{ product.total_ratings }} Reviews)</span> 
+                      </div>
+        
+                      <div class="product-nav product-nav-thumbs">
+                        {% for image in product.variant.first.images.all %}
+                          <a href="#" class="{% if forloop.first %}active{% endif %}">
+                            <img src="{{ image.image.url }}" alt="{{ product.name }}">
+                          </a>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+        <!-- <div class="tab-content tab-content-carousel">
             <div class="tab-pane p-0 fade show active" id="arrivals-all-tab" role="tabpanel" aria-labelledby="arrivals-all-link">
                 <div class="row">
                     {% for product in products %}
@@ -250,51 +309,52 @@
                                 {% endif %}
                                 <a href="{{ product.url }}">
                                     <img src="{{ product.variants.images.image.url }}" alt="Product image" class="product-image">
-                                </a>
-                            </figure><!-- End .product-media -->
-        
-                            <div class="product-body text-center">
-                                <div class="product-cat">
-                                    <a href="#">{{ product.category }}</a>
-                                </div><!-- End .product-cat -->
-                                <h3 class="product-title"><a href="{{ product.url }}">{{ product.name }}</a></h3><!-- End .product-title -->
-                                <div class="product-price">
-                                    {% if product.is_on_sale %}
-                                    <span class="new-price">{{ product.price }}</span>
-                                    <span class="old-price">Was </span>
-                                    {% else %}
-                                    <span class="cur-price">{{ product.price }}</span>
-                                    {% endif %}
-                                </div><!-- End .product-price -->
-                                <div class="ratings-container">
-                                    <div class="ratings">
-                                        <div class="ratings-val" style="width:10"></div><!-- End .ratings-val -->
-                                    </div><!-- End .ratings -->
-                                    <span class="ratings-text">( {{ product.reviews }} Reviews )</span>
-                                </div><!-- End .ratings-container -->
-        
-                                <div class="product-action">
-                                    <a href="#" class="btn-product btn-cart" title="Add to cart"><span>ADD TO CART</span></a>
-                                </div><!-- End .product-action -->
-        
-                                <a href="#" class="btn-addtolist"><span>&nbsp;Add to Wishlist</span></a>
-                            </div><!-- End .product-body -->
-                        </div><!-- End .product -->
-                    </div>
-                    {% endfor %}
-                </div><!-- End .row -->
-            </div><!-- End .tab-pane -->
-        </div><!-- End .tab-content -->
-        <div class="text-center">
-            <a href="category.html" class="btn btn-viewMore">
-                <span>VIEW MORE PRODUCTS</span>
-                <i class="icon-long-arrow-right"></i>
-            </a>
+                                </a> -->
+        <!-- </figure>
+
+        <div class="product-body text-center">
+            <div class="product-cat">
+                <a href="#">{{ product.category }}</a>
+            </div>
+            <h3 class="product-title"><a href="{{ product.url }}">{{ product.name }}</a></h3>
+            <div class="product-price">
+                {% if product.is_on_sale %}
+                <span class="new-price">{{ product.price }}</span>
+                <span class="old-price">Was </span>
+                {% else %}
+                <span class="cur-price">{{ product.price }}</span>
+                {% endif %}
+            </div>
+            <div class="ratings-container">
+                <div class="ratings">
+                    <div class="ratings-val" style="width:10"></div>
+                </div>
+                <span class="ratings-text">( {{ product.reviews }} Reviews )</span>
+            </div>
+
+            <div class="product-action">
+                <a href="#" class="btn-product btn-cart" title="Add to cart"><span>ADD TO CART</span></a>
+            </div>
+
+            <a href="#" class="btn-addtolist"><span>&nbsp;Add to Wishlist</span></a>
         </div>
+    </div>
+    </div>
+    {% endfor %}
+    </div>
+    </div>
+    </div> -->
+    <div class="text-center mt-5">
+        <a href="{% url 'user_shop' %}" class="btn btn-viewMore">
+            <span>VIEW MORE PRODUCTS</span>
+            <i class="icon-long-arrow-right"></i>
+        </a>
+    </div>
     </div><!-- End .container -->
 
     <div class="container newsletter">
         <div class="background" style="background-image: url('{% static "assets/images/main-banner.jpg" %}');">
+
             <div class="subscribe">
                 <div class="subscribe-title text-center">
                     <h1 class="intro-title2nd">SUBSCRIBE FOR OUR NEWSLETTER</h1>
@@ -302,9 +362,11 @@
                 </div>
                 <form action="#">
                     <div class="input-group">
-                        <input type="email" placeholder="Enter your Email Address" aria-label="Email Adress" required="">
+                        <input type="email" placeholder="Enter your Email Address" aria-label="Email Adress"
+                            required="">
                         <div class="input-group-append">
-                            <button class="btn btn-subscribe" type="submit"><span>Subscribe</span><i class="icon-long-arrow-right"></i></button>
+                            <button class="btn btn-subscribe" type="submit"><span>Subscribe</span><i
+                                    class="icon-long-arrow-right"></i></button>
                         </div><!-- .End .input-group-append -->
                     </div><!-- .End .input-group -->
                 </form>
@@ -325,7 +387,7 @@
                 </div><!-- End .icon-box-content -->
             </div><!-- End .icon-box -->
         </div><!-- End .col-sm-6 col-lg-4 -->
-        
+
         <div class="col-sm-6 col-lg-3">
             <div class="icon-box icon-box-side">
                 <span class="icon-box-icon text-dark">
@@ -369,4 +431,4 @@
 </main>
 
 
-{% endblock %}    
+{% endblock %}

@@ -106,6 +106,14 @@
     </style>
 </head>
 <body>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-error alert-dismissible fade show text-center" role="alert">
+        {{ message }}
+        <button type="button" class="btn" data-bs-dismiss="alert" aria-label="Close"> <i class="fas fa-times"></i></button>
+    </div>
+{% endfor %}
+{% endif %}
     <div class="failure-container">
         <div class="failure-icon">
             <span class="x-mark">×</span>

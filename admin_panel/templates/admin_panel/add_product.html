@@ -7,8 +7,20 @@
 
 {% block content %}
 <div class="container mt-5" style="max-width: 800px;">
+    {% if messages %}
+<div>
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
     <!-- Category Selection -->
     <div class="card mb-4">
+        
         <div class="card-header">
             <h2 class="mb-0">Add New Product</h2>
         </div>

@@ -87,9 +87,9 @@ class OrderItems(models.Model):
     
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.name } - variant:{self.variant.color}-{self.variant.size} in order # {self.order.id}"
+        return f"{self.quantity} x {self.product.name} - variant: {self.variant.variant.color} - {self.variant.size} in order # {self.order.id}"
 
-
+  
 class DeliveryCharge(models.Model):
     value = models.DecimalField(max_digits=10, decimal_places=2,default=0.00)
 

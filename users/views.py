@@ -7,11 +7,13 @@ from django.views.decorators.cache import never_cache
 from django.contrib import messages
 from django.core.validators import validate_email
 from django.core.exceptions import ObjectDoesNotExist
-from products.models import Product
+from products.models import Product, Variant
+from categories.models import Category
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
+from django.db.models import Max
 
 import random
 import json
@@ -96,7 +98,7 @@ def UserSignIn(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home')  # Redirect to home or any other page
+            return redirect('home') 
         else:
             messages.error(request, 'Invalid email or password')
               
@@ -104,7 +106,17 @@ def UserSignIn(request):
         
 @login_required
 def Home(request):
-    return render(request, 'home.html')
+    categories = Category.objects.filter(is_listed=True)[:4]
+    products = Product.objects.annotate(
+        latest_variant_created_at = Max('variants__created_at') 
+    ).prefetch_related('variants')[:8]
+    variants = Variant.objects.all().order_by('-created_at')[:12]
+    context = {
+        "products":products,
+        "variants":variants,
+        "categories":categories
+    }
+    return render(request, 'home.html',context)
 
 
 def userLogout(request):
@@ -133,7 +145,6 @@ def send_otp_email(email, otp):
         )
         return True
     except Exception as e:
-        print(f"Email sending error: {e}")
         return False
 
 

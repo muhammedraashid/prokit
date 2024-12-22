@@ -23,17 +23,20 @@
   <div class="page-content">
       <div class="checkout ">
           <div class="container">
-            <h1 class="checkout-title card px-5 py-3"><span><i class="fa fa-credit-card"></i> Checkout</span></h1>
+            
+            <h1 class="checkout-title card px-5 py-3 "><span><i class="fa fa-credit-card"></i> Checkout</span></h1>
+            {% if messages %}
+                {% for message in messages %}
+                  <div class="alert alert-info alert-dismissible fade show text-center my-3" role="alert">
+                      {{ message }}
+                      <button type="button" class="btn" data-bs-dismiss="alert" aria-label="Close"> <i class="fas fa-times"></i></button>
+                  </div>
+              {% endfor %}
+            {% endif %}
               <div class="row">
                   <div class="col-lg-6">
                       <div class="row">
-                        {% if messages %}
-                          {% for message in messages %}
-                          <div class="card col-12 text-center ">
-                              <p class="text-danger">{{message}}</p>
-                          </div>
-                          {% endfor%}
-                        {% endif %}
+                        
                           <div class="col-sm-12 card ">
                               <h2 class="checkout-title text-center">Select Delivery Address</h2>
                               {% if user.addresses.all %}

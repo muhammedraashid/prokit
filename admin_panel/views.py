@@ -162,7 +162,7 @@ def adminDashboard(request):
 @staff_member_required
 @login_required
 def adminUsers(request):
-    users = User.objects.exclude(id = 1).order_by('username')
+    users = User.objects.exclude(id = 1).order_by('date_joined').reverse()
     context = {
         'users': users,
         'current_page': 'users',
@@ -199,6 +199,8 @@ def adminProducts(request):
 @login_required
 def adminCategories(request):
     categories = Category.objects.all()
+    for category in categories:
+        category.sizes_text = ", ".join([size.size for size in category.sizes.all()])
     context = {
         'categories': categories,
         'current_page': 'categories',

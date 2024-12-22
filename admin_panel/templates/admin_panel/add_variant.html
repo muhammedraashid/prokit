@@ -9,9 +9,21 @@
 {% block content %}
  <h1>Add Variant Details</h1>
  <div class="container mt-5 " style="width: 70%;">
+    {% if messages %}
+<div>
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
     <form method="POST" enctype="multipart/form-data"  >
         {% csrf_token %}
         <div id="variantsContainer">
+            
             <div class="alert alert-info">
                 <i class="fas fa-info-circle"></i> Each variant requires:
                 <ul class="mb-0">

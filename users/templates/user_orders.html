@@ -17,7 +17,7 @@
     
  <main class="main" style="background-color:#dde8e9 ; height: 100%; padding-block: 20px;">
     <div class="container">
-        <h6 class="mb-4 card col-12 py-2 pr-2"> <span><i class="fas fa-box"></i> Orders</span></h6>
+        <h6 class="mb-4 card col-12 py-3 pr-2"> <span><i class="fas fa-box"></i> Orders</span></h6>
         
         {% if orders %}
             <div class="row">
@@ -36,19 +36,33 @@
                                 </span>
                         </div>
                         <div class="card-body d-flex justify-content-between">
+                           
+                            <div class="d-flex flex-wrap">
+                                {% for item in order.order_items.all %}
+                                <div class="d-flex align-items-center mb-2 mr-5" style="flex: 0 0 auto; margin-right: 20px;">
+                                    <img src="{{ item.variant.variant.images.first.image.url }}" alt="{{ item.product.name }}" 
+                                         class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                                    <div>
+                                        <p class="mb-0"><strong>{{ item.product.name }}</strong></p>
+                                        <p class="mb-0">Qty: {{ item.quantity }}</p>
+                                        <p class="mb-0">Price: ₹{{ item.product.price|floatformat:2 }}</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
                             <p class="card-text">
                                 <strong>Date:</strong> {{ order.created_at|date:"F d, Y" }}<br>
-                                <strong>Total:</strong> ${{ order.total_amount|floatformat:2 }}<br>
+                                <strong>Total:</strong> ₹{{ order.total_amount|floatformat:2 }}<br>
                                 <strong>Items:</strong> {{ order.order_items.all.count }}
                             </p>
                             <div class="d-flex">
-                                <a class="btn btn-sm btn-outline-primary  mr-3 rounded"   
-                                        href = "{% url 'user_order_view' order.id %}"
+                                <button class="btn btn-sm btn-outline-primary mr-3 rounded"   
+                                        onclick="window.location.href='{% url 'user_order_view' order.id %}'" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#orderDetailsModal{{ order.id }}"
                                         style="height: fit-content;">
                                     View Details
-                                </a>
+                                </button>
                                 {% if order.order_status == 'pending' %}
                                 <form action="{%url 'cancel_order' order.id %}" method="POST">
                                     {% csrf_token %}
@@ -66,33 +80,7 @@
                     </div>
                 </div>
                 
-                <div class="modal fade" id="orderDetailsModal{{ order.id }}" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Order #{{ order.order_number}} Details</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <h6>Items:</h6>
-                                <ul class="list-group">
-                                    {% for item in order.orderitem_set.all %}
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ item.product.name }}
-                                        <span>
-                                            {{ item.quantity }} x ${{ item.price|floatformat:2 }}
-                                        </span>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                                <hr>
-                                <div class="text-end">
-                                    <strong>Total:</strong> ${{ order.total_price|floatformat:2 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
                 {%endfor %}
             </div>
         {% else %}

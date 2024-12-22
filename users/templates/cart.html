@@ -14,11 +14,37 @@
             </ol>
         </div><!-- End .container -->
     </nav><!-- End .breadcrumb-nav -->
-    
-    <main class="main" style="background-color:#dde8e9; padding-block: 20px;">
+     
+    <main class="main" style="background-color:rgb(237, 244, 244); padding-block: 20px;">
+        
+
         <div class="page-content">
             <div class="cart">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show text-center mb-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>                
+                </div>
+                {% endfor %}
+                {% endif %}
+                
                 <div class="container">
+
+                    <div class="row mx-2">
+                        <nav class="col-lg-12 card " >
+                            <a href="{% url 'cart' %}" class="nav-item ">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="me-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                Cart Itmes
+                            </a>
+                            <!-- Other navigation items remain the same -->
+                        </nav>
+                    </div>
+
                     {% if cart_items %}
                     <div class="row">
                         <div class="col-lg-9 card">
@@ -77,7 +103,19 @@
                                     {% endfor %}
                                 </tbody>
                             </table>
-    
+                            {% if applied_coupon %}
+                            <div class="alert alert-success d-flex justify-content-between align-items-center mb-3">
+                                <span>
+                                    <strong>Coupon "{{ applied_coupon }}" applied successfully!</strong>
+                                </span>
+                                <form method="POST" action="{% url 'remove_coupon' %}" class="m-0">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn p-0" style="background: none; border: none;" aria-label="Remove Coupon" title="Remove Coupon">
+                                        <i class="fas fa-times text-danger"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            {% endif %}
                             <div class="cart-bottom">
                                 <select id="coupon-select" name="coupon" class="form-control rounded">
                                     <option value="" disabled selected>{% if applied_coupon %}{{applied_coupon}}{% else %}Select a coupon{% endif %}</option>
@@ -93,7 +131,6 @@
                                     {% endfor %}
                                 </select>
                               
-                                
     
                                 <a href="{% url 'cart' %}" class="btn btn-outline-dark-2">
                                     <span>UPDATE CART</span><i class="icon-refresh"></i>
@@ -101,23 +138,7 @@
                                
                             </div>
                             
-                           
-                            {% if applied_coupon %}
-                            <div class="card text-center p-3">
-                                
-                                <p class="text-success font-weight-bold">
-                                    Coupon {{ applied_coupon }} applied
-                                </p>
-                            
-                              
-                                <form method="POST" action="{% url 'remove_coupon' %}" style="display: inline-block;">
-                                    {% csrf_token %}
-                                    <button type="submit" id="remove-coupon" class="btn btn-outline-danger mt-2 rounded">
-                                        <i class="fas fa-times"></i> Remove Applied Coupon
-                                    </button>
-                                </form>
-                            </div>
-                            {% endif %}
+
                         </div>
                        
                         <aside class="col-lg-3">
@@ -135,6 +156,7 @@
                                                 <td>Subtotal:</td>
                                                 <td id="subtotal">₹{{ sub_total }}</td>
                                             </tr>
+                                           
                                             <tr id="discount-row" >
                                                 <td>Discount:</td>
                                                 <td id="discount-amount">-₹{{discount_amount}}</td>
@@ -156,7 +178,7 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-6 text-center">
                             <p class="text-primary mb-4">Your cart is empty</p>
-                            <a href="{% url 'user_shop' %}" class="btn btn-outline-primary btn-block mb-3">
+                            <a href="{% url 'user_shop' %}" class="btn btn-outline-primary btn-block mb-3 rounded">
                                 <span>CONTINUE SHOPPING</span>
                                 <i class="icon-refresh"></i>
                             </a>
