@@ -52,6 +52,7 @@ class Order(models.Model):
     applied_coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE ,null=True, blank=True )
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00,null=True)
     delivery_charge = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    is_seen = models.BooleanField(default=False)
    
 
     def save(self,*args,**kwargs):
