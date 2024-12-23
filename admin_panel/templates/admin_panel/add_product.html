@@ -114,7 +114,7 @@
                                 <select class="form-control" name="Brand" >
                                     <option value="">Select Brand</option>
                                     {% for brand in brands %}
-                                        <option value="{{ brand }}">{{ brand }}</option>
+                                        <option value="{{ brand.name }}">{{ brand.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -164,7 +164,7 @@
                                 <select class="form-control" name="color" required>
                                     <option value="">Select color</option>
                                     {% for color in colors %}
-                                        <option value="{{ color }}">{{ color }}</option>
+                                        <option value="{{ color.name }}">{{ color.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
