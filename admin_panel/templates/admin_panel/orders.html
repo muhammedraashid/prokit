@@ -52,7 +52,7 @@
                     
                     <div class="card-body">
                         <!-- Orders Table -->
-                        <table class="table table-striped table-hover">
+                        <table class="table">
                             <thead>
                                 <tr style="color: rgb(129, 247, 247);">
                                     <th scope="col">Order #</th>
@@ -65,49 +65,49 @@
                                 </tr>
                             </thead>
                             <tbody >
-                                {% for order in orders %}
-                                    <tr>
-                                        <td class="text-white">{{ order.order_number }}</td>
-                                        <td class="text-white">{{ order.user.username }}</td>
-                                        <td class="text-white">₹{{ order.total_amount }}</td>
-                                        <td>
-                                            <span class="badge {% if order.order_status == 'pending' %}bg-warning
-                                                               {% elif order.order_status == 'delivered' %}bg-success
-                                                               {% elif order.order_status == 'processing' %}bg-primary
-                                                               {% elif order.order_status == 'shipped' %}bg-info
-                                                               {% else %}bg-danger{% endif %}">
-                                                {{ order.order_status }}
-                                            </span>
-                                        </td>
-                                        <td class="text-white">
-                                            {{order.created_at}}
-                                        </td>
-                                        <td>
-                                            <a href="{% url 'admin_order_view' order.id %}" class="btn btn-outline-info btn-sm">
-                                                <i class="fas fa-eye"></i> View
-                                            </a>
-                                                                                
-                                        </td>
-                                        <td>
-                                            <form action="{% url 'order_status' order.id %}" method="POST">
-                                                {% csrf_token %}
-                                                <select name="order_status" style="background-color: rgb(165, 255, 249);" class="form-control" onchange="this.form.submit()">
-                                                    {% for status, display_name in order.STATUS_CHOICES %}
-                                                        <option value="{{ status }}" {% if order.order_status == status %} selected {% endif %}>
-                                                            {{ display_name }}
-                                                        </option>
-                                                    {% endfor %}
-                                                </select>
-                                            </form>  
-                                        </td>
 
-                                       
-                                    </tr>
-                                {% empty %}
-                                    <tr>
-                                        <td colspan="5" class="text-center text-secondary">No orders available.</td>
-                                    </tr>
-                                {% endfor %}
+                                {% for order in orders %}
+                                <tr class="{% if not order.is_seen %}bg-dark text-info{% else %}bg-dark text-white{% endif %}">
+                                    <td>{{ order.order_number }}
+                                        {% if not order.is_seen %}
+                                            <span class="badge bg-primary text-white ml-2">New</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ order.user.username }}</td>
+                                    <td>₹{{ order.total_amount }}</td>
+                                    <td>
+                                        <span class="badge {% if order.order_status == 'pending' %}bg-warning text-dark
+                                                           {% elif order.order_status == 'delivered' %}bg-success text-white
+                                                           {% elif order.order_status == 'processing' %}bg-primary text-white
+                                                           {% elif order.order_status == 'shipped' %}bg-info text-dark
+                                                           {% else %}bg-danger text-white{% endif %}">
+                                            {{ order.order_status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ order.created_at|date:"F d, Y H:i" }}</td>
+                                    <td>
+                                        <a href="{% url 'admin_order_view' order.id %}" class="btn btn-outline-info btn-sm">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'order_status' order.id %}" method="POST">
+                                            {% csrf_token %}
+                                            <select name="order_status" class="form-control bg-dark text-light" onchange="this.form.submit()">
+                                                {% for status, display_name in order.STATUS_CHOICES %}
+                                                    <option value="{{ status }}" {% if order.order_status == status %} selected {% endif %}>
+                                                        {{ display_name }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-secondary">No orders available.</td>
+                                </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
 
