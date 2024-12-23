@@ -15,7 +15,6 @@ class Product(models.Model):
     offer = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     is_listed = models.BooleanField(default=True)
     slug = models.SlugField(unique=True, blank=True)
-    # created_at = models.DateTimeField(auto_now_add=True, default=now)
 
 
     def save(self, *args, **kwargs):

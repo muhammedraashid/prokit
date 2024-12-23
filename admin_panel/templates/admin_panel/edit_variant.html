@@ -51,7 +51,7 @@
                                 <select class="form-control" name="color" required>
                                     <option value="">Select color</option>
                                     {% for color in colors %}
-                                        <option value="{{ color }}" {% if color == variant.color %}selected{% endif %}>{{ color }}</option>
+                                        <option value="{{ color.name }}" {% if color.name == variant.color %}selected{% endif %}>{{ color.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>

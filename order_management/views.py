@@ -180,13 +180,24 @@ def place_order(request):
         if not cart_items:
             messages.error(request, 'Your cart is empty!')
             return redirect('checkout')
-        
-        delivery_charge = DeliveryCharge.objects.get(id=1)
+
+        out_of_stock_items = []
+        for item in cart_items:
+            variant_size = item.variant
+            if variant_size.stock < cart_item.quantity:
+                out_of_stock_items.append(cart_item)
+
+        if out_of_stock_items:
+            out_of_stock_products = [item.product.name for item in out_of_stock_items]
+            for product in out_of_stock_products:
+                messages.error(request, f"{product} is out of stock or has insufficient quantity.")
+
+        delivery_charge = DeliveryCharge.objects.first()
         delivery_charge = delivery_charge.value
         total_amount = cart.calculate_total() + delivery_charge
         if cart.applied_coupon:
             total_amount = total_amount - cart.discount_amount 
-   
+        
         total_amount_in_paise = int(total_amount * 100)
         
         address = get_object_or_404(Address, id=address_id)
@@ -232,7 +243,6 @@ def place_order(request):
                 user=user,
                 address=address,    
                 cart=cart,
-                # coupon=coupon if coupon else None,
                 sub_total = sub_total,
                 total_amount= total_amount,
                 payment_method = payment_method,
@@ -253,7 +263,7 @@ def place_order(request):
                     
                 )
 
-                # Reduce stock after successful order
+                # reduce stock after successful order
                 variant_size = cart_item.variant_size
                 if variant_size.stock >= cart_item.quantity:
                     variant_size.stock -= cart_item.quantity

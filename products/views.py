@@ -17,7 +17,6 @@ from django.db.models import Q, Count,Sum, Prefetch
 @require_http_methods(["GET", "POST"])
 def add_product(request):
    
- 
     if request.method == 'GET':
         categories = Category.objects.all()
         category_id = request.GET.get("category", "1")
@@ -45,25 +44,37 @@ def add_product(request):
             if not category_id:
                 raise ValidationError("Category is required")
             
-          
+            price=request.POST.get('price')
+            name = request.POST.get("name", "").strip()
+
+            if price < 0 :
+                messages.warning(request,"Enter a valid Price Money")
+                return redirect('add_product')
+            if not name:
+                messages.error(request, "Product name cannot be empty or contain only spaces.")
+                return redirect('add_product')
+            if Product.objects.filter(name=name).exists():
+                messages.error(request, "A product with this name already exists.")   
+                return redirect('add_product')
+
             product = Product.objects.create(
-                name=request.POST.get('name'),
-                price=request.POST.get('price'),
+                name=name,
+                price=price,
                 description=request.POST.get('description', ''),
                 category_id=category_id,
                 brand = request.POST.get('brand',''),
                 offer=request.POST.get('offer') or None,
                 is_listed=request.POST.get('is_listed') == 'on'
             )
-
-            # sizes = request.POST.getlist('sizes')
+            
+        
             color = request.POST.get('color')
-            # stock = request.POST.get('stock')
+            
             
             variant = Variant.objects.create(
                 product=product,
                 color=color,
-                # stock=stock
+               
             )
                         
             variant_images = []
@@ -91,12 +102,17 @@ def add_product(request):
             sizes = Size.objects.filter(category=selected_category).values_list('size', flat=True)
             for size in sizes:
                 stock = request.POST.get(f"{size}")
-                
-                VariantSize.objects.create(
-                    variant = variant,
-                    size = size,
-                    stock = int(stock) if stock and stock.isdigit() and int(stock) >= 0 else 0
-                )
+                if int(stock) != 0:
+                    all_zero = False  
+                    break
+                if not all_zero:
+                    VariantSize.objects.create(
+                        variant = variant,
+                        size = size,
+                        stock = int(stock) if stock and stock.isdigit() and int(stock) >= 0 else 0
+                    )
+                else:
+                    messages.warning(request,"All sizes are cant be  out of stock while add a new product. Please try again!")    
 
             messages.success(request, "Product and variant created successfully!")
             return redirect('admin_products')
@@ -126,12 +142,11 @@ def update_product(request, slug):
         # Get the new name from the form and strip whitespace
         name = request.POST.get("name", "").strip()
         
-        # Check if name is empty after stripping spaces
         if not name:
             messages.error(request, "Product name cannot be empty or contain only spaces.")
             return render(request, 'admin_panel/product_details.html', {'product': product})
 
-        # Check if a product with the same name already exists (excluding the current product)
+
         if Product.objects.filter(name=name).exclude(slug=slug).exists():
             messages.error(request, "A product with this name already exists.")
             return render(request, 'admin_panel/product_details.html', {'product': product})
@@ -163,10 +178,7 @@ def Shop(request):
     brand_names = request.GET.getlist('brand_ids')
     
     selected_categories = Category.objects.filter(id__in=category_ids, is_listed=True) 
-    
-    # selected_sizes = [size for size in selected_sizes if size]
-    # sizes = Size.objects.filter(category__in=selected_categories).values_list('size', flat=True)
-
+ 
     query = request.GET.get('qry','')
     sortby= request.POST.get('sortby','name')
    
@@ -213,12 +225,10 @@ def Shop(request):
     context = {
         'products': products,
         'categories': categories,
-        # 'sizes' : list(set(sizes)),
         'query':query,
-        # 'selected_sizes':selected_sizes,
         'category_ids':category_ids,
         'brand_names':brand_names,
-        # 'sortby':sortby,
+        
     }
     return render(request, 'shop.html', context)
 
