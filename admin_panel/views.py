@@ -171,7 +171,7 @@ def adminUsers(request):
     return render(request, 'admin_panel/users.html',context)
 
 @staff_member_required
-def user_block_unblock(request, user_id):  # Admin block/unblock user
+def user_block_unblock(request, user_id):  
     user = get_object_or_404(User, id=user_id)
 
     if request.method == 'POST':

@@ -81,9 +81,14 @@ def add_to_cart(request,variant_size_slug):
                     cart_item.quantity += quantity
                     cart_item.save()    
                 else:
-                    messages.warning(request,f"You have reached the maximum limit of 10 units for this Item !")    
+                    messages.warning(request,f"This product is already in your cart!")
+            if cart.applied_coupon:         
+                cart.applied_coupon = None
+                cart.discount_amount = 0
+                cart.save()  
+                messages.info(request, "Coupon removed as new items were added to your cart. Reapply the coupon if needed.")      
             messages.success(request,'Product added to cart')
-
+        
     return redirect('cart')
 
 @login_required
@@ -94,9 +99,11 @@ def remove_from_cart(request,item_id):
         applied_coupon.used_limit += 1  
         applied_coupon.save()  
 
-        cart.discount_amount = 0
-        cart.applied_coupon = None
-        cart.save()
+        if cart.applied_coupon:         
+            cart.applied_coupon = None
+            cart.discount_amount = 0
+            cart.save()  
+            messages.info(request, "Coupon removed as an item were removed to your cart. Reapply the coupon if needed.")   
 
     cart_item = get_object_or_404(CartItems, id = item_id)
     cart_item.delete()

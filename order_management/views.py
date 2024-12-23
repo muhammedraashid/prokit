@@ -45,7 +45,7 @@ def admin_order_management(request):
         if filterby:
             if filterby != 'all':
                 orders = Order.objects.filter(order_status=filterby).order_by('-created_at')
-           
+        
     context = {
         'orders': orders,
         'status_choices': Order.STATUS_CHOICES,
@@ -608,88 +608,7 @@ def cancel_order_item(request, item_id):
     return redirect('user_order_view',ord_id=order.id)
   
 
-       
-
-# ---------------------------------------------------    
-    # if  order.applied_coupon:
-    #     total_order_price = Decimal(order.total_amount) + Decimal(order.discount_amount) # total price without coupon discounts
-    #     total_order_price -= Decimal(order_item.sub_total) # total price without coupon discount after removing
-    #     discount_amount = (Decimal(total_order_price) * Decimal(order.applied_coupon.discount_value) / 100)   # calculate discount amount after item cancelled
-    #     order.discount_amount = Decimal(order.applied_coupon.max_discount) if Decimal(order.applied_coupon.max_discount) > Decimal(discount_amount) else Decimal(discount_amount)
-    #     order.total_amount = Decimal(total_order_price) - Decimal(order.discount_amount) # total amount with discount
-    #     order.total_amount +=  Decimal(order.delivery_charge) # total amount after applying delivery charge
-    #     order.save()
-
-    #     if all(order_item.item_status == 'cancelled' for order_item in order.order_items.all()):
-    #         order.delivery_charge = 0.00
-    #         order.order_status = 'cancelled'
-    #         order.save()
-            
-    #     if order.total_amount < order.applied_coupon.min_amount:
-    #         if order.payment_method == 'upi' or order.payment_method=='wallet':
-    #             wallet = order.user.wallet
-    #             discount = Decimal(0) if Decimal(order.applied_coupon.max_discount) > Decimal(discount_amount) else (order_item.sub_total * Decimal(order.applied_coupon.discount_value)) / Decimal(100)
-    #             refund_amount = Decimal(order_item.sub_total) - discount
-
-    #             wallet.balance += refund_amount
-    #             wallet.save()
-                
-            
-    #             WalletTransaction.objects.create(
-    #                 wallet = wallet,
-    #                 amount = refund_amount,
-    #                 transaction_type = 'credit',
-
-    #             )
-    #             messages.success(request, f"₹{refund_amount} has been successfully refunded to your wallet. A discount of ₹{discount} was deducted due to the applied coupon.")
-
-    #         order.applied_coupon.used_count -= 1
-    #         order.applied_coupon.used_limit +=1
-    #         order.applied_coupon = None
-    #         order.discount_amount = 0.00
-    #         order.save()
-    #         messages.info(request, "Coupon invalid: Total amount is less than the minimum required.")    
-    # else:    
-    #     all_cancelled_or_returned = all(
-    #     item.item_status in ["returned", "cancelled"] for item in order.order_items.all()
-    #     )
-
-    #     for order_item in order.order_items.all():
-    #         if all_cancelled_or_returned:
-    #             order.total_amount -= sum(Decimal(item.sub_total) for item in order.order_items.all())
-    #             order.delivery_charge = 0.00
-    #         else:
-    #             order.total_amount -= Decimal(order_item.sub_total)
-
-        
-    #     order.total_amount = max(order.total_amount, Decimal(0)) # ensure total is positive value
-    #     order.save()
-
-
-    # if order.order_items.all().exclude(item_status__in=['cancelled', 'returned']).count() == 0:
-    #        order.order_status = 'cancelled'
-    #        order.discount_amount = 0 
-    #        order.save()          
-    
-    # if order.payment_method == 'upi' or order.payment_method=='wallet':
-    #     wallet = order.user.wallet
-    #     refund_amount = Decimal(order_item.sub_total)
-
-    #     wallet.balance += refund_amount
-    #     wallet.save()
-        
-    #     WalletTransaction.objects.create(
-    #         wallet = wallet,
-    #         amount = refund_amount,
-    #         transaction_type = 'credit',
-
-    #     )
-    #     messages.success(request, f"₹{refund_amount} has been refunded to  wallet!")
-        
-
-    # messages.success(request, f"Order Item {order_item.product.name} is cancelled ")
-    # return redirect('user_order_view',ord_id=order.id)
-
+   
 def return_order(request,ord_id):
     order = get_object_or_404(Order, id=ord_id)
     for order_item in order.order_items.all():
@@ -736,62 +655,90 @@ def return_order_item(request, item_id):
   
         order_item.item_status = 'returned'
         order_item.save()
-        
-        if  order.applied_coupon:
-            total_order_price = Decimal(order.total_amount) + Decimal(order.discount_amount) # total price without coupon discounts
-            total_order_price -= Decimal(order_item.sub_total) + Decimal(order.delivery_charge) # total price without coupon discount after removing
-            order.discount_amount = (total_order_price * order.applied_coupon.discount_value) / 100  # calculate discount amount after item returned
-            order.total_amount = Decimal(total_order_price) - Decimal(order.discount_amount) # total amount with discount
-            order.total_amount +=  Decimal(order.delivery_charge) # total amount after applying delivery charge
-            order.save()
 
-                
-            if order.total_amount < order.applied_coupon.min_amount:
-                order.applied_coupon.used_count -= 1
-                order.applied_coupon.used_limit +=1
-                order.applied_coupon = None
-                order.discount_amount = 0.00
+        if order.applied_coupon:
+            # calculate total order price excluding the returned item
+            total_order_price = (
+                Decimal(order.total_amount) +
+                Decimal(order.discount_amount) -
+                Decimal(order.delivery_charge) -
+                Decimal(order_item.sub_total)
+            )
+
+            # check if the updated total still qualifies for the coupon
+            if total_order_price >= order.applied_coupon.min_amount:
+                # calculate the new discount for the remaining items
+                new_discount_amount = (
+                    Decimal(total_order_price) *
+                    Decimal(order.applied_coupon.discount_value) / 100
+                )
+                new_discount_amount = min(new_discount_amount, order.applied_coupon.max_discount)
+
+                discount_difference = Decimal(order.discount_amount) - new_discount_amount
+                refund_amount = Decimal(order_item.sub_total) - discount_difference
+
+            
+                order.discount_amount = new_discount_amount
+                order.total_amount = total_order_price - new_discount_amount + order.delivery_charge
                 order.save()
-                messages.info(request, "Coupon invalid: Total amount is less than the minimum required.")    
-        else:    
-            order.total_amount -= Decimal(order_item.sub_total) 
-            order.save()
 
-        if order.order_items.all().exclude(item_status__in=['cancelled', 'returned']).count() == 0:
-            order.status = 'returned'
-            order.discount_amount = 0 
-            order.save()
+                # message for successful refund with a reduced discount
+                messages.success(request,f"₹{refund_amount} has been successfully refunded to your wallet. A discount adjustment of ₹{discount_difference} was applied." )
+            else:
+                # if coupon becomes invalid,
 
-        wallet = order.user.wallet
-        if order.applied_coupon:
-            discount = (order_item.sub_total * order.applied_coupon.discount_value ) / 100
-            refund_amount = Decimal(order_item.sub_total) - discount
-        else :
-            refund_amount = Decimal(order_item.sub_total)
-        
-        # refund the amount to the user wallet
-        wallet.balance += refund_amount
-        wallet.save()
-        
-       # update wallet transaction history
-        WalletTransaction.objects.create(
-            wallet = wallet,
-            amount = refund_amount,
-            transaction_type = 'credit',
+                refund_amount = Decimal(order_item.sub_total) - order.discount_amount
 
-        )
-        if order.applied_coupon:
-            messages.success(request, f"₹{refund_amount} has been successfully refunded to your wallet. A discount of ₹{discount} was deducted due to the applied coupon.")
+                total_order_price = (
+                    Decimal(order.total_amount) +
+                    Decimal(order.discount_amount) -
+                    Decimal(order_item.sub_total) 
+                )
+                messages.success(request, f"₹{refund_amount} has been successfully refunded to your wallet. A discount adjustment of ₹{order.discount_amount} was applied.")
+
+                # reset the coupon
+                order.applied_coupon.used_count -= 1
+                order.applied_coupon.used_limit += 1
+                order.applied_coupon = None
+                order.discount_amount = Decimal(0)
+                order.total_amount = total_order_price 
+                order.save()
+                
+                # inform the user about the coupon invalidation
+                messages.info(request,"The coupon was invalidated as the total amount after Returned fell below the minimum required.")
         else:
-             messages.success(request, f"₹{refund_amount} has been refunded to  wallet!")  
+            # refund full item subtotal if no coupon is applied
+            
+            refund_amount = Decimal(order_item.sub_total)
+
+        if order.payment_method in ['upi', 'wallet']:
+            # rrocess wallet refund
+            wallet = order.user.wallet
+            wallet.balance += refund_amount
+            wallet.save()
+        
+            WalletTransaction.objects.create(
+                wallet=wallet,
+                amount=refund_amount,
+                transaction_type='credit',
+            )
+
+            # final success message for wallet refund
+            messages.success(request,f"₹{refund_amount} has been successfully refunded to your wallet.")
+            
+        if order.order_items.all().exclude(item_status__in=['cancelled', 'returned']).count() == 0:
+            order.order_status = 'returned'
+            order.discount_amount = 0  
+            order.total_amount = order.delivery_charge
+            order.save()
 
         messages.success(request, f"Order {order.order_number} is Returned")
-        return redirect('admin_order_view',ord_id=order.id)      
-    
+        return redirect('admin_order_view',ord_id=order.id) 
     else:
         order_item.item_status = 'return_requested'
         order_item.save()
         return redirect('user_order_view',ord_id=order.id)
+            
 
 
 def order_status(request, ord_id):
@@ -822,6 +769,8 @@ def order_status(request, ord_id):
 
 def admin_order_view(request,ord_id): 
     order = get_object_or_404(Order, id=ord_id)
+    order.is_seen = True
+    order.save()
     context = {
         'order':order,
         'excluded_statuses' : ['cancelled', 'delivered', 'return_requested','returned']
