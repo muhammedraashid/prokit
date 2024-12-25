@@ -88,7 +88,6 @@ def UserAddresses(request):
     return render(request, 'addresses.html',context)
 
 def update_address(request,address_id):
-    print('hello running...')
     address = get_object_or_404(Address, id=address_id)
     if request.method == "POST":
         address_type = request.POST.get('address_type')
