@@ -172,7 +172,7 @@ import os
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -188,7 +188,7 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")  # Use App Password
 DEFAULT_FROM_EMAIL =  os.getenv("DEFAULT_FROM_EMAIL")
 
-FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:8000')
+FRONTEND_URL = config('FRONTEND_URL', default='http://prokit.shop')
 
 
 #authenticaton backends
