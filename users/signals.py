@@ -42,6 +42,7 @@ ProKit
             )
         
         except Exception as e:
+            pass
            
 
 @receiver(post_save, sender=User)
