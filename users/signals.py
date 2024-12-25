@@ -13,7 +13,7 @@ from django.conf import settings
 @receiver(post_save, sender=User)
 def send_email_verification(sender, instance, created, **kwargs):
     if created :
-        print(f"Creating verification token for user  {instance.username}")  
+       
 
         token = secrets.token_urlsafe(16)
         EmailVerification.objects.create(user=instance, token=token)
@@ -40,9 +40,9 @@ ProKit
                 recipient_list=[instance.email],
                 fail_silently=False,
             )
-            print(f"Verification email sent to {instance.email}")
+        
         except Exception as e:
-            print(f"Error sending email: {e}")
+           
 
 @receiver(post_save, sender=User)
 def create_or_update_profile(sender, instance, created, **kwargs):
