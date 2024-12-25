@@ -44,12 +44,19 @@ def add_product(request):
             if not category_id:
                 raise ValidationError("Category is required")
             
-            price=request.POST.get('price')
+          
             name = request.POST.get("name", "").strip()
 
-            if price < 0 :
-                messages.warning(request,"Enter a valid Price Money")
+            price = request.POST.get('price')
+            if not price or not price.isdigit():
+                messages.warning(request, "Enter a valid Price Money")
                 return redirect('add_product')
+
+            price = int(price)  # Convert to integer after validation
+            if price < 0:
+                messages.warning(request, "Enter a valid Price Money")
+                return redirect('add_product')
+
             if not name:
                 messages.error(request, "Product name cannot be empty or contain only spaces.")
                 return redirect('add_product')
@@ -129,7 +136,7 @@ def add_product(request):
     context = {
         'categories': categories,
         'category_id': category_id,
-        'total_stock': total_stock
+        # 'total_stock': total_stock
     }
     return render(request, 'admin_panel/add_product.html', context)
 
