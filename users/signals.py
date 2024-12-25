@@ -12,7 +12,7 @@ from django.conf import settings
 
 @receiver(post_save, sender=User)
 def send_email_verification(sender, instance, created, **kwargs):
-    if created :
+    if created  and not instance.is_superuser:
        
 
         token = secrets.token_urlsafe(16)
