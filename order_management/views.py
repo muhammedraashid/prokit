@@ -183,9 +183,9 @@ def place_order(request):
 
         out_of_stock_items = []
         for item in cart_items:
-            variant_size = item.variant
-            if variant_size.stock < cart_item.quantity:
-                out_of_stock_items.append(cart_item)
+            variant_size = item.variant_size
+            if variant_size.stock < item.quantity:
+                out_of_stock_items.append(item)
 
         if out_of_stock_items:
             out_of_stock_products = [item.product.name for item in out_of_stock_items]
