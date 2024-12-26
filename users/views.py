@@ -1,12 +1,12 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.models import User
-from .models import Profile, EmailVerification
+from .models import Profile, EmailVerification 
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from django.contrib import messages
 from django.core.validators import validate_email
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from products.models import Product, Variant
 from categories.models import Category
 from django.contrib import messages
@@ -48,9 +48,10 @@ def UserSignUp(request):
             error_messages.append('Account already exists in this email id')    
 
         try:
-             validate_email(email)
-        except:
-            error_messages.append('Invalid email address')  
+            validate_email(email)
+        except ValidationError:
+            error_messages.append('Invalid email address') 
+  
 
         if len(str(password)) < 8 :
             error_messages.append('Password must contains 8  characters long')  
@@ -102,12 +103,11 @@ def UserSignIn(request):
         else:
             messages.error(request, 'Invalid email or password')
               
-    return render(request, 'user_signin.html')            
-        
+    return render(request, 'user_signin.html')           
 @login_required
 def Home(request):
     categories = Category.objects.filter(is_listed=True)[:4]
-    products = Product.objects.annotate(
+    products = Product.objects.filter(is_listed=True).annotate(
         latest_variant_created_at = Max('variants__created_at') 
     ).prefetch_related('variants')[:8]
     variants = Variant.objects.all().order_by('-created_at')[:12]
