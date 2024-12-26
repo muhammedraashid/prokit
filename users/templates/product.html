@@ -15,10 +15,19 @@
                 </ol>
             </div>
         </nav>
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
+            {{ message }}
+            <button type="button" class="btn" data-bs-dismiss="alert" aria-label="Close"><i class="fas fa-times"></i></button>
+        </div>
+    {% endfor %}
+   {% endif %}
 <main class="main" style="background-color: #fafafa ;padding-block: 5%;">
-
+    
     <div class="page-content">
         <div class="container">
+           
             <div class="product-details-top">
                 <div class="row">
                     <div class="col-md-6">
@@ -56,6 +65,7 @@
                     
                     <div class="col-md-6">
                         <div class="product-details">
+                           
                             <h1 class="product-title">{{ product.name|capfirst }}</h1>
                             <div class="ratings-container">
                                 <div class="ratings">
@@ -116,7 +126,7 @@
                                     <input type="number" id="qty" class="form-control rounded" value="1" min="1" max="10" step="1" required>
                                 </div>
                             </div> -->
-
+                            
                             <div class="product-details-action">
                                     <form action="{% url 'add_to_cart' variant_size.slug  %}" method="post">
                                       {% csrf_token %}
@@ -124,7 +134,7 @@
                                     </form>
                                 <a href="{% url 'add_to_wishlist' variant_size.slug %}" class="btn-outline-danger text-center py-2 rounded" title="Wishlist" style="width: 30%;"><i class="far fa-heart"></i> ADD TO WISHLIST </a>   
                             </div>
-
+                           
                             <div class="product-details-footer">
                                 <div class="product-cat">
                                     <span>Category:</span>

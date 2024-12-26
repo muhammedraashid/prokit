@@ -16,6 +16,10 @@ def add_to_wishlist(request, variant_size_slug):
         variant = get_object_or_404(VariantSize, slug=variant_size_slug)
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
 
+        if variant.stock < 1 : 
+            messages.warning(request, "Sorry, This product is out of stock!")
+            return redirect('user_product_view',variant_size_slug)
+
         if WishlistItem.objects.filter(wishlist=wishlist, variant_size=variant).exists():
             messages.error(request, "Item already in wishlist")
             return redirect('wishlist')
