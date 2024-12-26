@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
-from django.db.models import Max
+from django.db.models import Max, Prefetch
 
 import random
 import json
@@ -107,15 +107,16 @@ def UserSignIn(request):
 @login_required
 def Home(request):
     categories = Category.objects.filter(is_listed=True)[:4]
-    products = Product.objects.filter(is_listed=True).annotate(
-        latest_variant_created_at = Max('variants__created_at') 
-    ).prefetch_related('variants')[:8]
+    products = Product.objects.filter(is_listed=True).prefetch_related(
+                Prefetch('variants', queryset= Variant.objects.filter(is_listed=True))).order_by('name')             
+
     variants = Variant.objects.all().order_by('-created_at')[:12]
     context = {
         "products":products,
         "variants":variants,
         "categories":categories
     }
+
     return render(request, 'home.html',context)
 
 
