@@ -44,19 +44,12 @@ def add_product(request):
             if not category_id:
                 raise ValidationError("Category is required")
             
-          
+            price=request.POST.get('price')
             name = request.POST.get("name", "").strip()
 
-            price = request.POST.get('price')
-            if not price or not price.isdigit():
-                messages.warning(request, "Enter a valid Price Money")
+            if price < 0 :
+                messages.warning(request,"Enter a valid Price Money")
                 return redirect('add_product')
-
-            price = int(price)  # Convert to integer after validation
-            if price < 0:
-                messages.warning(request, "Enter a valid Price Money")
-                return redirect('add_product')
-
             if not name:
                 messages.error(request, "Product name cannot be empty or contain only spaces.")
                 return redirect('add_product')
@@ -136,7 +129,8 @@ def add_product(request):
     context = {
         'categories': categories,
         'category_id': category_id,
-        # 'total_stock': total_stock
+        # 'total_stock': git checkout <commit_hash> -- <path_to_file>
+
     }
     return render(request, 'admin_panel/add_product.html', context)
 
@@ -300,6 +294,7 @@ def update_variant(request, variant_slug ):
     existing_images = variant.images.all()
     sizes = variant.sizes.all()
     variants =variant.sizes.all()
+
     if request.method == 'POST':
         # Update variant fields
         variant.color = request.POST.get('color')
@@ -307,7 +302,6 @@ def update_variant(request, variant_slug ):
         sizes = Size.objects.filter(category=category).values_list('size', flat=True)
         for size in sizes:
             stock = request.POST.get(f"{size}")
-            
             variant_size = get_object_or_404(VariantSize, variant=variant, size=size)
             variant_size.stock = stock if stock is not None and stock.isdigit() and int(stock) >= 0 else 0
             variant_size.save()
@@ -324,7 +318,6 @@ def update_variant(request, variant_slug ):
                     )         
                            
         VariantImages.objects.bulk_create(variant_images)
-        
         if variant_images :
             return redirect('variant_edit',variant.slug)
         else:
@@ -380,7 +373,14 @@ def add_variant(request, slug):
                     variant = variant,
                     size = size,
                     stock = int(stock),
-                )    
+                )
+            else:
+                 VariantSize.objects.create(
+                    variant = variant,
+                    size = size,
+                    stock = 0,
+                )
+
 
         messages.success(request, "Variant created successfully!")
         return redirect('admin_product_view', slug=slug)

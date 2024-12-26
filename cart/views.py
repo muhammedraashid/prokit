@@ -67,6 +67,10 @@ def add_to_cart(request,variant_size_slug):
     user = request.user
     variant_size = get_object_or_404(VariantSize,slug=variant_size_slug)
     cart = Cart.objects.get(user=user)
+    if variant_size.stock < 1 :
+        messages.warning(request, "Sorry, This product is out of stock!")
+        return redirect('user_product_view',variant_size_slug)
+    
     if request.method == 'POST':
         quantity = int(request.POST.get('quantity',1))
         if quantity <= 10 : 
