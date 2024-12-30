@@ -7,6 +7,7 @@ urlpatterns = [
     path('signin/',views.UserSignIn,name='user_signin'),
     path('signup/',views.UserSignUp,name='user_signup'),
     path('home/',views.Home,name='home'),
+    path('home/<int:category_id>',views.Home,name='home_with_category'),
     path('verify-email/<str:token>/', views.verify_email, name='verify_email'),
 
     path('home/logout/',views.userLogout,name='user_logout'),

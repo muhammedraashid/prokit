@@ -17,7 +17,7 @@
     </div><!-- End .container -->
 </nav>
 
-<main class="main" style="background-color:#dde8e9 ; padding-block: 20px;">
+<main class="main" style="background-color:#dde8e9 ; padding-block: 20px;min-height: 80vh;">
 
 <div class="container mx-auto px-4 py-8">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -56,29 +56,29 @@
 
                         <div class="form-group">
                             <label class="form-label">Username</label>
-                            <input type="text" name="username" value="{{ user.username }}" class="form-control">
+                            <input type="text" name="username" value="{{ user.username }}" class="form-control text-primary " style="font-weight: bold;">
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">First Name</label>
-                            <input type="text" name="first_name" value="{{ user.first_name }}" class="form-control">
+                            <input type="text" name="first_name" value="{{ user.first_name }}" class="form-control text-primary" style="font-weight: bold;">
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Last Name</label>
-                            <input type="text" name="last_name" value="{{ user.last_name }}" class="form-control">
+                            <input type="text" name="last_name" value="{{ user.last_name }}" class="form-control text-primary" style="font-weight: bold;">
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Email</label>
-                            <input type="email" name="email" value="{{ user.email }}" class="form-control">
+                            <input type="email" name="email" value="{{ user.email }}" class="form-control text-primary" style="font-weight: bold;" disabled>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Phone</label>
-                            <input type="tel" name="phone" value="{{ user.profile.phone_number }}" class="form-control">
+                            <input type="tel" name="phone" value="{{ user.profile.phone_number }}" class="form-control text-primary" style="font-weight: bold;">
                         </div>
-
+                        
                         <div class="form-group">
                             <label class="form-label">Reset Password </label>
                             <input type="password" name="password"  class="form-control">

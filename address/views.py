@@ -79,7 +79,7 @@ def add_address(request):
 @login_required       
 def UserAddresses(request):
     user =  request.user
-    addresses = user.addresses.all()
+    addresses = user.addresses.filter(is_deleted=False)
 
     context = {
         'user':user,
@@ -126,7 +126,7 @@ def update_address(request,address_id):
 def delete_address(request,address_id):
     address = get_object_or_404(Address, id=address_id)
     if request.method == 'POST':
-        address.delete()
+        address.soft_delete()
         messages.success(request,f'{address.address_type} address removed succesfully')
         
     return redirect('user_addresses')

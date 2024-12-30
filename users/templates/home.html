@@ -53,18 +53,18 @@
                 </div><!-- End .intro-content -->
             </div><!-- End .intro-slide -->
 
-            <div class="intro-slide" style="background-image: url(assets/images/demos/demo-21/slider/slide-2.jpg);">
+            <div class="intro-slide" style="background-image: url('{% static 'assets/images/banner3.jpg' %}'); margin: 10px; border-radius:5px; box-shadow: 3px 4px 6px rgba(0, 0, 0, 0.5);">
                 <div class="container intro-content">
                     <div class="row">
                         <div class="intro">
                             <div class="title">
-                                <h3 class="darkWhite">DEAL OF THE DAY</h3>
+                                <h3 class="darkWhite" style="color: goldenrod ;">DEAL OF THE DAY</h3>
                             </div>
                             <div class="content">
                                 <h3>IT'S TIME TO UPGRADE<br>YOUR HIKING KIT</h3>
                             </div>
                             <div class="price">
-                                <h3 class="darkWhite">SAVE UP TO 15%</h3>
+                                <h3 class="darkWhite" style="color: goldenrod ;">SAVE UP TO 15%</h3>
                             </div>
                             <div class="action">
                                 <a href="{% url 'user_shop' %}" class="btn btn-primary">
@@ -172,7 +172,7 @@
             {% for category in categories %}
             <div class="col-lg-3 col-md-6 col-sm-6 my-3">
                 <div class="category-container">
-                    <a href="{% url 'user_shop' %}?category={{ category.id }}">
+                    <a href="{% url 'user_shop' %}?category_ids={{ category.id }}">
                         <img src="{% static 'assets/images/boots-modal.jpg' %}" 
                              alt="{{ category.name }}" 
                              style="height: auto; max-height: 200px; width: 100%; object-fit: cover; border-radius: 6px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease-in-out;" 
@@ -182,13 +182,13 @@
                     </a>
 
                     <div class="category-details">
-                        <a href="{% url 'user_shop' %}?category={{ category.id }}">
+                        <a href="{% url 'user_shop' %}?category_ids={{ category.id }}">
                             <h3 class="category" style="color: rgb(31, 36, 142); font-size: 2.5rem; font-weight: 700; border: 2px solid rgba(255, 255, 255, 0); padding: 10px; border-radius: 4px; text-align: center; background-color: rgba(0, 0, 0, 0.432); margin-bottom: 15px;">
                                 <a href="{% url 'user_shop' %}?category={{ category.id }}" style="color: rgb(255, 255, 255); text-decoration: none;">
                                     {{ category.name|upper }}
                                 </a>
                             </h3>
-                            <a href="{% url 'user_shop' %}?category={{ category.id }}" class="action btn btn-outline-primary text-primary" style="text-decoration: none; padding: 10px 20px; font-size: 1rem; border-radius: 5px;">
+                            <a href="{% url 'user_shop' %}?category_ids={{ category.id }}" class="action btn btn-outline-primary text-primary" style="text-decoration: none; padding: 10px 20px; font-size: 1rem; border-radius: 5px;">
                                 SHOP NOW
                             </a>
                             
@@ -212,25 +212,19 @@
 
             <ul class="nav nav-pills justify-content-center" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="arrivals-all-link" data-toggle="tab" href="#arrivals-all-tab"
-                        role="tab" aria-controls="arrivals-all-tab" aria-selected="true">All</a>
+                    <a class="nav-link {% if  selected_category == None %} active {% endif %}"  href="{% url 'home' %}">All</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="arrivals-women-link" data-toggle="tab" href="#arrivals-women-tab" role="tab"
-                        aria-controls="arrivals-women-tab" aria-selected="false">Boots</a>
+                {% if categories %}
+                 {% for category in categories %}
+                 <li class="nav-item">
+                    <a class="nav-link {% if category == selected_category  %} active {% endif %}" 
+                       href="{% url 'home_with_category' category.id %} " >
+                        {{ category.name }}
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="arrivals-men-link" data-toggle="tab" href="#arrivals-men-tab" role="tab"
-                        aria-controls="arrivals-men-tab" aria-selected="false">Jersey</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="arrivals-shoes-link" data-toggle="tab" href="#arrivals-shoes-tab" role="tab"
-                        aria-controls="arrivals-shoes-tab" aria-selected="false">Shorts</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="arrivals-acc-link" data-toggle="tab" href="#arrivals-acc-tab" role="tab"
-                        aria-controls="arrivals-acc-tab" aria-selected="false">Socks</a>
-                </li>
+                 {% endfor %}
+                {% endif %}
+                
             </ul>
         </div><!-- End .heading -->
 
@@ -243,7 +237,7 @@
                   <div class="product product-7 text-center">
                     <figure class="product-media rounded" style="background-color: white;" >
     
-                      <a href="{% url 'user_product_view' product.variants.first.sizes.first.slug  %}"> 
+                        <!-- <a href="{% url 'user_product_view' product.variants.first.sizes.first.slug  %}"> -->
                         {% with product.variants.first.images.first as main_image %}
                           {% if main_image %}
                             <img src="{{ main_image.image.url }}" alt="{{ product.name }}" class="product-image">
