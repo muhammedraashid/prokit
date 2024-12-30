@@ -18,74 +18,74 @@
  <main class="main" style="background-color:#dde8e9 ; height: 100%; padding-block: 20px;">
     <div class="container">
         <h6 class="mb-4 card col-12 py-3 pr-2"> <span><i class="fas fa-box"></i> Orders</span></h6>
-        
         {% if orders %}
-            <div class="row">
-                {% for order in orders %}
-                <div class="crow col-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0"> Order#:{{ order.order_number }}</h5>
-                                <span class="badge {% if order.order_status == 'pending' %}bg-warning
-                                {% elif order.order_status == 'delivered' %}bg-success
-                                {% elif order.order_status == 'processing' %}bg-primary
-                                {% elif order.order_status == 'shipped' %}bg-info
-                                {% else %}bg-danger{% endif %}   text-white px-5 py-3"
-                                style="margin-left: 70%;">
-                                {{ order.order_status }}
-                                </span>
-                        </div>
-                        <div class="card-body d-flex justify-content-between">
-                           
-                            <div class="d-flex flex-wrap">
-                                {% for item in order.order_items.all %}
-                                <div class="d-flex align-items-center mb-2 mr-5" style="flex: 0 0 auto; margin-right: 20px;">
-                                    <img src="{{ item.variant.variant.images.first.image.url }}" alt="{{ item.product.name }}" 
-                                         class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
-                                    <div>
-                                        <p class="mb-0"><strong>{{ item.product.name }}</strong></p>
-                                        <p class="mb-0">Qty: {{ item.quantity }}</p>
-                                        <p class="mb-0">Price: ₹{{ item.product.price|floatformat:2 }}</p>
-                                    </div>
+        <div class="row">
+            {% for order in orders %}
+            <div class="crow col-12 mb-3">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Order No : {{ order.order_number }}</h5>
+                        <span class="badge {% if order.order_status == 'pending' %}bg-warning
+                            {% elif order.order_status == 'delivered' %}bg-success
+                            {% elif order.order_status == 'processing' %}bg-primary
+                            {% elif order.order_status == 'shipped' %}bg-info
+                            {% else %}bg-danger{% endif %} text-white px-5 py-3"
+                            style="margin-left: 70%;">
+                            {{ order.order_status }}
+                        </span>
+                    </div>
+                    <div class="card-body d-flex justify-content-between">
+                        <div class="d-flex flex-wrap">
+                            {% for item in order.order_items.all %}
+                            <div class="d-flex align-items-center mb-2 mr-5" style="flex: 0 0 auto; margin-right: 20px;">
+                                <img src="{{ item.variant.variant.images.first.image.url }}" 
+                                     alt="{{ item.product.name }}" 
+                                     class="img-thumbnail" 
+                                     style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                                <div>
+                                    <p class="mb-0 text-dark"><strong>{{ item.product.name }}</strong></p>
+                                    <p class="mb-0 text-dark">Qty: {{ item.quantity }}</p>
+                                    <p class="mb-0 text-dark">Price: ₹{{ item.product.price|floatformat:2 }}</p>
                                 </div>
-                                {% endfor %}
                             </div>
-                            <p class="card-text">
-                                <strong>Date:</strong> {{ order.created_at|date:"F d, Y" }}<br>
-                                <strong>Total:</strong> ₹{{ order.total_amount|floatformat:2 }}<br>
-                                <strong>Items:</strong> {{ order.order_items.all.count }}
-                            </p>
-                            <div class="d-flex">
-                                <button class="btn btn-sm btn-outline-primary mr-3 rounded"   
-                                        onclick="window.location.href='{% url 'user_order_view' order.id %}'" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#orderDetailsModal{{ order.id }}"
-                                        style="height: fit-content;">
-                                    View Details
+                            {% endfor %}
+                        </div>
+                        <p class="card-text">
+                            <strong class="text-muted">Date:</strong> {{ order.created_at|date:"F d, Y" }}<br>
+                            <strong class="text-muted">Total:</strong> ₹{{ order.total_amount|floatformat:2 }}<br>
+                            <strong class="text-muted">Items:</strong> {{ order.order_items.all.count }}
+                        </p>
+                        <div class="d-flex">
+                            <button class="btn btn-sm btn-outline-primary mr-3 rounded mt-3"   
+                                    onclick="window.location.href='{% url 'user_order_view' order.id %}'" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#orderDetailsModal{{ order.id }}"
+                                    style="height: fit-content;">
+                                View Details
+                            </button>
+                            {% if order.order_status == 'pending' %}
+                            <form action="{% url 'cancel_order' order.id %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded mt-3" 
+                                        onclick="return confirm('Are you sure you want to cancel this order?')">
+                                    Cancel Order
                                 </button>
-                                {% if order.order_status == 'pending' %}
-                                <form action="{%url 'cancel_order' order.id %}" method="POST">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded" 
-                                            onclick="return confirm('Are you sure you want to cancel this order?')">
-                                        Cancel Order
-                                    </button>
-                                </form>
-                                {% endif %}
-                                {% if order.order_status == 'delivered' %}
-                                <a href="{% url 'return_order' order.id %}" class="btn btn-info float-right rounded" style="height: 40px;"><i class="fas fa-undo"></i>Return</a>
-                                {% endif %}
-                            </div>
+                            </form>
+                            {% endif %}
+                            {% if order.order_status == 'delivered' %}
+                            <a href="{% url 'return_order' order.id %}" class="btn btn-info float-right rounded mt-3" style="height: 40px;">
+                                <i class="fas fa-undo"></i>Return
+                            </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-                
-                
-                {%endfor %}
             </div>
-        {% else %}
-        <p class="text-warning card col-12 text-center py-4 ">No orders maked yet !</p>   
-        {% endif %} 
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-warning card col-12 text-center py-4 mb-0">No orders made yet!</p>   
+    {% endif %} 
     </div>    
 
 

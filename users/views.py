@@ -13,7 +13,8 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
-from django.db.models import Max, Prefetch
+from django.db.models import Max,Prefetch
+from django.utils.crypto import get_random_string
 
 import random
 import json
@@ -57,7 +58,7 @@ def UserSignUp(request):
             error_messages.append('Password must contains 8  characters long')  
 
         if password != copassword :
-            error_messages.append('Password do not match')      
+            error_messages.append("Password doesn't matching")      
 
 
         if error_messages:
@@ -103,18 +104,27 @@ def UserSignIn(request):
         else:
             messages.error(request, 'Invalid email or password')
               
-    return render(request, 'user_signin.html')           
+    return render(request, 'user_signin.html')  
+         
 @login_required
-def Home(request):
+def Home(request, category_id=None):
     categories = Category.objects.filter(is_listed=True)[:4]
-    products = Product.objects.filter(is_listed=True).prefetch_related(
+    category = None
+    if category_id:
+        category = get_object_or_404(Category, id=category_id)
+        products = Product.objects.filter(is_listed=True,category=category).prefetch_related(
                 Prefetch('variants', queryset= Variant.objects.filter(is_listed=True))).order_by('name')             
-
-    variants = Variant.objects.all().order_by('-created_at')[:12]
+        variants = Variant.objects.all().order_by('-created_at')[:12]
+    else:    
+        products = Product.objects.filter(is_listed=True).prefetch_related(
+                    Prefetch('variants', queryset= Variant.objects.filter(is_listed=True))).order_by('name')             
+        variants = Variant.objects.all().order_by('-created_at')[:12]
+        
     context = {
         "products":products,
         "variants":variants,
-        "categories":categories
+        "categories":categories,
+        "selected_category":category 
     }
 
     return render(request, 'home.html',context)
@@ -358,7 +368,7 @@ def UserProfile(request):
              validate_email(email)
         except:
             error_messages.append('Invalid email address')  
-
+       
         if password :
             if len(str(password)) < 8 :
                 error_messages.append('Password must contains 8  characters long')  
@@ -372,8 +382,18 @@ def UserProfile(request):
                 messages.error(request,message)
                 
             return  render(request, 'profile.html',{'first_name':firstname,'last_name': lastname, 'username':username,'email':email})          
-
-
+        
+        verification_code = get_random_string(6, allowed_chars='0123456789')
+        subject = "Verify Your Email Address"
+        message = f"Hi {firstname},\n\n Please use the following code to verify your email address : \n\n {verification_code}\n\n Thank you !"
+        from_email = settings.DEFAULT_FROM_EMAIL
+        try:
+            send_mail(subject, message, from_email, [email])
+            messages.info(request, f"A verification code has been sent to {email}. Please check your inbox.")
+        except Exception as e:
+            messages.error(request, "Failed to send verification email. Please try again later.")
+            return render(request, 'profile.html', {'user': user})
+         
         user.username = username
         user.first_name = firstname
         user.last_name = lastname

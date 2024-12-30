@@ -12,6 +12,7 @@ from order_management.models import Order,OrderItems
 from django.db import transaction
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q, Count,Sum, Prefetch
+import os
 
 
 @require_http_methods(["GET", "POST"])
@@ -47,7 +48,7 @@ def add_product(request):
             price=request.POST.get('price')
             name = request.POST.get("name", "").strip()
 
-            if price < 0 :
+            if float(price) < 0 :
                 messages.warning(request,"Enter a valid Price Money")
                 return redirect('add_product')
             if not name:
@@ -69,6 +70,9 @@ def add_product(request):
             
         
             color = request.POST.get('color')
+            if Variant.objects.filter(product=product, color=color).exists():
+               messages.error(request, " A Variant Already exists in this color")
+               return redirect('add_product')
             
             
             variant = Variant.objects.create(
@@ -76,20 +80,27 @@ def add_product(request):
                 color=color,
                
             )
-                        
+                       
             variant_images = []
             required_images_count = 3  
 
-            
+            valid_extensions = ['.jpg','.png','.jpeg','.gif', '.bmp','.webp']
             for j in range(1, 6): # max 5 imgs
                 image_key = f'image{j}[]'
                 if image_key in request.FILES:
                     images = request.FILES.getlist(image_key)
                     for image in images:
+                        file_extension = os.path.splitext(image.name)[1].lower()
+                        if file_extension not in valid_extensions:
+                            messages.error(request, "Invalid File Format , Only images allowed !")
+                            return redirect('add_product')
+                        if not image.content_type.startswith('image/'):
+                            messages.error(request ,f"File {image.name} is not a valid image.")
+                            return redirect('add_product')
                         variant_images.append(
                             VariantImages(variant=variant, image=image)
                         )
-
+ 
            
             if len(variant_images) < required_images_count:
                 raise ValidationError(
@@ -102,18 +113,13 @@ def add_product(request):
             sizes = Size.objects.filter(category=selected_category).values_list('size', flat=True)
             for size in sizes:
                 stock = request.POST.get(f"{size}")
-                if int(stock) != 0:
-                    all_zero = False  
-                    break
-                if not all_zero:
-                    VariantSize.objects.create(
-                        variant = variant,
-                        size = size,
-                        stock = int(stock) if stock and stock.isdigit() and int(stock) >= 0 else 0
-                    )
-                else:
-                    messages.warning(request,"All sizes are cant be  out of stock while add a new product. Please try again!")    
-
+               
+                VariantSize.objects.create(
+                    variant = variant,
+                    size = size,
+                    stock = int(stock) if stock and stock.isdigit() and int(stock) >= 0 else 0
+                )
+              
             messages.success(request, "Product and variant created successfully!")
             return redirect('admin_products')
             
@@ -180,7 +186,7 @@ def Shop(request):
     
     selected_categories = Category.objects.filter(id__in=category_ids, is_listed=True) 
  
-    query = request.GET.get('qry','')
+    query = request.GET.get('qry','').strip()
     sortby= request.POST.get('sortby','name')
    
     
@@ -196,6 +202,10 @@ def Shop(request):
            products = Product.objects.filter(id__in=top_selling_products, is_listed=True).prefetch_related(
                Prefetch('variants',queryset=Variant.objects.filter(is_listed=True))
            )
+        elif sortby == 'priceLh':
+            products = Product.objects.filter(is_listed = True).prefetch_related(
+                Prefetch('variants', queryset= Variant.objects.filter(is_listed=True))
+            ).order_by('-price')
         else:
             products = Product.objects.filter(is_listed = True).prefetch_related(
                 Prefetch('variants', queryset= Variant.objects.filter(is_listed=True))
@@ -203,9 +213,9 @@ def Shop(request):
        
     elif request.method == 'GET': 
 
-        if  query:
+        if query:
             products =Product.objects.filter(
-                Q(name__icontains=query) | Q(brand__istartswith=query) | Q(category__name__istartswith=query) 
+                (Q(name__icontains=query) | Q(brand__istartswith=query) | Q(category__name__istartswith=query)) & Q(is_listed=True)
                 ).order_by('category')             
         elif category_ids: 
             products = Product.objects.filter(Q(is_listed=True) & Q(category__in=selected_categories)  ).prefetch_related(
@@ -289,15 +299,19 @@ def list_unlist_product(request,slug):
 def update_variant(request, variant_slug ):
 
     variant = get_object_or_404(Variant, slug=variant_slug )   
-    category_name = variant.product.category.name
+    product = variant.product
     category = variant.product.category
     existing_images = variant.images.all()
     sizes = variant.sizes.all()
     variants =variant.sizes.all()
 
     if request.method == 'POST':
-        # Update variant fields
-        variant.color = request.POST.get('color')
+        # update variant fields
+        color = request.POST.get('color')
+        if Variant.objects.filter(product=product, color=color).exists():
+               messages.error(request, " A Variant Already exists in this color")
+               return redirect('variant_edit',variant.id)
+        variant.color = color
         variant.save()
         sizes = Size.objects.filter(category=category).values_list('size', flat=True)
         for size in sizes:
@@ -307,12 +321,20 @@ def update_variant(request, variant_slug ):
             variant_size.save()
         
         variant_images = []
-       
+        valid_extensions = ['.jpg','.png','.jpeg','.gif', '.bmp','.webp']
         for i in range(1,6):
             image_key = f'image{i}[]'
             if image_key in request.FILES:
                 images = request.FILES.getlist(image_key)
                 for image in images:
+                    file_extension = os.path.splitext(image.name)[1].lower()
+                    if file_extension not in valid_extensions:
+                        messages.error(request, "Invalid File Format , Only images allowed !")
+                        return redirect('add_product')
+                    if not image.content_type.startswith('image/'):
+                        messages.error(request ,f"File {image.name} is not a valid image.")
+                        return redirect('add_product')
+                    
                     variant_images.append(
                         VariantImages(variant=variant, image=image)
                     )         
@@ -336,26 +358,37 @@ def update_variant(request, variant_slug ):
 
 def add_variant(request, slug):
     product = get_object_or_404(Product, slug=slug)
-    category_name = product.category.name
+    category_name = product.category.name 
     category = product.category
     sizes = Size.objects.filter(category=category).values_list('size', flat=True) # it return a list of sizes
     if request.method == "POST":
         
         color = request.POST.get('color')
+        if Variant.objects.filter(product=product, color=color).exists():
+               messages.error(request, " A Variant Already exists in this color")
+               return redirect('add_variant',slug) 
       
         variant = Variant.objects.create(
                 product=product,
                 color=color,
-                # stock=stock
                 )
 
-        
         variant_images = []
-
+        
+        valid_extensions = ['.jpg','.png','.jpeg','.gif', '.bmp','.webp']
+        
         # optional images
         for j in range(1, 6):
             images = request.FILES.getlist(f'image{j}[]')
             for image in images:
+                file_extension = os.path.splitext(image.name)[1].lower()
+                if file_extension not in valid_extensions:
+                    messages.error(request, "Invalid File Format , Only images allowed !")
+                    return redirect('add_product')
+                if not image.content_type.startswith('image/'):
+                    messages.error(request ,f"File {image.name} is not a valid image.")
+                    return redirect('add_product')
+                
                 variant_images.append(
                     VariantImages(variant=variant, image=image)
                 )

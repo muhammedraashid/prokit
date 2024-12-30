@@ -17,7 +17,7 @@
         </ol>
     </div><!-- End .container -->
 </nav>
-<main class="main" style="background-color:#dde8e9 ; padding-block: 20px;">
+<main class="main" style="background-color:#dde8e9 ; padding-block: 20px;min-height: 80vh;">
 <form method="POST" action="{% url 'order_placed' %}">
   {% csrf_token %}
   <div class="page-content">
@@ -39,9 +39,9 @@
                         
                           <div class="col-sm-12 card ">
                               <h2 class="checkout-title text-center">Select Delivery Address</h2>
-                              {% if user.addresses.all %}
+                              {% if addresses %}
                               <div class="checkout-address">
-                                  {% for address in user.addresses.all %}
+                                  {% for address in addresses %}
                                   <div class="form-check card py-5">
                                       <input class="form-check-input " value="{{address.id}}" type="radio" name="address" id="address-{{ address.id }}" {% if address.is_default %} checked {% endif %}  required>
                                       <label class="form-check-label text-success " for="address-{{ address.id }}">
@@ -181,7 +181,7 @@
 
 
 </form>
-</main> 
+
 
       
       <!-- add-address field -->
@@ -236,7 +236,7 @@
         </div>
       </div>
 
-
+</main> 
 <script>
     function AddAddress() {
         document.getElementById("addAddress").style.display = "block";
@@ -251,53 +251,5 @@
           document.getElementById("addAddress").style.display = "none";
          }
 </script>
-<!-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script>
-  const options = {
-      key: "{{ razorpay_key_id }}",  // Razorpay key ID from backend
-      amount: "{{ razorpay_order_amount }}",  // Amount in paise
-      currency: "INR",
-      name: "Prokit",
-      description: "Order Payment",
-      image: "https://example.com/your-logo.png",
-      order_id: "{{ razorpay_order_id }}",  // Razorpay Order ID
-      handler: function (response) {
-        fetch("#", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}",  // CSRF token for security
-            },
-            body: JSON.stringify({
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-            }),
-        })
-        .then((res) => res.json())
-        .then((data) => {
-            if (data.status === "success") {
-                window.location.href = "#";
-            } else {
-                alert("Payment verification failed!");
-            }
-        });
-    },
-      prefill: {
-          name: "{{ user.first_name }} {{ user.last_name }}",
-          email: "{{ user.email }}",
-          contact: "{{ user.profile.phone }}",
-      },
-      theme: {
-          color: "#3399cc",
-      },
-  };
 
-  // Open Razorpay Checkout on button click
-  document.getElementById("place-order-btn").addEventListener("click", function (e) {
-      e.preventDefault();
-      const rzp = new Razorpay(options);
-      rzp.open();
-  });
-</script> -->
 {% endblock %}

@@ -107,9 +107,9 @@
                   <a href="#" style="background: #669933;"><span class="sr-only">Color Name</span></a>
                   <a href="#" style="background: #f2719c;"><span class="sr-only">Color Name</span></a>
                   <a href="#" style="background: #ebebeb;"><span class="sr-only">Color Name</span></a>
-                </div><!-- End .filter-colors -->
-              <!-- </div><!-- End .widget-body -->
-            <!-- </div>
+                </div>
+               </div>
+            </div>
               </div> -->
 
               <div class="widget widget-collapsible">
@@ -117,7 +117,7 @@
                 <a data-toggle="collapse" href="#widget-4" role="button" aria-expanded="true" aria-controls="widget-4">
                     Brand
                 </a>
-            </h3><!-- End .widget-title -->
+            </h3>
 
             <div class="collapse show" id="widget-4">
               <div class="widget-body">
@@ -128,15 +128,15 @@
                     <div class="custom-control custom-checkbox">
                       <input type="checkbox" class="custom-control-input" id="brand-{{ forloop.counter }}" name="brand_ids" value="{{ brand.name }}" onchange="this.form.submit()"
                             {% if brand.name in brand_names %} checked {% endif %}>
-                      <label class="custom-control-label" for="brand-{{ forloop.counter }}">{{ brand.name }}</label>
+                      <label class="custom-control-label text-dark " for="brand-{{ forloop.counter }}">{{ brand.name }}</label>
                     </div><!-- End .custom-checkbox -->
                   </div><!-- End .filter-item -->
                 {% endfor %}
                 </form>  
-                                 </div><!-- End .filter-items -->
-                            </div><!-- End .widget-body -->
-                       </div><!-- End .collapse -->
-                    </div><!-- End .widget -->
+                                 </div>
+                            </div>
+                       </div>
+                    </div>
                     <!-- <div class="widget widget-collapsible">
                       <h3 class="widget-title">
                         <a data-toggle="collapse" href="#widget-5" role="button" aria-expanded="true" aria-controls="widget-5">
@@ -148,7 +148,7 @@
                       <div class="widget-body">
                         <div class="filter-price">
                           <div class="filter-price-text">
-                            Price Range: <span id="filter-price-range"> </span>
+                            Price Range: <span id="filter-price-range" > </span>
                           </div>
                     
                           <div id="price-slider" style="margin-top: 10px;"></div>
@@ -156,14 +156,14 @@
                       </div>
                     </div>
               </div> -->
-           </aside><!-- End .col-lg-3 -->
+           </aside>
 
 
                 <div class="col-lg-9">
                     <div class="toolbox">
                         <div class="toolbox-left">
                             <div class="toolbox-info">
-                                Showing <span> of {{products.count}}</span> Products
+                              <span>  Showing 12 of {{products.all.count}} Products</span>
                             </div><!-- End .toolbox-info -->
                         </div><!-- End .toolbox-left -->
 
@@ -176,7 +176,8 @@
                                     <select name="sortby" id="sortby" class="form-control" onchange="this.form.submit() ">
                                       <option value="popular">Most Popular</option>
                                       <!-- <option value="#">Most Rated</option> -->
-                                      <option value="price">Price</option>
+                                      <option value="price">Price : H - L</option>
+                                      <option value="priceLh">Price : L - H</option>
                                       <option value="name">A-Z</option>
                                       <option value="category">Category</option>
                                       <option value="popular">Most Popular</option>
@@ -212,7 +213,6 @@
                     
                                   <div class="product-action-vertical">
                                     <a href="{% url 'add_to_wishlist' product.variants.first.sizes.first.slug %}" class="btn-product-icon btn-wishlist btn-expandable" style="color:#cc3333";><span style="align-content: center;">Add to Wishlist</span></a>
-                                   
                                   </div>
                     
                                   <div class="product-action" >
@@ -253,9 +253,9 @@
                       </div>
 
                 </div>
-            </div><!-- End .row -->
-        </div><!-- End .container -->
-    </div><!-- End .page-content -->
+            </div>
+        </div>
+    </div>
 </main>
 
 

@@ -15,7 +15,7 @@
         </div><!-- End .container -->
     </nav><!-- End .breadcrumb-nav -->
     
- <main class="main " style="background-color:#dde8e9 ; padding-block: 20px;">
+ <main class="main " style="background-color:rgb(237, 244, 244); padding-block: 20px; min-height: 80vh;">
     {% if messages %}
     {% for message in messages %}
     <div class="alert alert-success alert-dismissible fade show text-center mb-3" role="alert">
@@ -39,38 +39,68 @@
     {% if wishlist_items %}
     <div class="container-fluid">
         {% for item in wishlist_items %}
-            <div class="row align-items-center mb-3 bg-white p-2 py-3 mx-5 rounded">
-                <div class="col-md-3">
-                    <img src="{{ item.variant_size.variant.images.first.image.url }}" 
-                         class="img-fluid rounded" 
-                         alt="{{ item.variant_size.variant.product.name }}"
-                         style="width: 100px;">
+        <div class="card mb-3 shadow-sm hover-shadow-md transition-all">
+            <div class="card-body">
+                <div class="row align-items-center g-3">
+                    <!-- Product Image -->
+                    <div class="col-12 col-sm-4 col-md-3 text-center text-sm-start mt-1">
+                        <img src="{{ item.variant_size.variant.images.first.image.url }}" 
+                             class="img-fluid rounded product-img" 
+                             alt="{{ item.variant_size.variant.product.name }}"
+                             style="max-width: 120px; object-fit: cover;">
+                    </div>
+                    
+                    <!-- Product Details -->
+                    <div class="col-12 col-sm-8 col-md-5">
+                        <h5 class="card-title mb-2" style="font-size: larger;">{{ item.variant_size.variant.product.name }}</h5>
+                        <div class="text-muted">
+                            <span class="badge bg-light text-primary">
+                                Size: {{ item.variant_size.size }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Price -->
+                    <div class="col-6 col-md-2 text-start text-md-center">
+                        <div class="fw-bold text-primary" style="font-weight: bold; font-size: larger;">
+                            <span class="fs-6">Price : ₹{{ item.variant_size.variant.product.price }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="col-6 col-md-2">
+                        <div class="d-flex justify-content-end gap-2">
+                            <!-- Add to Cart Button -->
+                            <form method="POST" action="{% url 'add_to_cart' item.variant_size.slug %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class=" btn-outline-primary mr-2 rounded" style="width: 50px;">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </button>
+                            </form>
+                            
+                            <!-- Remove Button -->
+                            <form method="POST" action="{% url 'remove_from_wishlist' item.variant_size.slug %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class=" btn-outline-danger bg-white rounded" style="width: 50px;">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-5">
-                    <h4 class="mb-2">{{ item.variant_size.variant.product.name }}</h4>
-                    <p class="text-muted mb-1 text-primary">Size: {{ item.variant_size.size }}</p>
-                </div>
-                  <div class="col-2">
-                      <p class="fw-bold text-primary">Price: ${{ item.variant_size.variant.product.price }}</p>
-                  </div>
-                <div class="col-1">
-                    <form method="POST" action="{% url 'remove_from_wishlist' item.variant_size.slug %}">
-                        {% csrf_token %}
-                        <button type="submit" class="bg-danger rounded  border-0">
-                            <i class="fas fa-trash-alt text-white"></i>
-                        </button>
-                    </form>
-                </div>
-                <div class="col-1">
-                  <form method="POST" action="{% url 'add_to_cart' item.variant_size.slug %}">
-                      {% csrf_token %}
-                      <button type="submit" class=" rounded  border-0">
-                        <i class="fas fa-shopping-cart text-primary"></i>
-                      </button>
-                  </form>
-              </div>
             </div>
-        {% endfor %}
+        </div>
+    {% empty %}
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-heart-broken fs-1 text-muted mb-3"></i>
+                <h5 class="text-muted">Your wishlist is empty</h5>
+                <a href="{% url 'products' %}" class="btn btn-primary mt-3">
+                    Continue Shopping
+                </a>
+            </div>
+        </div>
+    {% endfor %}
     </div>
 {% else %}
 
