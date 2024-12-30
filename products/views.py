@@ -48,7 +48,9 @@ def add_product(request):
             price=request.POST.get('price')
             name = request.POST.get("name", "").strip()
 
+
             if float(price) < 0 :
+
                 messages.warning(request,"Enter a valid Price Money")
                 return redirect('add_product')
             if not name:
@@ -70,9 +72,12 @@ def add_product(request):
             
         
             color = request.POST.get('color')
+
             if Variant.objects.filter(product=product, color=color).exists():
                messages.error(request, " A Variant Already exists in this color")
                return redirect('add_product')
+
+
             
             
             variant = Variant.objects.create(
@@ -186,7 +191,9 @@ def Shop(request):
     
     selected_categories = Category.objects.filter(id__in=category_ids, is_listed=True) 
  
+
     query = request.GET.get('qry','').strip()
+
     sortby= request.POST.get('sortby','name')
    
     
