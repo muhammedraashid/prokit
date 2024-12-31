@@ -13,12 +13,8 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
-<<<<<<< HEAD
 from django.db.models import Max,Prefetch
 from django.utils.crypto import get_random_string
-=======
-from django.db.models import Max, Prefetch
->>>>>>> d756ca4a21213be48b520aeb4ac8d006218a36e3
 
 import random
 import json
@@ -108,16 +104,13 @@ def UserSignIn(request):
         else:
             messages.error(request, 'Invalid email or password')
               
-<<<<<<< HEAD
+
     return render(request, 'user_signin.html')  
          
-=======
-    return render(request, 'user_signin.html')           
->>>>>>> d756ca4a21213be48b520aeb4ac8d006218a36e3
 @login_required
 def Home(request, category_id=None):
     categories = Category.objects.filter(is_listed=True)[:4]
-<<<<<<< HEAD
+
     category = None
     if category_id:
         category = get_object_or_404(Category, id=category_id)
@@ -128,13 +121,7 @@ def Home(request, category_id=None):
         products = Product.objects.filter(is_listed=True).prefetch_related(
                     Prefetch('variants', queryset= Variant.objects.filter(is_listed=True))).order_by('name')             
         variants = Variant.objects.all().order_by('-created_at')[:12]
-        
-=======
-    products = Product.objects.filter(is_listed=True).prefetch_related(
-                Prefetch('variants', queryset= Variant.objects.filter(is_listed=True))).order_by('name')             
-
-    variants = Variant.objects.all().order_by('-created_at')[:12]
->>>>>>> d756ca4a21213be48b520aeb4ac8d006218a36e3
+    
     context = {
         "products":products,
         "variants":variants,
@@ -398,16 +385,16 @@ def UserProfile(request):
                 
             return  render(request, 'profile.html',{'first_name':firstname,'last_name': lastname, 'username':username,'email':email})          
         
-        verification_code = get_random_string(6, allowed_chars='0123456789')
-        subject = "Verify Your Email Address"
-        message = f"Hi {firstname},\n\n Please use the following code to verify your email address : \n\n {verification_code}\n\n Thank you !"
-        from_email = settings.DEFAULT_FROM_EMAIL
-        try:
-            send_mail(subject, message, from_email, [email])
-            messages.info(request, f"A verification code has been sent to {email}. Please check your inbox.")
-        except Exception as e:
-            messages.error(request, "Failed to send verification email. Please try again later.")
-            return render(request, 'profile.html', {'user': user})
+        # verification_code = get_random_string(6, allowed_chars='0123456789')
+        # subject = "Verify Your Email Address"
+        # message = f"Hi {firstname},\n\n Please use the following code to verify your email address : \n\n {verification_code}\n\n Thank you !"
+        # from_email = settings.DEFAULT_FROM_EMAIL
+        # try:
+        #     send_mail(subject, message, from_email, [email])
+        #     messages.info(request, f"A verification code has been sent to {email}. Please check your inbox.")
+        # except Exception as e:
+        #     messages.error(request, "Failed to send verification email. Please try again later.")
+        #     return render(request, 'profile.html', {'user': user})
          
         user.username = username
         user.first_name = firstname
@@ -429,3 +416,11 @@ def UserProfile(request):
         'user':user
     }
     return render(request,'profile.html',context)
+
+# not found
+def custom_404_view(request, exception):
+    return render(request, '404.html', status=404)
+#connection time out
+def custom_500_view(request):
+    return render(request, '500.html', status=500)
+   

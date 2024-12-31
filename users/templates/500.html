@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 - Server Error</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4ecfb 100%);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .error-container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .error-code {
+            font-size: 120px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff4040, #ff0000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 0;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .error-message {
+            font-size: 24px;
+            color: #081337;
+            margin: 1rem 0;
+            opacity: 0;
+            animation: slideUp 0.5s ease-out forwards;
+            animation-delay: 0.3s;
+        }
+
+        .error-description {
+            color: #666;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: slideUp 0.5s ease-out forwards;
+            animation-delay: 0.6s;
+        }
+
+        .home-button {
+            background: linear-gradient(45deg, #ff4040, #ff0000);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: inline-block;
+            opacity: 0;
+            animation: slideUp 0.5s ease-out forwards;
+            animation-delay: 0.9s;
+        }
+
+        .home-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .gear-icon {
+            width: 100px;
+            height: 100px;
+            margin: 2rem auto;
+            opacity: 0;
+            animation: spin 4s linear infinite, slideUp 0.5s ease-out forwards;
+            animation-delay: 0.6s;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1 class="error-code">500</h1>
+        <h2 class="error-message">Server Error</h2>
+        <p class="error-description">Oops! Something went wrong on our end. We're working to fix it.</p>
+        <a href="/" class="home-button">Back to Home</a>
+    </div>
+</body>
+</html>

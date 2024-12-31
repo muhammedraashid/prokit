@@ -15,7 +15,7 @@
         </div><!-- End .container -->
     </nav><!-- End .breadcrumb-nav -->
      
-    <main class="main" style="background-color:rgb(237, 244, 244); padding-block: 20px;">
+    <main class="main" style="background-color:rgb(237, 244, 244); padding-block: 20px; min-height: 80vh;">
         
 
         <div class="page-content">
@@ -130,14 +130,17 @@
                                     </option>
                                     {% endfor %}
                                 </select>
-                              
+                                
     
                                 <a href="{% url 'cart' %}" class="btn btn-outline-dark-2">
                                     <span>UPDATE CART</span><i class="icon-refresh"></i>
                                 </a>
                                
                             </div>
-                            
+                            <a href="{% url 'user_shop' %}" class="btn btn-outline-primary btn-block mb-3 rounded">
+                                <span>CONTINUE SHOPPING</span>
+                                <i class="icon-refresh"></i>
+                            </a>
 
                         </div>
                        

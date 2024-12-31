@@ -126,7 +126,7 @@ def checkout(request):
         redirect('home')
     
     cart_items = CartItems.objects.filter(cart=cart)
-    address = Address.objects.filter(user=request.user)
+    addresses = Address.objects.filter(user=request.user,is_deleted=True)
 
     delivery_charge = DeliveryCharge.objects.get(id=1)
     delivery_charge = delivery_charge.value
@@ -144,7 +144,7 @@ def checkout(request):
     context = {
         'cart_items': cart_items,
         'cart': cart,
-        'address': address,
+        "addresses":addresses,
         'delivery_charge':delivery_charge,
         'total_price': total_price,
         'sub_total': sub_total,
@@ -483,13 +483,10 @@ def cancel_order(request,ord_id):
     for order_item in order.order_items.all():
         variant_size = order_item.variant
         variant_size.stock += order_item.quantity
-        variant_size.save()
-
-    order.order_status = 'cancelled'
-    order.save()
+        variant_size.save()   
    
     if order.payment_method == 'upi' or order.payment_method=='wallet':
-        wallet = request.user.wallet
+        wallet = order.user.wallet
         refund_amount = Decimal(order.total_amount)
         wallet.balance += refund_amount
         wallet.save()
@@ -506,7 +503,16 @@ def cancel_order(request,ord_id):
     if order.applied_coupon:
         order.applied_coupon.used_limit += 1
         order.applied_coupon.save()
-        
+
+    order.order_status = 'cancelled'
+    order.order_items.all().update(item_status='cancelled')
+    order.delivery_charge = 0
+    order.total_amount = 0
+    if order.applied_coupon:
+        order.applied_coupon = None
+        order.discount_amount = 0
+    order.save()    
+    
     if request.user.is_staff:
         return redirect('admin_orders')
     else:
@@ -635,6 +641,11 @@ def return_order(request,ord_id):
         wallet.balance += refund_amount
         wallet.save()
         order.payment_status = 'Refunded'
+        if order.applied_coupon:
+            order.applied_coupon = None
+            order.discount_amount = 0
+        order.total_amount = order.delivery_charge
+        order.order_items.all().update(item_status='returned')
         order.save()
 
         WalletTransaction.objects.create(
