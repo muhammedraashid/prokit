@@ -18,7 +18,12 @@ class Address(models.Model):
     email = models.EmailField(max_length=250)
     created_at = models.DateTimeField(auto_now_add=True)
     is_default = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
   
+    def soft_delete(self):
+        self.is_deleted = True
+        self.save()
 
+        
     def __str__(self):
         return f"{self.name} - {self.street_address},{self.pincode}"

@@ -19,6 +19,8 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf.urls.static import static
 from django.conf import settings
+from django.conf.urls import handler404,handler500
+from users.views import custom_404_view ,custom_500_view
 
 urlpatterns = [
     path("admin_panel/", admin.site.urls), # built-in
@@ -39,5 +41,9 @@ urlpatterns = [
  
 ]
 
+# url to view that handle the 404
+handler404 = custom_404_view
+# to handlw the 500
+handler500 = custom_500_view 
 # if settings.DEBUG:
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
