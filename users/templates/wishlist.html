@@ -5,115 +5,112 @@
 
 {% block content %}
 
-    <nav aria-label="breadcrumb" class="breadcrumb-nav">
-        <div class="container">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'user_shop' %}">Shop</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
-            </ol>
-        </div><!-- End .container -->
-    </nav><!-- End .breadcrumb-nav -->
-    
- <main class="main " style="background-color:rgb(237, 244, 244); padding-block: 20px; min-height: 80vh;">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<nav aria-label="breadcrumb" class="breadcrumb-nav pt-5 bg-light pb-1">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'user_shop' %}">Shope</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Wishlist</li>
+        </ol>
+    </div>
+</nav>
+
+<main>
     {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-success alert-dismissible fade show text-center mb-3" role="alert">
-        {{ message }}
-        <button type="button" class="btn" data-bs-dismiss="alert" aria-label="Close"> <i class="fas fa-times"></i></button>
-    </div>
-{% endfor %}
-{% endif %}
-<div class="container ">
-    <div class="row mx-2">
-        <nav class="col-lg-12 card " >
-            <a href="{% url 'wishlist' %}" class="nav-item ">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                Wishlist Itmes
-            </a>
-            <!-- Other navigation items remain the same -->
-        </nav>
-    </div>
-    {% if wishlist_items %}
-    <div class="container-fluid">
-        {% for item in wishlist_items %}
-        <div class="card mb-3 shadow-sm hover-shadow-md transition-all">
-            <div class="card-body">
-                <div class="row align-items-center g-3">
-                    <!-- Product Image -->
-                    <div class="col-12 col-sm-4 col-md-3 text-center text-sm-start mt-1">
-                        <img src="{{ item.variant_size.variant.images.first.image.url }}" 
-                             class="img-fluid rounded product-img" 
-                             alt="{{ item.variant_size.variant.product.name }}"
-                             style="max-width: 120px; object-fit: cover;">
-                    </div>
-                    
-                    <!-- Product Details -->
-                    <div class="col-12 col-sm-8 col-md-5">
-                        <h5 class="card-title mb-2" style="font-size: larger;">{{ item.variant_size.variant.product.name }}</h5>
-                        <div class="text-muted">
-                            <span class="badge bg-light text-primary">
-                                Size: {{ item.variant_size.size }}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <!-- Price -->
-                    <div class="col-6 col-md-2 text-start text-md-center">
-                        <div class="fw-bold text-primary" style="font-weight: bold; font-size: larger;">
-                            <span class="fs-6">Price : ₹{{ item.variant_size.variant.product.price }}</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Action Buttons -->
-                    <div class="col-6 col-md-2">
-                        <div class="d-flex justify-content-end gap-2">
-                            <!-- Add to Cart Button -->
-                            <form method="POST" action="{% url 'add_to_cart' item.variant_size.slug %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class=" btn-outline-primary mr-2 rounded" style="width: 50px;">
-                                    <i class="fas fa-shopping-cart"></i>
-                                </button>
-                            </form>
-                            
-                            <!-- Remove Button -->
-                            <form method="POST" action="{% url 'remove_from_wishlist' item.variant_size.slug %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class=" btn-outline-danger bg-white rounded" style="width: 50px;">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show text-center mb-3">
+                {{ message }}
+                <button type="button" class="btn" data-bs-dismiss="alert">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="container">
+
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class=" p-3 d-flex flex-row gap-2 align-items-center">
+                    <i class="bi bi-heart text-dark  fs-4"></i>
+                    <span class="fw-semibold">Wishlist Items</span>
                 </div>
             </div>
         </div>
-    {% empty %}
-        <div class="card shadow-sm">
-            <div class="card-body text-center py-5">
-                <i class="fas fa-heart-broken fs-1 text-muted mb-3"></i>
-                <h5 class="text-muted">Your wishlist is empty</h5>
-                <a href="{% url 'products' %}" class="btn btn-primary mt-3">
-                    Continue Shopping
-                </a>
+
+        {% if wishlist_items %}
+
+        {% for item in wishlist_items %}
+        <div class="card mb-3 shadow-sm border-0 rounded-3">
+            <div class="card-body">
+                <div class="row align-items-center gy-3">
+
+                    <div class="col-12 col-sm-4 col-md-3 text-center">
+                        <img src="{{ item.variant_size.variant.images.first.image.url }}"
+                             class="img-fluid rounded"
+                             style="max-width:130px; object-fit:cover;">
+                    </div>
+
+                    <div class="col-12 col-sm-8 col-md-5">
+                        <h5 class="fw-semibold mb-1">{{ item.variant_size.variant.product.name }}</h5>
+                        <span class="badge bg-light text-primary border">
+                            Size: {{ item.variant_size.size }}
+                        </span>
+                    </div>
+
+                    <div class="col-6 col-md-2 text-start text-md-center">
+                        <span class="fw-bold text-primary">
+                            ₹{{ item.variant_size.variant.product.price }}
+                        </span>
+                    </div>
+
+                    <div class="col-6 col-md-2">
+                        <div class="d-flex justify-content-end gap-2">
+
+                            <form method="POST" action="{% url 'add_to_cart' item.variant_size.slug %}">
+                                {% csrf_token %}
+                                <button class="btn btn-outline-primary rounded-pill p-2">
+                                    <i class="bi bi-cart3 fs-5"></i>
+                                </button>
+                            </form>
+
+                            <form method="POST" action="{% url 'remove_from_wishlist' item.variant_size.slug %}">
+                                {% csrf_token %}
+                                <button class="btn btn-outline-danger rounded-pill p-2 bg-white">
+                                    <i class="bi bi-trash fs-5"></i>
+                                </button>
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
-    {% endfor %}
-    </div>
-{% else %}
+        {% endfor %}
 
-<div class="row justify-content-center">
-    <div class="col-lg-6 text-center">
-        <p class="text-primary mb-4">No Wishlist Items</p>
-        <a href="{% url 'user_shop' %}" class="btn btn-outline-primary btn-block mb-3 rounded">
-            <span>CONTINUE SHOPPING</span>
-            <i class="icon-refresh"></i>
-        </a>
+        {% else %}
+
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+
+                <div class="card shadow-sm border-0 text-center p-5">
+                    <i class="bi bi-heartbreak-fill fs-1 text-muted mb-3"></i>
+                    <h5 class="text-muted mb-3">Your wishlist is empty</h5>
+
+                    <a href="{% url 'user_shop' %}" class="btn btn-dark rounded-pill px-4">
+                        Continue Shopping <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        {% endif %}
+
     </div>
-</div>
-{% endif %}
-</div>
- </main>
+</main>
+
 {% endblock %}

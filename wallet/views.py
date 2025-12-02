@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from decimal import Decimal
 
-# Create your views here.
 
 
 @login_required

@@ -32,7 +32,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False 
+DEBUG = True 
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
@@ -121,14 +121,21 @@ WSGI_APPLICATION = "prokit.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         'NAME': os.getenv("DB_NAME"),    
+#         'USER': os.getenv("DB_USER"),    
+#         'PASSWORD': os.getenv("DB_PASSWORD"), 
+#         'HOST': os.getenv("DB_HOST"),         
+#         'PORT': os.getenv("DB_PORT"), 
+#     }
+# }
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        'NAME': os.getenv("DB_NAME"),    
-        'USER': os.getenv("DB_USER"),    
-        'PASSWORD': os.getenv("DB_PASSWORD"), 
-        'HOST': os.getenv("DB_HOST"),         
-        'PORT': os.getenv("DB_PORT"), 
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -151,7 +158,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+    },
+    "root": {"handlers": ["console"], "level": "DEBUG"},
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -199,7 +213,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',  # allauth backend
 )
 
-SITE_ID = 1 
+SITE_ID = 1
 # Automatically generate a username if not provided
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USERNAME_REQUIRED = False

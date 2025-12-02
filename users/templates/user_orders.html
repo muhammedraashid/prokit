@@ -5,90 +5,188 @@
 
 {% block content %}
 
-    <nav aria-label="breadcrumb" class="breadcrumb-nav">
-        <div class="container">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'user_account' %}">Account</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Orders</li>
-            </ol>
-        </div><!-- End .container -->
-    </nav><!-- End .breadcrumb-nav -->
-    
- <main class="main" style="background-color:#dde8e9 ; height: 100%; padding-block: 20px;">
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="breadcrumb-nav pt-5">
     <div class="container">
-        <h6 class="mb-4 card col-12 py-3 pr-2"> <span><i class="fas fa-box"></i> Orders</span></h6>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'user_account' %}">Account</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Orders</li>
+        </ol>
+    </div>
+</nav>
+
+<main class="main">
+    <div class="container">
+
+        <h5 class="col-12 py-2 px-3 flex align-items-start gap-2">
+            <i class="bi bi-box-fill"></i> Orders
+        </h5>
+
+
         {% if orders %}
         <div class="row">
+
             {% for order in orders %}
-            <div class="crow col-12 mb-3">
+            <div class="col-12 mb-3">
                 <div class="card">
+
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">Order No : {{ order.order_number }}</h5>
-                        <span class="badge {% if order.order_status == 'pending' %}bg-warning
-                            {% elif order.order_status == 'delivered' %}bg-success
-                            {% elif order.order_status == 'processing' %}bg-primary
-                            {% elif order.order_status == 'shipped' %}bg-info
-                            {% else %}bg-danger{% endif %} text-white px-5 py-3"
-                            style="margin-left: 70%;">
+
+                        <span class="badge 
+                            {% if order.order_status == 'pending' %} bg-warning 
+                            {% elif order.order_status == 'delivered' %} bg-success
+                            {% elif order.order_status == 'processing' %} bg-primary
+                            {% elif order.order_status == 'shipped' %} bg-info
+                            {% else %} bg-danger {% endif %}
+                            text-white px-3 py-2">
                             {{ order.order_status }}
                         </span>
                     </div>
+
                     <div class="card-body d-flex justify-content-between">
                         <div class="d-flex flex-wrap">
+
                             {% for item in order.order_items.all %}
-                            <div class="d-flex align-items-center mb-2 mr-5" style="flex: 0 0 auto; margin-right: 20px;">
-                                <img src="{{ item.variant.variant.images.first.image.url }}" 
-                                     alt="{{ item.product.name }}" 
-                                     class="img-thumbnail" 
-                                     style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                            <div class="d-flex align-items-center mb-2 me-4">
+
+                                <img src="{{ item.variant.variant.images.first.image.url }}"
+                                     alt="{{ item.product.name }}"
+                                     class="img-thumbnail"
+                                     style="width:50px; height:50px; object-fit:cover; margin-right:10px;">
+
                                 <div>
-                                    <p class="mb-0 text-dark"><strong>{{ item.product.name }}</strong></p>
-                                    <p class="mb-0 text-dark">Qty: {{ item.quantity }}</p>
-                                    <p class="mb-0 text-dark">Price: ₹{{ item.product.price|floatformat:2 }}</p>
+                                    <p class="mb-0 fw-bold">{{ item.product.name }}</p>
+                                    <p class="mb-0">Qty: {{ item.quantity }}</p>
+                                    <p class="mb-0">₹{{ item.product.price|floatformat:2 }}</p>
                                 </div>
+
                             </div>
                             {% endfor %}
+
                         </div>
+
                         <p class="card-text">
                             <strong class="text-muted">Date:</strong> {{ order.created_at|date:"F d, Y" }}<br>
                             <strong class="text-muted">Total:</strong> ₹{{ order.total_amount|floatformat:2 }}<br>
                             <strong class="text-muted">Items:</strong> {{ order.order_items.all.count }}
                         </p>
+
                         <div class="d-flex">
-                            <button class="btn btn-sm btn-outline-primary mr-3 rounded mt-3"   
-                                    onclick="window.location.href='{% url 'user_order_view' order.id %}'" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#orderDetailsModal{{ order.id }}"
-                                    style="height: fit-content;">
+
+                            <!-- MODAL BUTTON -->
+                            <button 
+                                class="btn btn-sm btn-outline-primary rounded mt-3 me-3"
+                                data-bs-toggle="modal"
+                                data-bs-target="#orderDetailsModal{{ order.id }}">
                                 View Details
                             </button>
+
                             {% if order.order_status == 'pending' %}
                             <form action="{% url 'cancel_order' order.id %}" method="POST">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-danger rounded mt-3" 
-                                        onclick="return confirm('Are you sure you want to cancel this order?')">
+                                <button type="submit"
+                                    class="btn btn-sm btn-outline-danger rounded mt-3"
+                                    onclick="return confirm('Are you sure you want to cancel this order?')">
                                     Cancel Order
                                 </button>
                             </form>
                             {% endif %}
+
                             {% if order.order_status == 'delivered' %}
-                            <a href="{% url 'return_order' order.id %}" class="btn btn-info float-right rounded mt-3" style="height: 40px;">
-                                <i class="fas fa-undo"></i>Return
+                            <a href="{% url 'return_order' order.id %}"
+                               class="btn btn-info rounded mt-3"
+                               style="height:40px;">
+                                <i class="bi bi-arrow-counterclockwise"></i> Return
                             </a>
                             {% endif %}
+
                         </div>
                     </div>
                 </div>
             </div>
+
+           
+
+            <div class="modal fade" id="orderDetailsModal{{ order.id }}" tabindex="-1"
+                 aria-labelledby="orderDetailsLabel{{ order.id }}" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+
+                  <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="orderDetailsLabel{{ order.id }}">
+                      <i class="bi bi-receipt"></i> Order #{{ order.order_number }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                  </div>
+
+                  <div class="modal-body">
+
+                    <!-- Order Summary -->
+                    <div class="mb-3">
+                      <h6 class="fw-bold mb-2">Order Summary</h6>
+                      <p class="mb-1"><strong>Date:</strong> {{ order.created_at|date:"F d, Y" }}</p>
+                      <p class="mb-1"><strong>Status:</strong> {{ order.order_status }}</p>
+                      <p class="mb-1"><strong>Total Amount:</strong> ₹{{ order.total_amount|floatformat:2 }}</p>
+                    </div>
+
+                    <hr>
+
+                    <!-- Items -->
+                    <h6 class="fw-bold mb-3">Items</h6>
+
+                    {% for item in order.order_items.all %}
+                    <div class="d-flex align-items-center mb-3 border rounded p-2">
+                      
+                      <img src="{{ item.variant.variant.images.first.image.url }}"
+                           class="rounded me-3"
+                           style="width:60px; height:60px; object-fit:cover;">
+
+                      <div class="flex-grow-1">
+                        <p class="mb-0 fw-bold">{{ item.product.name }}</p>
+                        <p class="mb-0">Qty: {{ item.quantity }}</p>
+                        <p class="mb-0">₹{{ item.product.price }}</p>
+                      </div>
+
+                    </div>
+                    {% endfor %}
+
+                  </div>
+
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="{% url 'user_order_view' order.id %}" class="btn btn-primary">
+                        Full Details
+                    </a>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
             {% endfor %}
         </div>
-    {% else %}
-        <p class="text-warning card col-12 text-center py-4 mb-0">No orders made yet!</p>   
-    {% endif %} 
-    </div>    
 
+        {% else %}
+            <div class="card col-12 py-5 text-center border-0 bg-light">
+                <div class="card-body">
+                    <i class="bi bi-bag-x fs-1 text-secondary  mb-3"></i>
 
- </main>  
+                    <h5 class="text-dark mb-2 fw-bold">No Orders Yet</h5>
 
- {% endblock %}
+                    <p class="text-muted mb-4">
+                        You have not placed any orders. Start shopping now!
+                    </p>
+
+                    <a href="{% url 'user_shop' %}" class="btn btn-dark rounded px-4">
+                        <i class="bi bi-shop me-2"></i> Browse Products
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+    </div>
+</main>
+
+{% endblock %}

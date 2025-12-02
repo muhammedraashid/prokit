@@ -5,424 +5,151 @@
 
 {% block content %}
 
-
-<main class="main">
-
-    <div class="intro-slider-container mb-5">
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
-                {{ message }}
-                <button type="button" class="btn" data-bs-dismiss="alert" aria-label="Close"><i class="fas fa-times"></i></button>
-            </div>
-        {% endfor %}
-       {% endif %}
-        <div class="intro-slider owl-carousel owl-theme owl-nav-inside owl-light" data-toggle="owl" data-owl-options='{
-                "dots": true,
-                "nav": false, 
-                "responsive": {
-                    "1200": {
-                        "nav": false,
-                        "dots": false
-                    }
-                }
-            }'>
-            <div class="intro-slide" style="background-image: url('{% static 'assets/images/main-banner.jpg' %}'); margin: 10px; border-radius:5px; box-shadow: 3px 4px 6px rgba(0, 0, 0, 0.5);">
-               
-                <div class="container intro-content">
-                    <div class="row">
-                        <div class="intro">
-                            <div class="title">
-                                <h3 style="color:orange">Men's</h3>
-                            </div>
-                            <div class="content">
-                                <h3>BOOTS&</h3>
-                                <h3>TRAINING JERSEY'S</h3>
-                            </div>
-                            <div class="price">
-                                <h3 style="color:rgba(255, 166, 0, 0.838)">SAVE UP TO 30%</h3>
-                            </div>
-                            <div class="action">
-                                <a href="{% url 'user_shop' %}" class="btn btn-primary">
-                                    <span>DISCOVER NOW</span>
-                                </a>
-                            </div>
-
-                        </div>
-                    </div><!-- End .row -->
-                </div><!-- End .intro-content -->
-            </div><!-- End .intro-slide -->
-
-            <div class="intro-slide" style="background-image: url('{% static 'assets/images/banner3.jpg' %}'); margin: 10px; border-radius:5px; box-shadow: 3px 4px 6px rgba(0, 0, 0, 0.5);">
-                <div class="container intro-content">
-                    <div class="row">
-                        <div class="intro">
-                            <div class="title">
-                                <h3 class="darkWhite" style="color: goldenrod ;">DEAL OF THE DAY</h3>
-                            </div>
-                            <div class="content">
-                                <h3>IT'S TIME TO UPGRADE<br>YOUR HIKING KIT</h3>
-                            </div>
-                            <div class="price">
-                                <h3 class="darkWhite" style="color: goldenrod ;">SAVE UP TO 15%</h3>
-                            </div>
-                            <div class="action">
-                                <a href="{% url 'user_shop' %}" class="btn btn-primary">
-                                    <span>DISCOVER NOW</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div><!-- End .row -->
-                </div><!-- End .intro-content -->
-            </div><!-- End .intro-slide -->
-
-
-
-        </div><!-- End .intro-slider owl-carousel owl-simple -->
-
-        <span class="slider-loader"></span><!-- End .slider-loader -->
-    </div><!-- End .intro-slider-container -->
-
-
-    <div class="container banner-container">
-        <div class="col-lg-4 col-md-8 col-sm-10 col-12 col-pd1">
-            <a href="{% url 'user_shop' %}">
-                <img src="{% static 'assets/images/banner1.png' %} "  style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;">
-            </a>
-            <div class="banner-content">
-                <div class="title">
-                    <a href="{% url 'user_shop' %}">
-                        <h3 class="darkWhite">It's a lifestyle.</h3>
-                    </a>
-                </div>
-                <div class="content">
-                    <a href="{% url 'user_shop' %}">
-                        <h3>Running Apparel</h3>
-                    </a>
-                    <a href="{% url 'user_shop' %}">
-                        <h3>END OF SEASON SALE</h3>
-                    </a>
-                </div>
-                <div class="action">
-                    <a href="{% url 'user_shop' %}" class="btn btn-demoprimary">
-                        <span>SHOP NOW</span>
-                        <i class="icon-long-arrow-right"></i>
-                    </a>
-                </div>
-            </div><!-- End .row -->
-        </div>
-        <div class="col-lg-4 col-md-8 col-sm-10 col-12 col-pd1">
-            <a href="{% url 'user_shop' %}">
-                <img src="{% static 'assets/images/banner2.jpg' %}">
-            </a>
-            <div class="banner-content">
-                <div class="title">
-                    <a href="{% url 'user_shop' %}">
-                        <h3 class="darkWhite">Hike Your Next Trail </h3>
-                    </a>
-                </div>
-                <div class="content">
-                    <a href="{% url 'user_shop' %}">
-                        <h3>NEW SEASON</h3>
-                    </a>
-                    <a href="{% url 'user_shop' %}">
-                        <h3>NEW GEAR</h3>
-                    </a>
-                </div>
-                <div class="action">
-                    <a href="{% url 'user_shop' %}" class="btn btn-demoprimary">
-                        <span>DISCOVER NOW</span>
-                        <i class="icon-long-arrow-right"></i>
-                    </a>
-                </div>
-            </div><!-- End .row -->
-        </div>
-        <div class="col-lg-4 col-md-8 col-sm-10 col-12 col-pd1">
-            <a href="{% url 'user_shop' %}">
-                <img src="{% static 'assets/images/banner3.jpg' %}"  style="border-top-right-radius: 4px; border-bottom-right-radius: 4px;">
-            </a>
-            <div class="banner-content">
-                <div class="title">
-                    <a href="{% url 'user_shop' %}">
-                        <h3 class="darkWhite">Summer Sale</h3>
-                    </a>
-                </div>
-                <div class="content">
-                    <a href="{% url 'user_shop' %}">
-                        <h3>Summer sale</h3>
-                    </a>
-                    <a href="c{% url 'user_shop' %}">
-                        <h3>Save up to 30%</h3>
-                    </a>
-                </div>
-                <div class="action">
-                    <a href="{% url 'user_shop' %}" class="btn btn-demoprimary">
-                        <span>SHOP NOW</span>
-                        <i class="icon-long-arrow-right"></i>
-                    </a>
-                </div>
-            </div><!-- End .row -->
-        </div>
+<div id="heroCarousel" class="carousel slide " data-bs-ride="carousel">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="{% static 'assets/images/main-banner.jpg' %}" class="d-block w-100 h-5" alt="Hero 1">
+      <div class="carousel-caption d-none d-md-block">
+        <h1>Men's Boots & Training Jerseys</h1>
+        <p>Save Up To 30%</p>
+        <a href="{% url 'user_shop' %}" class="btn btn-primary">Discover Now</a>
+      </div>
     </div>
-
-
-
-    <div class="container category-banner">
-        <div class="row">
-            {% for category in categories %}
-            <div class="col-lg-3 col-md-6 col-sm-6 my-3">
-                <div class="category-container">
-                    <a href="{% url 'user_shop' %}?category_ids={{ category.id }}">
-                        <img src="{% static 'assets/images/boots-modal.jpg' %}" 
-                             alt="{{ category.name }}" 
-                             style="height: auto; max-height: 200px; width: 100%; object-fit: cover; border-radius: 6px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease-in-out;" 
-                             onmouseover="this.style.transform='scale(1.05)'" 
-                             onmouseout="this.style.transform='scale(1)'">
-
-                    </a>
-
-                    <div class="category-details">
-                        <a href="{% url 'user_shop' %}?category_ids={{ category.id }}">
-                            <h3 class="category" style="color: rgb(31, 36, 142); font-size: 2.5rem; font-weight: 700; border: 2px solid rgba(255, 255, 255, 0); padding: 10px; border-radius: 4px; text-align: center; background-color: rgba(0, 0, 0, 0.432); margin-bottom: 15px;">
-                                <a href="{% url 'user_shop' %}?category={{ category.id }}" style="color: rgb(255, 255, 255); text-decoration: none;">
-                                    {{ category.name|upper }}
-                                </a>
-                            </h3>
-                            <a href="{% url 'user_shop' %}?category_ids={{ category.id }}" class="action btn btn-outline-primary text-primary" style="text-decoration: none; padding: 10px 20px; font-size: 1rem; border-radius: 5px;">
-                                SHOP NOW
-                            </a>
-                            
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+    <div class="carousel-item">
+      <img src="{% static 'assets/images/banner3.jpg' %}" class="d-block w-100 h-50" alt="Hero 2">
+      <div class="carousel-caption d-none d-md-block">
+        <h1>Deal of The Day</h1>
+        <p>Upgrade Your Hiking Kit - Save Up To 15%</p>
+        <a href="{% url 'user_shop' %}" class="btn btn-primary">Shop Now</a>
+      </div>
     </div>
-    
-    
-    
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </button>
+</div>
 
+<!-- Search Bar -->
+<div class="container my-4">
+  <form action="{% url 'user_shop' %}" method="get" class="d-flex">
+    <input type="text" name="qry" value="{{ query }}" class="form-control me-2 border border-secondary" placeholder="Search products...">
+    <button type="submit" class="btn btn-dark">Search</button>
+  </form>
+</div>
 
-    <div class="container new-arrivals">
-
-        <hr class="mb-5 mt-8">
-
-        <div class="heading heading-center mb-3">
-            <h2 class="title">NEW ARRIVALS </h2><!-- End .title -->
-
-            <ul class="nav nav-pills justify-content-center" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link {% if  selected_category == None %} active {% endif %}"  href="{% url 'home' %}">All</a>
-                </li>
-                {% if categories %}
-                 {% for category in categories %}
-                 <li class="nav-item">
-                    <a class="nav-link {% if category == selected_category  %} active {% endif %}" 
-                       href="{% url 'home_with_category' category.id %} " >
-                        {{ category.name }}
-                    </a>
-                </li>
-                 {% endfor %}
-                {% endif %}
-                
-            </ul>
-        </div><!-- End .heading -->
-
-        <!-- New Arrivals -->
-        <div class="products mb-3">
-            <div class="row justify-content-center">
-              {% for product in products %}
-              
-                <div class="col-6 col-md-4 col-lg-4 col-xl-3 my-5 rounded">
-                  <div class="product product-7 text-center">
-                    <figure class="product-media rounded" style="background-color: white;" >
-    
-                        <!-- <a href="{% url 'user_product_view' product.variants.first.sizes.first.slug  %}"> -->
-                        {% with product.variants.first.images.first as main_image %}
-                          {% if main_image %}
-                            <img src="{{ main_image.image.url }}" alt="{{ product.name }}" class="product-image">
-                          {% else %}
-                            <img src="{% static 'assets/images/default_product.png' %}" alt="{{ product.name }}" class="product-image">
-                          {% endif %}
-                        {% endwith %}
-                      </a>
-        
-                      <div class="product-action-vertical">
-                        <a href="{% url 'add_to_wishlist' product.variants.first.sizes.first.slug %}" class="btn-product-icon btn-wishlist btn-expandable" style="color:#cc3333";><span style="align-content: center;">Add to Wishlist</span></a>
-                       
-                      </div>
-        
-                      <div class="product-action" style="display: flex; justify-content: center; align-items: center;">
-                        <form action="{% url 'add_to_cart' product.variants.first.sizes.first.slug %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn-product btn-cart rounded text-center" style="padding: 10px 20px; white-space: nowrap;">
-                                <span>Add to Cart</span>
-                            </button>
-                        </form>
-                    </div>
-                    </figure>
-        
-                    <div class="product-body">
-                      <div class="product-cat">
-                        <a href="#">{{ product.category.name }}</a>
-                      </div>
-                      <h3 class="product-title"><a href="#">{{ product.name |capfirst}}</a></h3>
-                      <div class="product-price">
-                        ₹{{ product.price }}
-                      </div>
-                      <div class="ratings-container">
-                        <div class="ratings">
-                          <div class="ratings-val" style="width: {{ product.total_ratings }}%;"></div> 
-                        </div>
-                        <span class="ratings-text">({{ product.total_ratings }} Reviews)</span> 
-                      </div>
-        
-                      <div class="product-nav product-nav-thumbs">
-                        {% for image in product.variant.first.images.all %}
-                          <a href="#" class="{% if forloop.first %}active{% endif %}">
-                            <img src="{{ image.image.url }}" alt="{{ product.name }}">
-                          </a>
-                        {% endfor %}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-
-        <!-- <div class="tab-content tab-content-carousel">
-            <div class="tab-pane p-0 fade show active" id="arrivals-all-tab" role="tabpanel" aria-labelledby="arrivals-all-link">
-                <div class="row">
-                    {% for product in products %}
-                    <div class="col-xl-5col col-lg-3 col-md-4 col-6">
-                        <div class="product demo21">
-                            <figure class="product-media">
-                                {% if product.is_listed %}
-                                <span class="product-label label-sale">Sale</span>
-                                {% endif %}
-                                <a href="{{ product.url }}">
-                                    <img src="{{ product.variants.images.image.url }}" alt="Product image" class="product-image">
-                                </a> -->
-        <!-- </figure>
-
-        <div class="product-body text-center">
-            <div class="product-cat">
-                <a href="#">{{ product.category }}</a>
-            </div>
-            <h3 class="product-title"><a href="{{ product.url }}">{{ product.name }}</a></h3>
-            <div class="product-price">
-                {% if product.is_on_sale %}
-                <span class="new-price">{{ product.price }}</span>
-                <span class="old-price">Was </span>
-                {% else %}
-                <span class="cur-price">{{ product.price }}</span>
-                {% endif %}
-            </div>
-            <div class="ratings-container">
-                <div class="ratings">
-                    <div class="ratings-val" style="width:10"></div>
-                </div>
-                <span class="ratings-text">( {{ product.reviews }} Reviews )</span>
-            </div>
-
-            <div class="product-action">
-                <a href="#" class="btn-product btn-cart" title="Add to cart"><span>ADD TO CART</span></a>
-            </div>
-
-            <a href="#" class="btn-addtolist"><span>&nbsp;Add to Wishlist</span></a>
+<!-- Banner Section -->
+<div class="container my-5">
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card text-center">
+        <img src="{% static 'assets/images/banner1.png' %}" class="card-img-top" alt="Banner 1">
+        <div class="card-body">
+          <h5 class="card-title">Running Apparel</h5>
+          <a href="{% url 'user_shop' %}" class="btn btn-outline-primary">Shop Now</a>
         </div>
+      </div>
     </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <img src="{% static 'assets/images/banner2.jpg' %}" class="card-img-top" alt="Banner 2">
+        <div class="card-body">
+          <h5 class="card-title">New Season Gear</h5>
+          <a href="{% url 'user_shop' %}" class="btn btn-outline-primary">Discover</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <img src="{% static 'assets/images/banner3.jpg' %}" class="card-img-top" alt="Banner 3">
+        <div class="card-body">
+          <h5 class="card-title">Summer Sale</h5>
+          <a href="{% url 'user_shop' %}" class="btn btn-outline-primary">Shop Now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Categories -->
+<div class="container my-5">
+  <h2 class="text-center mb-4">Shop By Category</h2>
+  <div class="row g-3">
+    {% for category in categories %}
+    <div class="col-6 col-md-3">
+      <div class="card category-card text-center">
+        <a href="{% url 'user_shop' %}?category_ids={{ category.id }}">
+          <img src="{% static 'assets/images/boots-modal.jpg' %}" class="card-img-top" alt="{{ category.name }}">
+        </a>
+        <div class="card-body">
+          <h5 class="card-title">{{ category.name|upper }}</h5>
+          <a href="{% url 'user_shop' %}?category_ids={{ category.id }}" class="btn btn-outline-primary btn-sm">Shop Now</a>
+        </div>
+      </div>
     </div>
     {% endfor %}
-    </div>
-    </div>
-    </div> -->
-    <div class="text-center mt-5">
-        <a href="{% url 'user_shop' %}" class="btn btn-viewMore">
-            <span>VIEW MORE PRODUCTS</span>
-            <i class="icon-long-arrow-right"></i>
-        </a>
-    </div>
-    </div><!-- End .container -->
+  </div>
+</div>
 
-    <div class="container newsletter">
-        <div class="background" style="background-image: url('{% static "assets/images/main-banner.jpg" %}');">
-
-            <div class="subscribe">
-                <div class="subscribe-title text-center">
-                    <h1 class="intro-title2nd">SUBSCRIBE FOR OUR NEWSLETTER</h1>
-                    <h1 class="intro-title1st">Learn about new offers and get more deals by joining our newsletter</h1>
-                </div>
-                <form action="#">
-                    <div class="input-group">
-                        <input type="email" placeholder="Enter your Email Address" aria-label="Email Adress"
-                            required="">
-                        <div class="input-group-append">
-                            <button class="btn btn-subscribe" type="submit"><span>Subscribe</span><i
-                                    class="icon-long-arrow-right"></i></button>
-                        </div><!-- .End .input-group-append -->
-                    </div><!-- .End .input-group -->
-                </form>
-            </div>
+<!-- New Arrivals -->
+<div class="container my-5">
+  <h2 class="text-center mb-4">New Arrivals</h2>
+  <div class="row g-3 justify-content-center">
+    {% for product in products %}
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="card text-center h-100">
+        {% with product.variants.first.images.first as main_image %}
+        <img src="{% if main_image %}{{ main_image.image.url }}{% else %}{% static 'assets/images/default_product.png' %}{% endif %}" class="card-img-top" alt="{{ product.name }}">
+        {% endwith %}
+        <div class="card-body d-flex flex-column">
+          <h6 class="card-subtitle mb-2 text-muted">{{ product.category.name }}</h6>
+          <h5 class="card-title">{{ product.name|capfirst }}</h5>
+          <p class="card-text">₹{{ product.price }}</p>
+          <a href="{% url 'add_to_cart' product.variants.first.sizes.first.slug %}" class="btn btn-primary mt-auto">Add to Cart</a>
         </div>
+      </div>
     </div>
+    {% endfor %}
+  </div>
+  <div class="text-center mt-4">
+    <a href="{% url 'user_shop' %}" class="btn btn-outline-primary">View More Products</a>
+  </div>
+</div>
 
-    <div class="container service mt-4">
-        <div class="col-sm-6 col-lg-3 col-noPadding">
-            <div class="icon-box icon-box-side">
-                <span class="icon-box-icon text-dark">
-                    <i class="icon-truck"></i>
-                </span>
+<!-- Newsletter -->
+<div class="container my-5">
+  <div class="p-5 bg-light text-center">
+    <h2>Subscribe to Our Newsletter</h2>
+    <p>Get updates on new products and exclusive deals</p>
+    <form class="d-flex justify-content-center" action="#">
+      <input type="email" class="form-control w-50 me-2" placeholder="Enter your email" required>
+      <button type="submit" class="btn btn-primary">Subscribe</button>
+    </form>
+  </div>
+</div>
 
-                <div class="icon-box-content">
-                    <h3 class="icon-box-title">Payment &amp; Delivery</h3><!-- End .icon-box-title -->
-                    <p>Free shipping for orders over $50</p>
-                </div><!-- End .icon-box-content -->
-            </div><!-- End .icon-box -->
-        </div><!-- End .col-sm-6 col-lg-4 -->
-
-        <div class="col-sm-6 col-lg-3">
-            <div class="icon-box icon-box-side">
-                <span class="icon-box-icon text-dark">
-                    <i class="icon-rotate-left"></i>
-                </span>
-
-                <div class="icon-box-content">
-                    <h3 class="icon-box-title">Return &amp; Refund</h3><!-- End .icon-box-title -->
-                    <p>Free 100% money back guarantee</p>
-                </div><!-- End .icon-box-content -->
-            </div><!-- End .icon-box -->
-        </div><!-- End .col-sm-6 col-lg-4 -->
-
-        <div class="col-sm-6 col-lg-3">
-            <div class="icon-box icon-box-side">
-                <span class="icon-box-icon text-dark">
-                    <i class="icon-life-ring"></i>
-                </span>
-
-                <div class="icon-box-content">
-                    <h3 class="icon-box-title">Quality Support</h3><!-- End .icon-box-title -->
-                    <p>Alway online feedback 24/7</p>
-                </div><!-- End .icon-box-content -->
-            </div><!-- End .icon-box -->
-        </div><!-- End .col-sm-6 col-lg-4 -->
-
-        <div class="col-sm-6 col-lg-3">
-            <div class="icon-box icon-box-side">
-                <span class="icon-box-icon text-dark">
-                    <i class="icon-envelope"></i>
-                </span>
-
-                <div class="icon-box-content">
-                    <h3 class="icon-box-title">JOIN OUR NEWSLETTER</h3><!-- End .icon-box-title -->
-                    <p>10% off by subscribing to our newsletter</p>
-                </div><!-- End .icon-box-content -->
-            </div><!-- End .icon-box -->
-        </div><!-- End .col-sm-6 col-lg-4 -->
+<!-- Services -->
+<div class="container my-5">
+  <div class="row text-center g-4">
+    <div class="col-md-3">
+      <h5>Payment & Delivery</h5>
+      <p>Free shipping for orders over $50</p>
     </div>
-
-</main>
-
+    <div class="col-md-3">
+      <h5>Return & Refund</h5>
+      <p>Free 100% money back guarantee</p>
+    </div>
+    <div class="col-md-3">
+      <h5>Quality Support</h5>
+      <p>Always online feedback 24/7</p>
+    </div>
+    <div class="col-md-3">
+      <h5>Newsletter</h5>
+      <p>10% off by subscribing</p>
+    </div>
+  </div>
+</div>
 
 {% endblock %}

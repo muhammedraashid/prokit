@@ -19,10 +19,9 @@ from django.utils.crypto import get_random_string
 import random
 import json
 
+import logging
+logger = logging.getLogger(__name__)
 
-
-
-# Create your views here.
 
 @never_cache
 def UserSignUp(request):
@@ -88,24 +87,34 @@ def verify_email(request, token):
     return redirect('user_signin')
 
 def UserSignIn(request):
+    logger.debug("🔍 UserSignIn view triggered")
+
     if request.method == 'POST':
+        logger.debug("POST data received")
         email = request.POST.get('email')
         password = request.POST.get('password')
-        
+        logger.debug(f"Email entered: {email}")
+
         try:
-            username = User.objects.get(email=email).username
+            user_obj = User.objects.get(email=email)
+            username = user_obj.username
+            logger.debug(f"Username found: {username}")
         except User.DoesNotExist:
-            username = email 
+            logger.debug("Email not found, trying as username")
+            username = email
 
         user = authenticate(request, username=username, password=password)
-        if user is not None:
+        if user:
+            logger.debug("Authentication successful")
             login(request, user)
-            return redirect('home') 
+            return redirect('home')
         else:
+            logger.error("Authentication failed")
             messages.error(request, 'Invalid email or password')
-              
 
-    return render(request, 'user_signin.html')  
+    logger.debug("Rendering user_signin.html")
+    return render(request, 'user_signin.html')
+  
          
 @login_required
 def Home(request, category_id=None):
@@ -138,8 +147,6 @@ def userLogout(request):
 
 
 
-
-# ------------------------------------------------------------------------------
 
 
 def generate_otp():
